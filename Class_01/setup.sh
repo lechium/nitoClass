@@ -8,6 +8,8 @@
 ## Class 1
 ## This script aims to analyze your system and automatically set up anything possible to make the initial process easier for you to get moving! 
 ## will make exhaustive comments as necessary in case you want to learn a little bit about shell scripting as well!
+## bash scripting isnt my speciality, i can do it, but im not an expert. forgive the mess!
+
 
 ## Essentials 
 
@@ -87,15 +89,12 @@ open_developer_account_site() {
 id_check() {
 	echo -e "${bold} Do you have a Apple developer account? (Free acounts are sufficient) [y/n]: ${normal}\n"
 	read idcheck
-	if [ $idcheck == 'y' ]; then
-		echo ""
-	elif [ $idcheck == 'Y' ] ; then
-		echo ""
-	elif [ $idcheck == 'N' ]; then
-		open_developer_account_site 
-	elif [ $idcheck == 'n' ]; then
+	if [ $idcheck == 'y' -o $idcheck == 'Y' ]; then
+		return 0
+	elif [ $idcheck == 'N' -o $idcheck == 'n' ]; then
 		open_developer_account_site 
 	fi 
+	return 1
 }
 
 install_xcode() {
