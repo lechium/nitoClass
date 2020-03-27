@@ -17,34 +17,75 @@
 ## theos
 ## apt/dpkg
 ## some download links for reference https://download.developer.apple.com/Developer_Tools/Xcode_10.1/Xcode_10.1.xip
-## https://download.developer.apple.com/Developer_Tools/Command_Line_Tools_macOS_10.13_for_Xcode_10/Command_Line_Tools_macOS_10.13_for_Xcode_10.dmg
 ## https://download.developer.apple.com/Developer_Tools/Command_Line_Tools_macOS_10.14_for_Xcode_10.2/Command_Line_Tools_macOS_10.14_for_Xcode_10.2.dmg
+## https://download.developer.apple.com/Developer_Tools/Command_Line_Tools_for_Xcode_11.3.1/Command_Line_Tools_for_Xcode_11.3.1.dmg
 ## https://download.developer.apple.com/Developer_Tools/Xcode_11.3.1/Xcode_11.3.1.xip
 ## https://download.developer.apple.com/Developer_Tools/Xcode_11.4/Xcode_11.4.xip
 ## account sign up page https://developer.apple.com/account/
 ## downloads: https://developer.apple.com/download/more/
-
+## 10.13 = HS
+## 10.14 = Mojavers
+## 10.15 = Catalina
 ## 
 
+EQUAL=0
+GT=1
+LT=2
 bold=$(tput bold)
 normal=$(tput sgr0)
 
 OS_VERS="`sw_vers -productVersion`"
+#OS_VERS="10.15.1"
 
 HAS_XCODE="`which xcode-select`"
 CLANG_PATH="`xcrun -f clang`"
 CLANGPLUS_PATH="`xcrun -f clang++`"
 
+# not sure of the licensing of this but ill figure it out later -
+# https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash 
+
+vercomp () {
+	if [[ $1 == $2 ]]
+	then
+		return 0
+	fi
+	local IFS=.
+	local i ver1=($1) ver2=($2)
+	# fill empty fields in ver1 with zeros
+	for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
+	do
+		ver1[i]=0
+	done
+	for ((i=0; i<${#ver1[@]}; i++))
+	do
+		if [[ -z ${ver2[i]} ]]
+		then
+			# fill empty fields in ver2 with zeros
+			ver2[i]=0
+		fi
+		if ((10#${ver1[i]} > 10#${ver2[i]}))
+		then
+			return 1
+
+		fi
+		if ((10#${ver1[i]} < 10#${ver2[i]}))
+		then
+			return 2
+		fi
+	done
+	return 0
+}
+
 open_developer_account_site() {
 
-		echo -e "\n\t${bold}** You need an apple developer account set up before continuing. Opening https://developer.apple.com/account in 3 seconds and then exiting.\n\tSetup an account and then rung the script again.**\n\n"
-		sleep 3
-		open "https://developer.apple.com/account"
-		exit 1
+	echo -e "\n\t${bold}** You need an apple developer account set up before continuing. Opening https://developer.apple.com/account in 3 seconds and then exiting.\n\tSetup an account and then run the script again.**\n\n"
+	sleep 3
+	open "https://developer.apple.com/account"
+	exit 1
 }
 
 id_check() {
-	echo -e "Do you have a Apple developer account? (Yes free acounts are sufficient) [y/n]: "
+	echo -e "${bold} Do you have a Apple developer account? (Free acounts are sufficient) [y/n]: ${normal}\n"
 	read idcheck
 	if [ $idcheck == 'y' ]; then
 		echo ""
@@ -59,7 +100,26 @@ id_check() {
 
 install_xcode() {
 
-	echo "OS Version detected: $OS_VERS"
+	vercomp $OS_VERS "10.15"
+	CATPLUS="$?"
+	vercomp $OS_VERS "10.14"
+	MPLUS="$?"
+	vercomp $OS_VERS "10.13"
+	HSPLUS="$?"
+	echo -e "OS Version: $OS_VERS\n"
+	if [ $CATPLUS == $GT -o $CATPLUS == $EQUAL ]; then
+		echo -e "Catalina detected\n"
+		#open "https://download.developer.apple.com/Developer_Tools/Xcode_11.4/Xcode_11.4.xip"
+		#open "https://download.developer.apple.com/Developer_Tools/Command_Line_Tools_for_Xcode_11.4/Command_Line_Tools_for_Xcode_11.4.dmg"
+	elif [ $MPLUS == $EQUAL -o $MPLUS == $GT  ]; then 
+		echo -e "Mojave detected\n"
+		#open "https://download.developer.apple.com/Developer_Tools/Xcode_11.3.1/Xcode_11.3.1.xip"
+		#open "https://download.developer.apple.com/Developer_Tools/Command_Line_Tools_for_Xcode_11.3.1/Command_Line_Tools_for_Xcode_11.3.1.dmg"
+	elif [ $HSPLUS == $EQUAL -o $HSPLUS == $GT ]; then
+		echo -e "High Sierra detected\n"
+		#open "https://download.developer.apple.com/Developer_Tools/Xcode_10.1/Xcode_10.1.xip"
+		#open "https://download.developer.apple.com/Developer_Tools/Command_Line_Tools_macOS_10.13_for_Xcode_10/Command_Line_Tools_macOS_10.13_for_Xcode_10.dmg"
+	fi
 
 	id_check
 
@@ -73,7 +133,7 @@ if [ -z $HAS_XCODE ]; then
 	exit 1
 else
 	echo -e "Xcode exists, continue!\n"
-## if you are wondering why this is here, since i have xcode installed im lazily testing the negative path here instead to make sure it works for you.
+	## if you are wondering why this is here, since i have xcode installed im lazily testing the negative path here instead to make sure it works for you.
 	install_xcode
 
 fi
