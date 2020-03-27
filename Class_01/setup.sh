@@ -29,6 +29,8 @@
 bold=$(tput bold)
 normal=$(tput sgr0)
 
+OS_VERS="`sw_vers -productVersion`"
+
 HAS_XCODE="`which xcode-select`"
 CLANG_PATH="`xcrun -f clang`"
 CLANGPLUS_PATH="`xcrun -f clang++`"
@@ -57,6 +59,8 @@ id_check() {
 
 install_xcode() {
 
+	echo "OS Version detected: $OS_VERS"
+
 	id_check
 
 	## make sure they have an apple id
@@ -69,6 +73,7 @@ if [ -z $HAS_XCODE ]; then
 	exit 1
 else
 	echo -e "Xcode exists, continue!\n"
+## if you are wondering why this is here, since i have xcode installed im lazily testing the negative path here instead to make sure it works for you.
 	install_xcode
 
 fi
