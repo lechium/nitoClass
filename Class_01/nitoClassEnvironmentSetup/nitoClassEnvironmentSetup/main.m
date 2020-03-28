@@ -16,12 +16,17 @@ int main(int argc, const char * argv[]) {
         // insert code here...
         HelperClass *hc = [HelperClass new];
 
-        NSLog(@"Version: %@", hc.downloads.systemVersionCodename);
-        NSLog(@"dl link: %@", hc.downloads.xcodeDownloadURL);
-        NSLog(@"cli link: %@", hc.downloads.commandLineURL);
-        NSLog(@"xcode installed: %d", hc.downloads.xcodeInstalled);
-        NSLog(@"cli installed: %d", hc.downloads.cliInstalled);
-        
+        DLog(@"\n\nWelcome to the nitoClass environment setup tool!\n\n");
+        DLog(@"System Info\n-----------\n\n")
+        DLog(@"Version: %@\n", hc.downloads.systemVersionCodename);
+        DLog(@"Checking system environment...\n\n");
+        if (hc.downloads.xcodeInstalled){
+            DLog(@"Xcode missing, download link: %@\n", hc.downloads.xcodeDownloadURL);
+        }
+        if (hc.downloads.cliInstalled){
+            DLog(@"cli tools missing, download link: %@\n", hc.downloads.commandLineURL);
+        }
+
         hc.hasAppleId = [HelperClass queryUserWithString:@"Do you have a Apple ID set up?"];
         if (!hc.hasAppleId){
             [hc openIDSignupPage];

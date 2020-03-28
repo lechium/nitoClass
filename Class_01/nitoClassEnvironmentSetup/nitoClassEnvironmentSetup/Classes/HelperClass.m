@@ -148,7 +148,7 @@
     if (call==nil)
     return 0;
     char line[200];
-    DLog(@"\nRunning process: %@\n", call);
+    //DLog(@"\nRunning process: %@\n", call);
     FILE* fp = popen([call UTF8String], "r");
     NSMutableArray *lines = [[NSMutableArray alloc]init];
     if (fp)
