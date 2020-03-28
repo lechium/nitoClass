@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL xcodeInstalled;
 @property BOOL cliInstalled;
 @property NCSystemVersionType sytemVersion;
+@property NSString *systemVersionCodename;
 @property NSString *xcodeDownloadURL;
 @property NSString *commandLineURL;
 

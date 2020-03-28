@@ -34,7 +34,6 @@
 }
 + (BOOL)xcodeInstall {
     NSString *returnVals = [self singleLineReturnForProcess:@"/usr/bin/which xcode-select"];
-    NSLog(@"returnVals: %@", returnVals);
     if (returnVals.length > 0){
         return true;
     }

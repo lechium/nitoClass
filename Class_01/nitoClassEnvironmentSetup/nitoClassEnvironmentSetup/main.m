@@ -16,7 +16,7 @@ int main(int argc, const char * argv[]) {
         // insert code here...
         HelperClass *hc = [HelperClass new];
 
-        NSLog(@"Version: %lu", hc.downloads.sytemVersion);
+        NSLog(@"Version: %@", hc.downloads.systemVersionCodename);
         NSLog(@"dl link: %@", hc.downloads.xcodeDownloadURL);
         NSLog(@"cli link: %@", hc.downloads.commandLineURL);
         NSLog(@"xcode installed: %d", hc.downloads.xcodeInstalled);
