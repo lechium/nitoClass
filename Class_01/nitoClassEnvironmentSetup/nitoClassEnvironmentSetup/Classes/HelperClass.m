@@ -32,6 +32,15 @@
 + (BOOL)commandLineToolsInstalled {
     return ([[NSFileManager defaultManager] fileExistsAtPath:@"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/SDKSettings.plist"]);
 }
+
+- (void)openIDSignupPage {
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://appleid.apple.com/account#!&page=create"]];
+}
+
+- (void)openDeveloperAccountSite {
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://developer.apple.com/download/more/"]];
+}
+
 + (BOOL)xcodeInstall {
     NSString *returnVals = [self singleLineReturnForProcess:@"/usr/bin/which xcode-select"];
     if (returnVals.length > 0){
@@ -40,10 +49,20 @@
     return false;
 }
 
+- (void)waitForReturnWithMessage:(NSString *)message {
+
+    char c;
+    printf("%s", [message UTF8String]);
+    c=getchar();
+    while(c!='\n'){
+        c=getchar();
+    }
+    NSLog(@"return presssed, continuing...");
+}
+
 + (BOOL)queryUserWithString:(NSString *)query {
     
-    NSString *errorString = [NSString stringWithFormat:@"\n%@ [y/n]?", query];
-    
+    NSString *errorString = [NSString stringWithFormat:@"\n%@ [y/n]? ", query];
     char c;
     printf("%s", [errorString UTF8String] );
     c=getchar();
