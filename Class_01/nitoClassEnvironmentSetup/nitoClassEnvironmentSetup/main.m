@@ -10,16 +10,23 @@
 #import "Defines.h"
 #import "HelperClass.h"
 #import "XcodeDownloads.h"
+#include <unistd.h>
 
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
         // insert code here...
         HelperClass *hc = [HelperClass new];
-
+        NSString *shell = [HelperClass singleLineReturnForProcess:@"printenv SHELL"];
         DLog(@"\n\nWelcome to the nitoClass environment setup tool!\n\n");
         DLog(@"System Info\n-----------\n\n")
-        DLog(@"Version: %@\n", hc.downloads.systemVersionCodename);
+        DLog(@"Version: %@", hc.downloads.systemVersionCodename);
+        DLog(@"Default Shell: %@\n\n", shell);
         DLog(@"Checking system environment...\n\n");
+        if (hc.theosPath.length > 0){
+            DLog(@"THEOS path found: %@\n", hc.theosPath);
+        } else {
+            DLog(@"THEOS is not installed!\n");
+        }
         if (!hc.downloads.xcodeInstalled){
             DLog(@"Xcode missing, download link: %@\n", hc.downloads.xcodeDownloadURL);
         }

@@ -11,6 +11,7 @@
     self = [super init];
     if (self){
         _downloads = [XcodeDownloads new];
+        _theosPath = [HelperClass singleLineReturnForProcess:@"printenv THEOS"];
     }
     return self;
 }
@@ -330,9 +331,6 @@
     return [NSString stringWithFormat:@"%@:%@", octalUser, octalGroup];
     
 }
-
-
-
 
 
 + (InputPackage *)packageForDeb:(NSString *)debFile {

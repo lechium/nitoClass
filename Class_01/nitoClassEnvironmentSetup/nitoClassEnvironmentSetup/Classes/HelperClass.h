@@ -6,6 +6,7 @@
 @property XcodeDownloads *downloads;
 @property BOOL hasAppleId;
 @property BOOL hasDeveloperAccount;
+@property NSString *theosPath;
 
 - (void)waitForReturnWithMessage:(NSString *)message;
 + (BOOL)xcodeInstall;
