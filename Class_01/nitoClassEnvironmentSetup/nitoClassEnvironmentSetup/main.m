@@ -20,10 +20,10 @@ int main(int argc, const char * argv[]) {
         DLog(@"System Info\n-----------\n\n")
         DLog(@"Version: %@\n", hc.downloads.systemVersionCodename);
         DLog(@"Checking system environment...\n\n");
-        if (hc.downloads.xcodeInstalled){
+        if (!hc.downloads.xcodeInstalled){
             DLog(@"Xcode missing, download link: %@\n", hc.downloads.xcodeDownloadURL);
         }
-        if (hc.downloads.cliInstalled){
+        if (!hc.downloads.cliInstalled){
             DLog(@"cli tools missing, download link: %@\n", hc.downloads.commandLineURL);
         }
 
