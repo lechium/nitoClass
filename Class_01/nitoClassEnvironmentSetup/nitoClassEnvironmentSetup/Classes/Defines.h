@@ -24,6 +24,8 @@ typedef NS_ENUM(NSInteger, NCSystemVersionType) {
     NCSystemVersionTypeMojave,
     NCSystemVersionTypeCatalina
 };
-
+#import "HelperClass.h"
+#define LOG_SELF        NSLog(@"%@ %@", self, NSStringFromSelector(_cmd))
+#define DLOG_SELF DLog(@"%@ %@", self, NSStringFromSelector(_cmd))
 #define DLog(format, ...) CFShow((__bridge CFStringRef)[NSString stringWithFormat:format, ## __VA_ARGS__]);
 #define FM [NSFileManager defaultManager]

@@ -67,10 +67,8 @@
     DLog(@"\nchecking out tvOS theos sdks...\n");
     fullCmd = [NSString stringWithFormat:@"/usr/bin/git clone %@", sdks];
     [HelperClass runTask:fullCmd inFolder:[path stringByAppendingPathComponent:@"theos/sdks"]];
-    
-    //checkout SDKs as well
-    
-    //TODO: need to check out SDKs from our branch and maybe some custom nic files
+
+    //TODO: need to check out custom nic files
 }
 
 + (BOOL)brewInstalled {
@@ -95,18 +93,30 @@
     return ([[NSFileManager defaultManager] fileExistsAtPath:@"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/SDKSettings.plist"]);
 }
 
-- (void)openIDSignupPage {
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://appleid.apple.com/account#!&page=create"]];
++ (void)openIDSignupPage {
+    [[NSWorkspace sharedWorkspace] openURL:self.appleIDPage];
 }
 
-- (void)openDeveloperAccountSite {
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://developer.apple.com/download/more/"]];
++ (NSURL *)appleIDPage {
+    return [NSURL URLWithString:@"https://appleid.apple.com/account#!&page=create"];
+}
++ (NSURL*)developerAccountSite {
+    return [NSURL URLWithString:@"https://developer.apple.com/account"];
+        //https://developer.apple.com/account
+}
+
++ (NSURL *)moreDownloadsURL {
+    return [NSURL URLWithString:@"https://developer.apple.com/download/more/"];
+}
+
++ (void)openDeveloperAccountSite {
+    [[NSWorkspace sharedWorkspace] openURL:self.developerAccountSite];
 }
 /*
  -f = fail silently
  -s = silent / quiet mode
  -S = error when failing
- -L = location, handles redirects?
+ -L = location, handles redirects
  
  curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh
  
@@ -145,7 +155,7 @@
     return false;
 }
 
-- (void)waitForReturnWithMessage:(NSString *)message {
+- (void)waitForReturnWithMessage:(NSString *)message { //doesnt work properly... might prune.
     
     char c;
     printf("%s", [message UTF8String]);
@@ -176,32 +186,7 @@
     return FALSE;
 }
 
-+ (BOOL)shouldContinueWithError:(NSString *)errorMessage {
-    
-    NSString *errorString = [NSString stringWithFormat:@"\n%@ Are you sure you want to continue? [y/n]?", errorMessage];
-    
-    char c;
-    printf("%s", [errorString UTF8String] );
-    c=getchar();
-    while(c!='y' && c!='n')
-    {
-        if (c!='\n'){
-            printf("[y/n]");
-        }
-        c=getchar();
-    }
-    
-    if (c == 'n')
-    {
-        DLog(@"\nSmart move... exiting\n\n");
-        return FALSE;
-    } else if (c == 'y') {
-        DLog(@"\nDon't say we didn't warn ya!....\n");
-    }
-    
-    return TRUE;
-    
-}
+
 + (NSInteger)runTask:(NSString *)fullCommand inFolder:(NSString *)targetFolder {
     
     if (![FM fileExistsAtPath:targetFolder]){

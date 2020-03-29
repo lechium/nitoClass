@@ -27,7 +27,7 @@
     switch (_sytemVersion) {
         case NCSystemVersionTypeCatalina:
             _systemVersionCodename = @"Catalina or Later";
-            _xcodeDownloadURL = @"https://download.developer.apple.com/Developer_Tools/Xcode_11.4/Xcode_11.4.xip"; //8.11 GB compressed
+            _xcodeDownloadURL = @"https://download.developer.apple.com/Developer_Tools/Xcode_11.4/Xcode_11.4.xip"; //8.11 GB compressed + 9.43 extracted
             _commandLineURL = @"https://download.developer.apple.com/Developer_Tools/Command_Line_Tools_for_Xcode_11.4/Command_Line_Tools_for_Xcode_11.4.dmg"; //248 MB
             break;
             
@@ -47,5 +47,26 @@
     
 }
 
+- (void)downloadFileType:(FileDownloadType)type {
+    self.downloader = [URLDownloader new];
+    NSString *file = nil;
+    switch (type){
+        case FileDownloadTypeCLI:
+            file = _commandLineURL;
+            break;
+    
+        case FileDownloadTypeXcode:
+            file = _xcodeDownloadURL;
+            break;
+    }
+    NSString *dlLocation = [[HelperClass tempFolder] stringByAppendingPathComponent:[file lastPathComponent]];
+
+    [self.downloader downloadFileWithURL:[NSURL URLWithString:file] toLocation:dlLocation withCredential:nil completed:^(NSString *downloadedFile) {
+       
+        DLog(@"downloaded file: %@", dlLocation);
+        
+        
+    }];
+}
 
 @end

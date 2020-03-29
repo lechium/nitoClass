@@ -7,17 +7,21 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "URLDownloader.h"
 
-NS_ASSUME_NONNULL_BEGIN
+typedef enum {
+    FileDownloadTypeXcode,
+    FileDownloadTypeCLI,
+}
+FileDownloadType;
 
 @interface XcodeDownloads : NSObject
+@property (nonatomic, strong) URLDownloader *downloader;
 @property BOOL xcodeInstalled;
 @property BOOL cliInstalled;
 @property NCSystemVersionType sytemVersion;
 @property NSString *systemVersionCodename;
 @property NSString *xcodeDownloadURL;
 @property NSString *commandLineURL;
-
+- (void)downloadFileType:(FileDownloadType)type;
 @end
-
-NS_ASSUME_NONNULL_END

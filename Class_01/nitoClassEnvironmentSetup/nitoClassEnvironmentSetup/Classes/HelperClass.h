@@ -10,6 +10,7 @@
 @property NSString *dpkgPath;
 @property NSString *username;
 + (BOOL)belowFreeSpaceThreshold;
++ (NSURL *)moreDownloadsURL;
 + (NSString *)tempFolder;
 - (void)installHomebrewIfNecessary;
 - (void)checkoutTheosIfNecessary;
@@ -20,12 +21,13 @@
 + (BOOL)brewInstalled;
 + (BOOL)commandLineToolsInstalled;
 + (BOOL)queryUserWithString:(NSString *)query;
-+ (BOOL)shouldContinueWithError:(NSString *)errorMessage;
 + (NSArray *)returnForProcess:(NSString *)call;
 + (NSString *)octalFromSymbols:(NSString *)theSymbols;
 + (NSString *)singleLineReturnForProcess:(NSString *)call;
 + (NSArray *)arrayReturnForTask:(NSString *)taskBinary withArguments:(NSArray *)taskArguments;
 + (NCSystemVersionType)currentVersion;
-- (void)openIDSignupPage;
-- (void)openDeveloperAccountSite;
++ (void)openIDSignupPage;
++ (NSURL *)appleIDPage;
++ (NSURL*)developerAccountSite;
++ (void)openDeveloperAccountSite;
 @end

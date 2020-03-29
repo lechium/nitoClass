@@ -7,6 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3211F26E243072F900B54920 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3211F26D243072F900B54920 /* AppDelegate.m */; };
+		3211F2702430730000B54920 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3211F26F2430730000B54920 /* Assets.xcassets */; };
+		3211F2732430730000B54920 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3211F2712430730000B54920 /* MainMenu.xib */; };
+		3211F2762430730000B54920 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3211F2752430730000B54920 /* main.m */; };
+		3211F27B2430730A00B54920 /* NSObject+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFEB242F4C9D005508BA /* NSObject+Additions.m */; };
+		3211F27C2430730D00B54920 /* NSString+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFED242F4C9D005508BA /* NSString+Additions.m */; };
+		3211F27D2430731200B54920 /* XcodeDownloads.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFFC242F554D005508BA /* XcodeDownloads.m */; };
+		3211F27E2430731500B54920 /* HelperClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFE5242F4C9D005508BA /* HelperClass.m */; };
+		3211F2812430735F00B54920 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3211F2802430735F00B54920 /* Foundation.framework */; };
+		3211F2832430736500B54920 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3211F2822430736500B54920 /* Cocoa.framework */; };
+		3211F2852430736F00B54920 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3211F2842430736F00B54920 /* WebKit.framework */; };
+		3211F29824312FE000B54920 /* URLCredential.m in Sources */ = {isa = PBXBuildFile; fileRef = 3211F29524312FE000B54920 /* URLCredential.m */; };
+		3211F29924312FE000B54920 /* URLCredential.m in Sources */ = {isa = PBXBuildFile; fileRef = 3211F29524312FE000B54920 /* URLCredential.m */; };
+		3211F29A24312FE000B54920 /* URLDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 3211F29724312FE000B54920 /* URLDownloader.m */; };
+		3211F29B24312FE000B54920 /* URLDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 3211F29724312FE000B54920 /* URLDownloader.m */; };
 		32DEAFC7242F4881005508BA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFC6242F4881005508BA /* main.m */; };
 		32DEAFF1242F4C9D005508BA /* HelperClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFE5242F4C9D005508BA /* HelperClass.m */; };
 		32DEAFF4242F4C9D005508BA /* NSObject+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFEB242F4C9D005508BA /* NSObject+Additions.m */; };
@@ -27,6 +42,21 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3211F26A243072F900B54920 /* nitoClassSetup.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nitoClassSetup.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3211F26C243072F900B54920 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		3211F26D243072F900B54920 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		3211F26F2430730000B54920 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3211F2722430730000B54920 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		3211F2742430730000B54920 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3211F2752430730000B54920 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		3211F2772430730000B54920 /* nitoClassSetup.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = nitoClassSetup.entitlements; sourceTree = "<group>"; };
+		3211F2802430735F00B54920 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		3211F2822430736500B54920 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		3211F2842430736F00B54920 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		3211F29424312FE000B54920 /* URLCredential.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLCredential.h; sourceTree = "<group>"; };
+		3211F29524312FE000B54920 /* URLCredential.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLCredential.m; sourceTree = "<group>"; };
+		3211F29624312FE000B54920 /* URLDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLDownloader.h; sourceTree = "<group>"; };
+		3211F29724312FE000B54920 /* URLDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLDownloader.m; sourceTree = "<group>"; };
 		32DEAFC3242F4881005508BA /* nitoClassEnvironmentSetup */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = nitoClassEnvironmentSetup; sourceTree = BUILT_PRODUCTS_DIR; };
 		32DEAFC6242F4881005508BA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32DEAFE1242F4C9D005508BA /* Defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Defines.h; sourceTree = "<group>"; };
@@ -41,6 +71,16 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		3211F267243072F900B54920 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3211F2852430736F00B54920 /* WebKit.framework in Frameworks */,
+				3211F2832430736500B54920 /* Cocoa.framework in Frameworks */,
+				3211F2812430735F00B54920 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		32DEAFC0242F4880005508BA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -51,11 +91,48 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3211F26B243072F900B54920 /* nitoClassSetup */ = {
+			isa = PBXGroup;
+			children = (
+				3211F26C243072F900B54920 /* AppDelegate.h */,
+				3211F26D243072F900B54920 /* AppDelegate.m */,
+				3211F26F2430730000B54920 /* Assets.xcassets */,
+				3211F2712430730000B54920 /* MainMenu.xib */,
+				3211F2742430730000B54920 /* Info.plist */,
+				3211F2752430730000B54920 /* main.m */,
+				3211F2772430730000B54920 /* nitoClassSetup.entitlements */,
+			);
+			path = nitoClassSetup;
+			sourceTree = "<group>";
+		};
+		3211F27F2430735E00B54920 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3211F2842430736F00B54920 /* WebKit.framework */,
+				3211F2822430736500B54920 /* Cocoa.framework */,
+				3211F2802430735F00B54920 /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3211F29324312FE000B54920 /* Download */ = {
+			isa = PBXGroup;
+			children = (
+				3211F29424312FE000B54920 /* URLCredential.h */,
+				3211F29524312FE000B54920 /* URLCredential.m */,
+				3211F29624312FE000B54920 /* URLDownloader.h */,
+				3211F29724312FE000B54920 /* URLDownloader.m */,
+			);
+			path = Download;
+			sourceTree = "<group>";
+		};
 		32DEAFBA242F4880005508BA = {
 			isa = PBXGroup;
 			children = (
 				32DEAFC5242F4881005508BA /* nitoClassEnvironmentSetup */,
+				3211F26B243072F900B54920 /* nitoClassSetup */,
 				32DEAFC4242F4881005508BA /* Products */,
+				3211F27F2430735E00B54920 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -63,6 +140,7 @@
 			isa = PBXGroup;
 			children = (
 				32DEAFC3242F4881005508BA /* nitoClassEnvironmentSetup */,
+				3211F26A243072F900B54920 /* nitoClassSetup.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -79,6 +157,7 @@
 		32DEAFE0242F4C9D005508BA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				3211F29324312FE000B54920 /* Download */,
 				32DEAFF7242F5498005508BA /* Categories */,
 				32DEAFE1242F4C9D005508BA /* Defines.h */,
 				32DEAFFB242F554D005508BA /* XcodeDownloads.h */,
@@ -103,6 +182,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		3211F269243072F900B54920 /* nitoClassSetup */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3211F2782430730000B54920 /* Build configuration list for PBXNativeTarget "nitoClassSetup" */;
+			buildPhases = (
+				3211F266243072F900B54920 /* Sources */,
+				3211F267243072F900B54920 /* Frameworks */,
+				3211F268243072F900B54920 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = nitoClassSetup;
+			productName = nitoClassSetup;
+			productReference = 3211F26A243072F900B54920 /* nitoClassSetup.app */;
+			productType = "com.apple.product-type.application";
+		};
 		32DEAFC2242F4880005508BA /* nitoClassEnvironmentSetup */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 32DEAFCA242F4881005508BA /* Build configuration list for PBXNativeTarget "nitoClassEnvironmentSetup" */;
@@ -129,6 +225,9 @@
 				LastUpgradeCheck = 1010;
 				ORGANIZATIONNAME = nito;
 				TargetAttributes = {
+					3211F269243072F900B54920 = {
+						CreatedOnToolsVersion = 10.1;
+					};
 					32DEAFC2242F4880005508BA = {
 						CreatedOnToolsVersion = 10.1;
 					};
@@ -140,6 +239,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 32DEAFBA242F4880005508BA;
 			productRefGroup = 32DEAFC4242F4881005508BA /* Products */;
@@ -147,26 +247,103 @@
 			projectRoot = "";
 			targets = (
 				32DEAFC2242F4880005508BA /* nitoClassEnvironmentSetup */,
+				3211F269243072F900B54920 /* nitoClassSetup */,
 			);
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		3211F268243072F900B54920 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3211F2702430730000B54920 /* Assets.xcassets in Resources */,
+				3211F2732430730000B54920 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
+		3211F266243072F900B54920 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3211F27B2430730A00B54920 /* NSObject+Additions.m in Sources */,
+				3211F27C2430730D00B54920 /* NSString+Additions.m in Sources */,
+				3211F29924312FE000B54920 /* URLCredential.m in Sources */,
+				3211F27D2430731200B54920 /* XcodeDownloads.m in Sources */,
+				3211F29B24312FE000B54920 /* URLDownloader.m in Sources */,
+				3211F2762430730000B54920 /* main.m in Sources */,
+				3211F27E2430731500B54920 /* HelperClass.m in Sources */,
+				3211F26E243072F900B54920 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		32DEAFBF242F4880005508BA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3211F29A24312FE000B54920 /* URLDownloader.m in Sources */,
 				32DEAFF5242F4C9D005508BA /* NSString+Additions.m in Sources */,
 				32DEAFFD242F554D005508BA /* XcodeDownloads.m in Sources */,
 				32DEAFF4242F4C9D005508BA /* NSObject+Additions.m in Sources */,
 				32DEAFF1242F4C9D005508BA /* HelperClass.m in Sources */,
+				3211F29824312FE000B54920 /* URLCredential.m in Sources */,
 				32DEAFC7242F4881005508BA /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXVariantGroup section */
+		3211F2712430730000B54920 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3211F2722430730000B54920 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
+		3211F2792430730000B54920 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 9EUFEA5U7G;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/nitoClassEnvironmentSetup/Classes/Defines.h";
+				INFOPLIST_FILE = nitoClassSetup/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nito.nitoClassSetup;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		3211F27A2430730000B54920 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 9EUFEA5U7G;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/nitoClassEnvironmentSetup/Classes/Defines.h";
+				INFOPLIST_FILE = nitoClassSetup/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nito.nitoClassSetup;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		32DEAFC8242F4881005508BA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -303,6 +480,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		3211F2782430730000B54920 /* Build configuration list for PBXNativeTarget "nitoClassSetup" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3211F2792430730000B54920 /* Debug */,
+				3211F27A2430730000B54920 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		32DEAFBE242F4880005508BA /* Build configuration list for PBXProject "nitoClassEnvironmentSetup" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

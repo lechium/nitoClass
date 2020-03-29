@@ -96,7 +96,7 @@ int main(int argc, const char * argv[]) {
             if (shouldContinue) {
                 hc.hasDeveloperAccount = [HelperClass queryUserWithString:@"Do you have a Apple developer account? (Free acounts are sufficient)"];
                 if (!hc.hasDeveloperAccount){
-                    [hc openDeveloperAccountSite];
+                    [HelperClass openDeveloperAccountSite];
                     BOOL shouldContinue = [HelperClass queryUserWithString:@"You need a developer account to continue, opening the page in your default browser, press 'y when complete or n to cancel"];
                     if (shouldContinue){
                         NSLog(@"passed developer account signup");
@@ -107,7 +107,7 @@ int main(int argc, const char * argv[]) {
         } else { //we have an apple id
             hc.hasDeveloperAccount = [HelperClass queryUserWithString:@"Do you have a Apple developer account? (Free acounts are sufficient)"];
             if (!hc.hasDeveloperAccount){
-                [hc openDeveloperAccountSite];
+                [HelperClass openDeveloperAccountSite];
                 BOOL shouldContinue = [HelperClass queryUserWithString:@"You need a developer account to continue, opening the page in your default browser, press 'y when complete or n to cancel"];
                 if (shouldContinue){
                     NSLog(@"passed developer account signup");
