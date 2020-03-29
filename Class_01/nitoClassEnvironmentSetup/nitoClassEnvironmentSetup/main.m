@@ -61,19 +61,23 @@ int main(int argc, const char * argv[]) {
         DLog(@"Username: %@", hc.username);
         DLog(@"Default Shell: %@\n\n", shell);
         DLog(@"Checking system environment...\n\n");
-        [hc installHomebrewIfNecessary];
         if ([HelperClass brewInstalled]){
             DLog(@"Homebrew is installed!\n");
         } else {
-            DLog(@"Homebrew is missing!\n");
+            DLog(@"** Homebrew is missing, this is used to install a variety of software with greater ease, for our purposes we're using it for dpkg and related dependencies. For more information visit https://brew.sh **\n\n");
+            [hc installHomebrewIfNecessary];
         }
         if (hc.dpkgPath.length > 0){
             DLog(@"dpkg-deb path found: %@\n", hc.dpkgPath);
         } else {
-            DLog(@"dpkg-deb is not installed!\n");
+            if (![HelperClass brewInstalled]){
+                DLog(@"dpkg-deb is not installed & brew is missing!. Exiting, running again, brew should be able to install before this step!\n");
+                return 1;
+            }
         }
         if (hc.theosPath.length > 0){
             DLog(@"THEOS path found: %@\n", hc.theosPath);
+            
         } else {
             DLog(@"THEOS is not installed!\n");
             [hc checkoutTheosIfNecessary];

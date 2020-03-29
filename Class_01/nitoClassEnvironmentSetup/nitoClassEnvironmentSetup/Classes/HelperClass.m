@@ -20,12 +20,14 @@
 
 - (void)checkoutTheosIfNecessary {
     if ([FM fileExistsAtPath:_theosPath]){
-        DLog(@"theos detected, skip checkout...");
+        DLog(@"theos detected! skip installation...\n");
         return;
     }
+    DLog(@"\nchecking out theos master...\n");
     NSString *theosCheckout = @"git@github.com:theos/theos.git";
+    NSString *sdks = @"git@github.com:lechium/sdks.git";
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-    NSString *path = paths[0];//NSHomeDirectory();//[NSString stringWithFormat:@"/Users/%@/Develop", _username];
+    NSString *path = paths[0];
     if ([FM fileExistsAtPath:path]){
         mkdir([path UTF8String], 755);
     }
@@ -42,11 +44,19 @@
         fullCmd = [NSString stringWithFormat:@"echo \"export THEOS=%@/theos\" >> %@", path, aliasFile];
         [HelperClass singleLineReturnForProcess:fullCmd];
     }
+    //reuse fullCmd - waste not want not!
+    
+    DLog(@"\nchecking out tvOS theos sdks...\n");
+    fullCmd = [NSString stringWithFormat:@"/usr/bin/git clone %@", sdks];
+    [HelperClass runTask:fullCmd inFolder:[path stringByAppendingPathComponent:@"theos/sdks"]];
+    
+    //checkout SDKs as well
+    
     //TODO: need to check out SDKs from our branch and maybe some custom nic files
 }
 
 + (BOOL)brewInstalled {
-    return ([FM fileExistsAtPath:@"/usr/local/bin/brew"]);
+    return (![FM fileExistsAtPath:@"/usr/local/bin/brew"]);
 }
 
 + (NCSystemVersionType)currentVersion {
