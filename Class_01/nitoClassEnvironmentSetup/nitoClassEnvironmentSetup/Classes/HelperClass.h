@@ -1,4 +1,3 @@
-#import "StatusPackageModel.h"
 #import "XcodeDownloads.h"
 
 @interface HelperClass: NSObject
@@ -7,14 +6,21 @@
 @property BOOL hasAppleId;
 @property BOOL hasDeveloperAccount;
 @property NSString *theosPath;
+@property NSString *dpkgPath;
+@property NSString *username;
 
++ (NSString *)tempFolder;
+- (void)installHomebrewIfNecessary;
+- (void)checkoutTheosIfNecessary;
++ (NSInteger)runTask:(NSString *)fullCommand inFolder:(NSString *)targetFolder;
 - (void)waitForReturnWithMessage:(NSString *)message;
-+ (BOOL)xcodeInstall;
++ (BOOL)xcodeInstalled;
+- (void)installXcode;
++ (BOOL)brewInstalled;
 + (BOOL)commandLineToolsInstalled;
 + (BOOL)queryUserWithString:(NSString *)query;
 + (BOOL)shouldContinueWithError:(NSString *)errorMessage;
 + (NSArray *)returnForProcess:(NSString *)call;
-+ (InputPackage *)packageForDeb:(NSString *)debFile;
 + (NSString *)octalFromSymbols:(NSString *)theSymbols;
 + (NSString *)singleLineReturnForProcess:(NSString *)call;
 + (NSArray *)arrayReturnForTask:(NSString *)taskBinary withArguments:(NSArray *)taskArguments;

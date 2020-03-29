@@ -2,9 +2,6 @@
 #import <Foundation/Foundation.h>
 #import "NSObject+Additions.h"
 #import "NSString+Additions.h"
-#import "ErrorReturn.h"
-#import "InputPackage.h"
-#import "InputPackageFile.h"
 
 typedef NS_ENUM(NSInteger, BSPackageFileType)
 {

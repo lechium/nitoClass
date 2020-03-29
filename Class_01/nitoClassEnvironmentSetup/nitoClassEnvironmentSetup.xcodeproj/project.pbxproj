@@ -8,13 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		32DEAFC7242F4881005508BA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFC6242F4881005508BA /* main.m */; };
-		32DEAFF0242F4C9D005508BA /* ErrorReturn.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFE3242F4C9D005508BA /* ErrorReturn.m */; };
 		32DEAFF1242F4C9D005508BA /* HelperClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFE5242F4C9D005508BA /* HelperClass.m */; };
-		32DEAFF2242F4C9D005508BA /* InputPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFE7242F4C9D005508BA /* InputPackage.m */; };
-		32DEAFF3242F4C9D005508BA /* InputPackageFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFE9242F4C9D005508BA /* InputPackageFile.m */; };
 		32DEAFF4242F4C9D005508BA /* NSObject+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFEB242F4C9D005508BA /* NSObject+Additions.m */; };
 		32DEAFF5242F4C9D005508BA /* NSString+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFED242F4C9D005508BA /* NSString+Additions.m */; };
-		32DEAFF6242F4C9D005508BA /* StatusPackageModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFEF242F4C9D005508BA /* StatusPackageModel.m */; };
 		32DEAFFD242F554D005508BA /* XcodeDownloads.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFFC242F554D005508BA /* XcodeDownloads.m */; };
 /* End PBXBuildFile section */
 
@@ -34,20 +30,12 @@
 		32DEAFC3242F4881005508BA /* nitoClassEnvironmentSetup */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = nitoClassEnvironmentSetup; sourceTree = BUILT_PRODUCTS_DIR; };
 		32DEAFC6242F4881005508BA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32DEAFE1242F4C9D005508BA /* Defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Defines.h; sourceTree = "<group>"; };
-		32DEAFE2242F4C9D005508BA /* ErrorReturn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ErrorReturn.h; sourceTree = "<group>"; };
-		32DEAFE3242F4C9D005508BA /* ErrorReturn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ErrorReturn.m; sourceTree = "<group>"; };
 		32DEAFE4242F4C9D005508BA /* HelperClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelperClass.h; sourceTree = "<group>"; };
 		32DEAFE5242F4C9D005508BA /* HelperClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HelperClass.m; sourceTree = "<group>"; };
-		32DEAFE6242F4C9D005508BA /* InputPackage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputPackage.h; sourceTree = "<group>"; };
-		32DEAFE7242F4C9D005508BA /* InputPackage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InputPackage.m; sourceTree = "<group>"; };
-		32DEAFE8242F4C9D005508BA /* InputPackageFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputPackageFile.h; sourceTree = "<group>"; };
-		32DEAFE9242F4C9D005508BA /* InputPackageFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InputPackageFile.m; sourceTree = "<group>"; };
 		32DEAFEA242F4C9D005508BA /* NSObject+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+Additions.h"; sourceTree = "<group>"; };
 		32DEAFEB242F4C9D005508BA /* NSObject+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+Additions.m"; sourceTree = "<group>"; };
 		32DEAFEC242F4C9D005508BA /* NSString+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Additions.h"; sourceTree = "<group>"; };
 		32DEAFED242F4C9D005508BA /* NSString+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Additions.m"; sourceTree = "<group>"; };
-		32DEAFEE242F4C9D005508BA /* StatusPackageModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StatusPackageModel.h; sourceTree = "<group>"; };
-		32DEAFEF242F4C9D005508BA /* StatusPackageModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StatusPackageModel.m; sourceTree = "<group>"; };
 		32DEAFFB242F554D005508BA /* XcodeDownloads.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XcodeDownloads.h; sourceTree = "<group>"; };
 		32DEAFFC242F554D005508BA /* XcodeDownloads.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XcodeDownloads.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -91,13 +79,10 @@
 		32DEAFE0242F4C9D005508BA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				32DEAFFA242F54C0005508BA /* Packages */,
 				32DEAFF7242F5498005508BA /* Categories */,
 				32DEAFE1242F4C9D005508BA /* Defines.h */,
 				32DEAFFB242F554D005508BA /* XcodeDownloads.h */,
 				32DEAFFC242F554D005508BA /* XcodeDownloads.m */,
-				32DEAFE2242F4C9D005508BA /* ErrorReturn.h */,
-				32DEAFE3242F4C9D005508BA /* ErrorReturn.m */,
 				32DEAFE4242F4C9D005508BA /* HelperClass.h */,
 				32DEAFE5242F4C9D005508BA /* HelperClass.m */,
 			);
@@ -113,19 +98,6 @@
 				32DEAFED242F4C9D005508BA /* NSString+Additions.m */,
 			);
 			path = Categories;
-			sourceTree = "<group>";
-		};
-		32DEAFFA242F54C0005508BA /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-				32DEAFE6242F4C9D005508BA /* InputPackage.h */,
-				32DEAFE7242F4C9D005508BA /* InputPackage.m */,
-				32DEAFE8242F4C9D005508BA /* InputPackageFile.h */,
-				32DEAFE9242F4C9D005508BA /* InputPackageFile.m */,
-				32DEAFEE242F4C9D005508BA /* StatusPackageModel.h */,
-				32DEAFEF242F4C9D005508BA /* StatusPackageModel.m */,
-			);
-			path = Packages;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -184,12 +156,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				32DEAFF6242F4C9D005508BA /* StatusPackageModel.m in Sources */,
 				32DEAFF5242F4C9D005508BA /* NSString+Additions.m in Sources */,
-				32DEAFF0242F4C9D005508BA /* ErrorReturn.m in Sources */,
-				32DEAFF3242F4C9D005508BA /* InputPackageFile.m in Sources */,
 				32DEAFFD242F554D005508BA /* XcodeDownloads.m in Sources */,
-				32DEAFF2242F4C9D005508BA /* InputPackage.m in Sources */,
 				32DEAFF4242F4C9D005508BA /* NSObject+Additions.m in Sources */,
 				32DEAFF1242F4C9D005508BA /* HelperClass.m in Sources */,
 				32DEAFC7242F4881005508BA /* main.m in Sources */,

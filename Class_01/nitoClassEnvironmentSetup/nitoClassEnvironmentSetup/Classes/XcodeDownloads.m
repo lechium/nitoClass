@@ -16,7 +16,7 @@
     if (self){
         _sytemVersion = [HelperClass currentVersion];
         [self _populateInfo];
-        _xcodeInstalled = [HelperClass xcodeInstall];
+        _xcodeInstalled = [HelperClass xcodeInstalled];
         _cliInstalled = [HelperClass commandLineToolsInstalled];
     }
     return self;

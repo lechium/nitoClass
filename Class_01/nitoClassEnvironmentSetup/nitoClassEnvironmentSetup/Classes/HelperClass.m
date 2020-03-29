@@ -2,7 +2,7 @@
 #import "HelperClass.h"
 #import <AppKit/AppKit.h>
 #import <CoreServices/CoreServices.h>
-
+#include <sys/stat.h>
 @implementation HelperClass
 
 #pragma mark version checking
@@ -12,8 +12,41 @@
     if (self){
         _downloads = [XcodeDownloads new];
         _theosPath = [HelperClass singleLineReturnForProcess:@"printenv THEOS"];
+        _username = [HelperClass singleLineReturnForProcess:@"whoami"];
+        _dpkgPath = [HelperClass singleLineReturnForProcess:@"which dpkg-deb"];
     }
     return self;
+}
+
+- (void)checkoutTheosIfNecessary {
+    if ([FM fileExistsAtPath:_theosPath]){
+        DLog(@"theos detected, skip checkout...");
+        return;
+    }
+    NSString *theosCheckout = @"git@github.com:theos/theos.git";
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+    NSString *path = paths[0];//NSHomeDirectory();//[NSString stringWithFormat:@"/Users/%@/Develop", _username];
+    if ([FM fileExistsAtPath:path]){
+        mkdir([path UTF8String], 755);
+    }
+    NSString *fullCmd = [NSString stringWithFormat:@"/usr/bin/git clone %@", theosCheckout];
+    [HelperClass runTask:fullCmd inFolder:path];
+    NSString *shell = [HelperClass singleLineReturnForProcess:@"printenv SHELL"];
+    NSString *aliasFile = nil;
+    if ([shell containsString:@"bash"]){
+        aliasFile = [NSHomeDirectory() stringByAppendingPathComponent:@".bash_profile"];
+    } else if ([shell containsString:@"zsh"]){
+        aliasFile = [NSHomeDirectory() stringByAppendingPathComponent:@".zshrc"];
+    }
+    if (aliasFile.length > 0){
+        fullCmd = [NSString stringWithFormat:@"echo \"export THEOS=%@/theos\" >> %@", path, aliasFile];
+        [HelperClass singleLineReturnForProcess:fullCmd];
+    }
+    //TODO: need to check out SDKs from our branch and maybe some custom nic files
+}
+
++ (BOOL)brewInstalled {
+    return ([FM fileExistsAtPath:@"/usr/local/bin/brew"]);
 }
 
 + (NCSystemVersionType)currentVersion {
@@ -41,8 +74,42 @@
 - (void)openDeveloperAccountSite {
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://developer.apple.com/download/more/"]];
 }
+/*
+ -f = fail silently
+ -s = silent / quiet mode
+ -S = error when failing
+ -L = location, handles redirects?
+ 
+ curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh
+ 
+ */
 
-+ (BOOL)xcodeInstall {
+- (void)installHomebrewIfNecessary {
+    if (![HelperClass brewInstalled]){
+        NSString *temp = [HelperClass tempFolder];
+        NSString *runCmd = [NSString stringWithFormat:@"curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh -o %@install.sh ; chmod +x %@install.sh", temp, temp];
+        //DLog(@"runCmd: %@", runCmd);
+        [HelperClass singleLineReturnForProcess:runCmd];
+        NSString *runScript = [NSString stringWithFormat:@"/bin/bash %@", [NSTemporaryDirectory() stringByAppendingString:@"install.sh"]];
+        //DLog(@"%@", runScript);
+        [HelperClass runInteractiveProcess:runScript];
+    }
+}
+
++ (NSString *)tempFolder {
+    NSString *ourTempFolder = NSTemporaryDirectory();
+    //mkdir([ourTempFolder UTF8String], 755);
+    if ([FM fileExistsAtPath:ourTempFolder]){
+        return ourTempFolder;
+    }
+    return NSTemporaryDirectory();
+}
+
+- (void)installXcode {
+    
+}
+
++ (BOOL)xcodeInstalled {
     NSString *returnVals = [self singleLineReturnForProcess:@"/usr/bin/which xcode-select"];
     if (returnVals.length > 0){
         return true;
@@ -51,7 +118,7 @@
 }
 
 - (void)waitForReturnWithMessage:(NSString *)message {
-
+    
     char c;
     printf("%s", [message UTF8String]);
     c=getchar();
@@ -67,21 +134,18 @@
     char c;
     printf("%s", [errorString UTF8String] );
     c=getchar();
-    while(c!='y' && c!='n')
-    {
+    while(c!='y' && c!='n') {
         if (c!='\n'){
             printf("[y/n]");
         }
         c=getchar();
     }
-    if (c == 'n')
-    {
+    if (c == 'n') {
         return FALSE;
     } else if (c == 'y') {
         return TRUE;
     }
     return FALSE;
-    
 }
 
 + (BOOL)shouldContinueWithError:(NSString *)errorMessage {
@@ -110,9 +174,26 @@
     return TRUE;
     
 }
-
-+ (NSArray *)arrayReturnForTask:(NSString *)taskBinary withArguments:(NSArray *)taskArguments
-{
++ (NSInteger)runTask:(NSString *)fullCommand inFolder:(NSString *)targetFolder {
+    
+    if (![FM fileExistsAtPath:targetFolder]){
+        DLog(@"folder missing: %@", targetFolder);
+        return -1;
+    }
+    NSArray *args = [fullCommand componentsSeparatedByString:@" "];
+    NSString *taskBinary = args[0];
+    NSArray *taskArguments = [args subarrayWithRange:NSMakeRange(1, args.count-1)];
+    NSLog(@"%@ %@", taskBinary, [taskArguments componentsJoinedByString:@" "]);
+    NSTask *task = [[NSTask alloc] init];
+    [task setLaunchPath:taskBinary];
+    [task setArguments:taskArguments];
+    [task setCurrentDirectoryPath:targetFolder];
+    [task launch];
+    [task waitUntilExit];
+    NSTaskTerminationReason retStatus = [task terminationReason];
+    return retStatus;
+}
++ (NSArray *)arrayReturnForTask:(NSString *)taskBinary withArguments:(NSArray *)taskArguments {
     NSLog(@"%@ %@", taskBinary, [taskArguments componentsJoinedByString:@" "]);
     NSTask *task = [[NSTask alloc] init];
     NSPipe *pipe = [[NSPipe alloc] init];
@@ -127,35 +208,43 @@
     
     NSData *outData = nil;
     NSString *temp = nil;
-    while((outData = [handle readDataToEndOfFile]) && [outData length])
-    {
+    while((outData = [handle readDataToEndOfFile]) && [outData length]) {
         temp = [[NSString alloc] initWithData:outData encoding:NSASCIIStringEncoding];
-        
     }
     [handle closeFile];
     task = nil;
-    
     return [temp componentsSeparatedByString:@"\n"];
-    
 }
 
-+ (NSString *)singleLineReturnForProcess:(NSString *)call
-{
++ (NSString *)singleLineReturnForProcess:(NSString *)call {
     return [[self returnForProcess:call] componentsJoinedByString:@"\n"];
 }
 
-+ (NSArray *)returnForProcess:(NSString *)call
-{
++ (void)runInteractiveProcess:(NSString *)call {
     if (call==nil)
-    return 0;
+        return;
+    char line[200];
+    //DLog(@"\nRunning process: %@\n", call);
+    FILE* fp = popen([call UTF8String], "r");
+    if (fp) {
+        while (fgets(line, sizeof line, fp)){
+            NSString *s = [NSString stringWithCString:line encoding:NSUTF8StringEncoding];
+            s = [s stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            DLog(@"%@", s);
+        }
+    }
+    pclose(fp);
+}
+
++ (NSArray *)returnForProcess:(NSString *)call {
+    if (call==nil)
+        return 0;
     char line[200];
     //DLog(@"\nRunning process: %@\n", call);
     FILE* fp = popen([call UTF8String], "r");
     NSMutableArray *lines = [[NSMutableArray alloc]init];
-    if (fp)
-    {
-        while (fgets(line, sizeof line, fp))
-        {
+    if (fp) {
+        while (fgets(line, sizeof line, fp)){
             NSString *s = [NSString stringWithCString:line encoding:NSUTF8StringEncoding];
             s = [s stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
             [lines addObject:s];
@@ -165,115 +254,7 @@
     return lines;
 }
 
-+ (InputPackageFile *)packageFileFromLine:(NSString *)inputLine {
-    //    "-rwxr-xr-x  0 root   wheel   69424 Oct 22 03:56 ./Library/MobileSubstrate/DynamicLibraries/beigelist7.dylib\n",
-    
-    //-rwxr-xr-x root/staff    10860 2011-02-02 03:55 ./Library/Frameworks/CydiaSubstrate.framework/Commands/cycc
-    
-    inputLine = [inputLine stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    inputLine = [inputLine stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\t"]];
-    NSMutableString *newString = [[NSMutableString alloc] initWithString:inputLine];
-    [newString replaceOccurrencesOfString:@"      " withString:@" " options:NSLiteralSearch range:NSMakeRange(0, [newString length])];
-    [newString replaceOccurrencesOfString:@"     " withString:@" " options:NSLiteralSearch range:NSMakeRange(0, [newString length])];
-    [newString replaceOccurrencesOfString:@"    " withString:@" " options:NSLiteralSearch range:NSMakeRange(0, [newString length])];
-    [newString replaceOccurrencesOfString:@"   " withString:@" " options:NSLiteralSearch range:NSMakeRange(0, [newString length])];
-    [newString replaceOccurrencesOfString:@"  " withString:@" " options:NSLiteralSearch range:NSMakeRange(0, [newString length])];
-    
-    NSArray *lineObjects = [newString componentsSeparatedByString:@" "];
-    
-    //NSLog(@"lineObjects: %@", lineObjects);
-    
-    
-    /*
-     
-     "drwxr-xr-x",
-     "root/wheel",
-     0,
-     "2018-06-27",
-     "01:21",
-     "./"
-     */
-    
-    
-    NSString *permissionsAndType = [lineObjects objectAtIndex:0];
-    NSString *userGroup = [lineObjects objectAtIndex:1];
-    NSString *size = [lineObjects objectAtIndex:2];
-    NSString *date = [lineObjects objectAtIndex:3];
-    NSString *time = [lineObjects objectAtIndex:4];
-    NSString *path = [lineObjects objectAtIndex:5];
-    
-    //@"drwxr-xr-x"
-    NSString *fileTypeChar = [permissionsAndType substringWithRange:NSMakeRange(0, 1)];
-    
-    NSString *octalPermissions = [self octalFromSymbols:permissionsAndType];
-    NSString *octalUG = [self octalFromGroupSymbols:userGroup];
-    NSString *fileName = [path lastPathComponent];
-    NSString *fullPath = [path substringFromIndex:0];
-    //NSString *fullPath = [NSString stringWithFormat:@"/%@", path];
-    if (path.length > 1){
-        if ([[path substringToIndex:1] isEqualToString:@"./"]){
-            fullPath = [path substringFromIndex:1];
-        }
-    }
-    
-    //NSString *fullPath = [path substringFromIndex:1];
-    //NSString *fullPath = [path substringFromIndex:0];
-    NSLog(@"fullPath: %@", fullPath);
-    InputPackageFile *pf = [InputPackageFile new];
-    [pf _setFileTypeFromRaw:fileTypeChar];
-    
-    switch (pf.type) {
-        case BSPackageFileTypeLink:
-        {
-            
-            fullPath = [lineObjects objectAtIndex:7];
-            NSString *linkDest = [NSString stringWithFormat:@"/%@", path];
-            pf.permissions = octalPermissions;
-            pf.owner = octalUG;
-            pf.size = size;
-            pf.time = time;
-            pf.date = date;
-            pf.path = fullPath;
-            pf.basename = fileName;
-            pf.linkDestination = linkDest;
-            
-            return pf;
-        }
-            break;
-            
-        case BSPackageFileTypeDirectory: //return for now
-            
-            //DLog(@"we dont want directory entries do we %@", lineObjects);
-            pf.permissions = octalPermissions;
-            pf.owner = octalUG;
-            pf.size = size;
-            pf.time = time;
-            pf.date = date;
-            pf.path = fullPath;
-            pf.basename = fileName;
-            return pf;
-            break;
-            
-        default:
-            break;
-    }
-    
-    
-    pf.permissions = octalPermissions;
-    pf.owner = octalUG;
-    pf.size = size;
-    pf.time = time;
-    pf.date = date;
-    pf.path = fullPath;
-    pf.basename = fileName;
-    return pf;
-    // return [NSDictionary dictionaryWithObjectsAndKeys:fileType, @"fileType",octalPermissions, @"octalPermissions", octalUG, @"octalUG", size, @"size", date, @"date", time, @"time", fileName, @"fileName", fullPath, @"fullPath",  nil];
-    
-}
-
-
-+ (NSString *)octalFromGroupSymbols:(NSString *)theSymbols
-{
++ (NSString *)octalFromGroupSymbols:(NSString *)theSymbols {
     NSArray *groupArray = [theSymbols componentsSeparatedByString:@"/"];
     NSString *user = [groupArray objectAtIndex:0];
     NSString *group = [groupArray objectAtIndex:1];
@@ -281,145 +262,81 @@
     NSString *octalUser = nil;
     NSString *octalGroup = nil;
     //uid=0(root) gid=0(wheel) groups=0(wheel),1(daemon),2(kmem),3(sys),4(tty),5(operator),8(procview),9(procmod),20(staff),29(certusers),80(admin)
-    if ([user isEqualToString:@"root"])
-    {
+    if ([user isEqualToString:@"root"]) {
         octalUser = @"0";
-    } else if ([user isEqualToString:@"mobile"])
-    {
+    } else if ([user isEqualToString:@"mobile"]) {
         octalUser = @"501";
     }
     //obviously more cases!! FIXME:
     
-    if ([group isEqualToString:@"staff"])
-    {
+    if ([group isEqualToString:@"staff"]) {
         octalGroup = @"20";
-    } else if ([group isEqualToString:@"admin"])
-    {
+    } else if ([group isEqualToString:@"admin"]) {
         octalGroup = @"80";
-    } else if ([group isEqualToString:@"wheel"])
-    {
+    } else if ([group isEqualToString:@"wheel"]) {
         octalGroup = @"0";
-    } else if ([group isEqualToString:@"daemon"])
-    {
+    } else if ([group isEqualToString:@"daemon"]) {
         octalGroup = @"1";
-    } else if ([group isEqualToString:@"kmem"])
-    {
+    } else if ([group isEqualToString:@"kmem"]) {
         octalGroup = @"2";
-    } else if ([group isEqualToString:@"sys"])
-    {
+    } else if ([group isEqualToString:@"sys"]) {
         octalGroup = @"3";
-    } else if ([group isEqualToString:@"tty"])
-    {
+    } else if ([group isEqualToString:@"tty"]) {
         octalGroup = @"4";
-    } else if ([group isEqualToString:@"operator"])
-    {
+    } else if ([group isEqualToString:@"operator"]) {
         octalGroup = @"5";
-    } else if ([group isEqualToString:@"procview"])
-    {
+    } else if ([group isEqualToString:@"procview"]) {
         octalGroup = @"8";
-    } else if ([group isEqualToString:@"procmod"])
-    {
+    } else if ([group isEqualToString:@"procmod"]) {
         octalGroup = @"9";
-    } else if ([group isEqualToString:@"certusers"])
-    {
+    } else if ([group isEqualToString:@"certusers"]) {
         octalGroup = @"29";
-    } else
-    {
+    } else {
         octalGroup = @"501"; //default to mobile
     }
     //uid=0(root) gid=0(wheel) groups=0(wheel),1(daemon),2(kmem),3(sys),4(tty),5(operator),8(procview),9(procmod),20(staff),29(certusers),80(admin)
     return [NSString stringWithFormat:@"%@:%@", octalUser, octalGroup];
-    
 }
 
-
-+ (InputPackage *)packageForDeb:(NSString *)debFile {
-    
-    NSString *packageName = [self singleLineReturnForProcess:[NSString stringWithFormat:@"/usr/local/bin/dpkg -f %@ Package", debFile]];
-    NSString *packageVersion = [self singleLineReturnForProcess:[NSString stringWithFormat:@"/usr/local/bin/dpkg -f %@ Version", debFile]];
-    NSArray <InputPackageFile *> *fileList = [self returnForProcess:[NSString stringWithFormat:@"/usr/local/bin/dpkg -c %@", debFile]];
-    
-    __block NSMutableArray *finalArray = [NSMutableArray new];
-    
-    [fileList enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        
-        InputPackageFile *file = [self packageFileFromLine:obj];
-        if (file) {
-            //DLog(@"%@", file);
-            [finalArray addObject:file];
-        }
-        
-    }];
-    
-    InputPackage *pkg = [InputPackage new];
-    pkg.files = finalArray;
-    pkg.path = debFile;
-    pkg.packageName = packageName;
-    pkg.version = packageVersion;
-    return pkg;
-    
-}
-
-+ (NSString *)octalFromSymbols:(NSString *)theSymbols
-{
-    //NSLog(@"%@ %s", self, _cmd);
++ (NSString *)octalFromSymbols:(NSString *)theSymbols {
     NSString *U = [theSymbols substringWithRange:NSMakeRange(1, 3)];
     NSString *G = [theSymbols substringWithRange:NSMakeRange(4, 3)];
     NSString *O = [theSymbols substringWithRange:NSMakeRange(7, 3)];
-    //NSLog(@"fileTypeChar: %@", fileTypeChar);
-    //NSLog(@"U; %@", U);
-    //NSLog(@"G; %@", G);
-    //NSLog(@"O; %@", O);
     
     //USER
-    
     int sIdBit = 0;
-    
     int uOctal = 0;
-    
     const char *uArray = [U cStringUsingEncoding:NSASCIIStringEncoding];
     NSUInteger stringLength = [U length];
     
     int x;
-    for( x=0; x<stringLength; x++ )
-    {
+    for( x=0; x<stringLength; x++ ) {
         unsigned int aCharacter = uArray[x];
-        if (aCharacter == 'r')
-        {
+        if (aCharacter == 'r') {
             uOctal += 4;
-        } else     if (aCharacter == 'w')
-        {
+        } else if (aCharacter == 'w') {
             uOctal += 2;
-        } else     if (aCharacter == 'x')
-        {
+        } else if (aCharacter == 'x') {
             uOctal += 1;
-        } else     if (aCharacter == 's')
-        {
+        } else if (aCharacter == 's') {
             sIdBit += 4;
         }
     }
     
     //GROUP
-    
     int gOctal = 0;
     const char *gArray = [G cStringUsingEncoding:NSASCIIStringEncoding];
     stringLength = [G length];
-    
     int y;
-    for( y=0; y<stringLength; y++ )
-    {
+    for( y=0; y<stringLength; y++ ) {
         unsigned int aCharacter = gArray[y];
-        if (aCharacter == 'r')
-        {
+        if (aCharacter == 'r') {
             gOctal += 4;
-        } else     if (aCharacter == 'w')
-        {
+        } else if (aCharacter == 'w') {
             gOctal += 2;
-        } else     if (aCharacter == 'x')
-        {
+        } else if (aCharacter == 'x') {
             gOctal += 1;
-        } else     if (aCharacter == 's')
-        {
+        } else if (aCharacter == 's') {
             gOctal += 2;
         }
     }
@@ -429,26 +346,17 @@
     int oOctal = 0;
     const char *oArray = [O cStringUsingEncoding:NSASCIIStringEncoding];
     stringLength = [O length];
-    
-    
-    for( z=0; z<stringLength; z++ )
-    {
+    for( z=0; z<stringLength; z++ ) {
         unsigned int aCharacter = oArray[z];
-        if (aCharacter == 'r')
-        {
+        if (aCharacter == 'r') {
             oOctal += 4;
-        } else     if (aCharacter == 'w')
-        {
+        } else if (aCharacter == 'w') {
             oOctal += 2;
-        } else     if (aCharacter == 'x')
-        {
+        } else if (aCharacter == 'x') {
             oOctal += 1;
         }
     }
-    
-    
     return [NSString stringWithFormat:@"%i%i%i%i", sIdBit, uOctal, gOctal, oOctal];
-    
 }
 
 @end
