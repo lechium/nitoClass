@@ -1,14 +1,15 @@
 #import "XcodeDownloads.h"
 
 @interface HelperClass: NSObject
-
++ (NSString *)freeSpaceString;
++ (float)freeSpaceAvailable;
 @property XcodeDownloads *downloads;
 @property BOOL hasAppleId;
 @property BOOL hasDeveloperAccount;
 @property NSString *theosPath;
 @property NSString *dpkgPath;
 @property NSString *username;
-
++ (BOOL)belowFreeSpaceThreshold;
 + (NSString *)tempFolder;
 - (void)installHomebrewIfNecessary;
 - (void)checkoutTheosIfNecessary;

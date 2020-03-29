@@ -61,6 +61,7 @@ int main(int argc, const char * argv[]) {
         DLog(@"Username: %@", hc.username);
         DLog(@"Default Shell: %@\n\n", shell);
         DLog(@"Checking system environment...\n\n");
+        DLog(@"free space available: %@", [HelperClass freeSpaceString]);
         if ([HelperClass brewInstalled]){
             DLog(@"Homebrew is installed!\n");
         } else {

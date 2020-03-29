@@ -18,6 +18,24 @@
     return self;
 }
 
++ (NSString *)freeSpaceString {
+    float space = [self freeSpaceAvailable];
+    return [[NSString stringWithFormat:@"%f", space] suffixNumber];
+}
+
++ (float)freeSpaceAvailable {
+    float available = [[[FM attributesOfFileSystemForPath:@"/" error:nil] objectForKey:NSFileSystemFreeSize] floatValue];
+    float avail2 = available / 1024;
+    return avail2;
+}
+
++ (BOOL)belowFreeSpaceThreshold {
+    float avail2 = [self freeSpaceAvailable];
+    DLog(@"avail: %f", avail2);
+    return (avail2 < 60);
+}
+
+//base theos + our SDKs requires about 170 MB
 - (void)checkoutTheosIfNecessary {
     if ([FM fileExistsAtPath:_theosPath]){
         DLog(@"theos detected! skip installation...\n");
@@ -56,7 +74,7 @@
 }
 
 + (BOOL)brewInstalled {
-    return (![FM fileExistsAtPath:@"/usr/local/bin/brew"]);
+    return ([FM fileExistsAtPath:@"/usr/local/bin/brew"]);
 }
 
 + (NCSystemVersionType)currentVersion {

@@ -2,7 +2,40 @@
 
 #import "NSString+Additions.h"
 
+@implementation NSNumber (NumberFormatting)
+
+-(NSString*) suffixNumber {
+    
+    long long num = [self longLongValue];
+    int s = ( (num < 0) ? -1 : (num > 0) ? 1 : 0 );
+    NSString* sign = (s == -1 ? @"-" : @"" );
+    num = llabs(num);
+    if (num < 1000)
+        return [NSString stringWithFormat:@"%@%lld",sign,num];
+    
+    int exp = (int) (log10l(num) / 3.f); //log10l(1000));
+    NSArray* units = @[@"MB",@"GB",@"TB",@"PB",@"EB",@"YB"];
+    return [NSString stringWithFormat:@"%@%.1f%@",sign, (num / pow(1000, exp)), [units objectAtIndex:(exp-1)]];
+}
+
+@end
+
 @implementation NSString (Additions)
+
+-(NSString*) suffixNumber {
+    
+    long long num = [self longLongValue];
+    int s = ( (num < 0) ? -1 : (num > 0) ? 1 : 0 );
+    NSString* sign = (s == -1 ? @"-" : @"" );
+    num = llabs(num);
+    if (num < 1000)
+        return [NSString stringWithFormat:@"%@%lld",sign,num];
+    
+    int exp = (int) (log10l(num) / 3.f); //log10l(1000));
+    NSArray* units = @[@"MB",@"GB",@"TB",@"PB",@"EB",@"YB"];
+    return [NSString stringWithFormat:@"%@%.1f%@",sign, (num / pow(1000, exp)), [units objectAtIndex:(exp-1)]];
+}
+
 
 - (NSString *)nextVersionNumber {
     
