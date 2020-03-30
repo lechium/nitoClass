@@ -66,4 +66,15 @@
     
 }
 
+- (id)dictionaryRepresentation {
+    NSString *error = nil;
+    NSPropertyListFormat format;
+    NSData *theData = [self dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+    id theDict = [NSPropertyListSerialization propertyListFromData:theData
+                                                  mutabilityOption:NSPropertyListImmutable
+                                                            format:&format
+                                                  errorDescription:&error];
+    return theDict;
+}
+
 @end

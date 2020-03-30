@@ -91,7 +91,7 @@ int main(int argc, const char * argv[]) {
         }
         hc.hasAppleId = [HelperClass queryUserWithString:@"Do you have a Apple ID set up?"];
         if (!hc.hasAppleId){
-            [hc openIDSignupPage];
+            [HelperClass openIDSignupPage];
             BOOL shouldContinue = [HelperClass queryUserWithString:@"You need an apple id before continuing!, opening the page in your default browser, press 'y when complete or n to cancel"];
             if (shouldContinue) {
                 hc.hasDeveloperAccount = [HelperClass queryUserWithString:@"Do you have a Apple developer account? (Free acounts are sufficient)"];

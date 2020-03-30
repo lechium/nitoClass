@@ -42,8 +42,8 @@
         return;
     }
     DLog(@"\nchecking out theos master...\n");
-    NSString *theosCheckout = @"git@github.com:theos/theos.git";
-    NSString *sdks = @"git@github.com:lechium/sdks.git";
+    NSString *theosCheckout = @"https://github.com/theos/theos.git";//@"git@github.com:theos/theos.git";
+    NSString *sdks = @"https://github.com/lechium/sdks.git";//@"git@github.com:lechium/sdks.git";
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
     NSString *path = paths[0];
     if ([FM fileExistsAtPath:path]){
@@ -67,7 +67,7 @@
     DLog(@"\nchecking out tvOS theos sdks...\n");
     fullCmd = [NSString stringWithFormat:@"/usr/bin/git clone %@", sdks];
     [HelperClass runTask:fullCmd inFolder:[path stringByAppendingPathComponent:@"theos/sdks"]];
-
+    
     //TODO: need to check out custom nic files
 }
 
@@ -102,7 +102,7 @@
 }
 + (NSURL*)developerAccountSite {
     return [NSURL URLWithString:@"https://developer.apple.com/account"];
-        //https://developer.apple.com/account
+    //https://developer.apple.com/account
 }
 
 + (NSURL *)moreDownloadsURL {
@@ -206,6 +206,7 @@
     NSTaskTerminationReason retStatus = [task terminationReason];
     return retStatus;
 }
+
 + (NSArray *)arrayReturnForTask:(NSString *)taskBinary withArguments:(NSArray *)taskArguments {
     NSLog(@"%@ %@", taskBinary, [taskArguments componentsJoinedByString:@" "]);
     NSTask *task = [[NSTask alloc] init];
@@ -370,6 +371,67 @@
         }
     }
     return [NSString stringWithFormat:@"%i%i%i%i", sIdBit, uOctal, gOctal, oOctal];
+}
+
+//this is specifically if we need to find an external drive to extract / download some of the files to.
+
++ (NSArray *)scanForDrives {
+    //NSLog(@"%@ %s", self, _cmd);
+    NSMutableArray *deviceList = [[NSMutableArray alloc] init];
+    NSTask *scanTask = [[NSTask alloc] init];
+    NSPipe *pipe = [[NSPipe alloc] init];
+    NSFileHandle *handle = [pipe fileHandleForReading];
+    NSData *outData = nil;
+    [scanTask setLaunchPath:@"/usr/sbin/diskutil"];
+    [scanTask setStandardOutput:pipe];
+    [scanTask setStandardError:pipe];
+    [scanTask setArguments:[NSArray arrayWithObjects:@"list", @"-plist", nil]];
+    //Variables needed for reading output
+    NSString *temp = @"";
+    [scanTask launch];
+    while((outData = [handle readDataToEndOfFile]) && [outData length]) {
+        temp = [[NSString alloc] initWithData:outData encoding:NSASCIIStringEncoding];
+    }
+    
+    NSDictionary *dictReturn = [temp dictionaryRepresentation];
+    //DLog(@"dictR: %@", dictReturn);
+    NSArray *allDisks = dictReturn[@"AllDisksAndPartitions"];
+    for (NSDictionary *device in allDisks) {
+        NSString *deviceContent = device[@"Content"];
+        NSString *devicePath = [NSString stringWithFormat:@"/dev/%@", device[@"DeviceIdentifier"]];
+        NSArray *partitions = device[@"Partitions"];
+        for (NSDictionary *partition in partitions) {
+            NSString *content = partition[@"Content"];
+            NSNumber *byteSize = partition[@"Size"];
+            NSInteger mb = byteSize.integerValue / 1000000;
+            NSString *sizeLabel = nil;
+            NSInteger theSize = byteSize.integerValue / 1000000000;
+            BOOL shouldDisplay = true;
+            if (theSize > 0) {
+                sizeLabel = @"GB";
+            } else {
+                sizeLabel = @"MB";
+                theSize = mb;
+            }
+            
+            NSArray *acceptableTypes = @[@"Apple_HFS", @"APFS"];
+            
+            if ([acceptableTypes containsObject:content]) {
+                NSString *volumeName = partition[@"VolumeName"];
+                if (volumeName == nil) volumeName = partition[@"Content"];
+                if (shouldDisplay == true) {
+                    float avail = [[[FM attributesOfFileSystemForPath:[@"/Volumes" stringByAppendingPathComponent:volumeName] error:nil] objectForKey:NSFileSystemFreeSize] floatValue]/1024/1024/1024;
+                    NSString *freeSpace = [NSString stringWithFormat:@"%.2f", avail];
+                    NSString *displayName = [NSString stringWithFormat:@"%@ : %li %@", volumeName, (long)theSize, sizeLabel];
+                    NSDictionary *volumeInfo = @{@"PartitionScheme": deviceContent, @"VolumeName": volumeName, @"Path": devicePath, @"Size": [NSString stringWithFormat:@"%li %@", (long)theSize, sizeLabel], @"DisplayName": displayName, @"FreeSpace": freeSpace, @"Content": content};
+                    [deviceList addObject:volumeInfo];
+                }
+            }
+        }
+    }
+    scanTask = nil;
+    pipe = nil;
+    return deviceList;
 }
 
 @end

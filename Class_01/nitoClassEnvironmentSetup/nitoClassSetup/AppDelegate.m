@@ -23,6 +23,8 @@
     // Insert code here to initialize your application
     [self _createViews];
     [self openDeveloperPage:nil];
+    NSArray *drives = [HelperClass scanForDrives];
+    NSLog(@"drives: %@", drives);
 }
 
 - (IBAction)openDownloadsPage:(id)sender {

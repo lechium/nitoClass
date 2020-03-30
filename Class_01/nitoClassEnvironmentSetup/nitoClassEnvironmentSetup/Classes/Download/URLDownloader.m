@@ -34,10 +34,8 @@
 
 #pragma mark Setters
 
-- (void)setState:(URLDownloaderState)downloaderState
-{
-    if (downloaderState != state) 
-    {
+- (void)setState:(URLDownloaderState)downloaderState {
+    if (downloaderState != state)  {
         state = downloaderState;
         if ([self.delegate respondsToSelector:@selector(urlDownloader:didChangeStateTo:)])
         {
@@ -90,7 +88,7 @@
 #pragma clang diagnostic pop
     self.CompletedBlock = completedBlock;
     [self.urlConnection start];
-    OurLog(@"[URLDownloader] Download started");
+    NSLog(@"[URLDownloader] Download started");
 }
 
 
@@ -110,7 +108,7 @@
 #if TARGET_OS_IOS
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 #endif
-	OurLog(@"[URLDownloader] Download started");
+	NSLog(@"[URLDownloader] Download started");
 }
 
 - (void)cancel
@@ -118,7 +116,7 @@
 
 	[urlConnection cancel];
 	
-	OurLog(@"[URLDownloader] Download canceled");
+	NSLog(@"[URLDownloader] Download canceled");
     if ([self.delegate respondsToSelector:@selector(urlDownloaderDidCancelDownloading:)])
     {
         [self.delegate urlDownloaderDidCancelDownloading:self];
@@ -172,20 +170,20 @@
     
 	if ([challenge previousFailureCount] == 0)
 	{
-		OurLog(@"[URLDownloader] Authentication challenge received");
+		NSLog(@"[URLDownloader] Authentication challenge received");
 		
 		NSURLCredential *credential = [NSURLCredential credentialWithUser:self.urlCredential.username
 																 password:self.urlCredential.password
 															  persistence:self.urlCredential.persistance];
 		[[challenge sender] useCredential:credential forAuthenticationChallenge:challenge];
 
-		OurLog(@"[URLDownloader] Credentials sent");
+		NSLog(@"[URLDownloader] Credentials sent");
 	}
 	else
 	{
    //     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
         
-		OurLog(@"[URLDownloader] Authentication failed");
+		NSLog(@"[URLDownloader] Authentication failed");
         [self.delegate urlDownloader:self didFailOnAuthenticationChallenge:challenge];
 	}
 }
@@ -196,7 +194,7 @@
     [self.urlData setLength:0]; // in case of 302
 
     [self setState:URLDownloaderStateDownloading];
-    OurLog(@"[URLDownloader] Downloading %@ ...", [[response URL] absoluteString]);
+    NSLog(@"[URLDownloader] Downloading %@ ...", [[response URL] absoluteString]);
     if ([self.delegate respondsToSelector:@selector(urlDownloaderDidStart:)])
     {
         [self.delegate urlDownloaderDidStart:self];
@@ -224,7 +222,7 @@
     
     [self setState:URLDownloaderStateInactive];
 
-    OurLog(@"[URLDownloader] Error: %@, %ld", error, (long)[error code]);
+    NSLog(@"[URLDownloader] Error: %@, %ld", error, (long)[error code]);
 	switch ([error code])
 	{
 		case NSURLErrorNotConnectedToInternet:
@@ -242,7 +240,7 @@
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
 
-    OurLog(@"[URLDownloader] Download finished");
+    NSLog(@"[URLDownloader] Download finished");
 
     NSData *data = [NSData dataWithData:self.urlData];
     

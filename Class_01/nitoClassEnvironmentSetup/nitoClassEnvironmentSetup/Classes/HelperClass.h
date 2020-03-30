@@ -30,4 +30,5 @@
 + (NSURL *)appleIDPage;
 + (NSURL*)developerAccountSite;
 + (void)openDeveloperAccountSite;
++ (NSArray *)scanForDrives;
 @end
