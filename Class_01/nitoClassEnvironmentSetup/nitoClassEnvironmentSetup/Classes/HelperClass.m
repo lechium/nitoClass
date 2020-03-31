@@ -3,6 +3,7 @@
 #import <AppKit/AppKit.h>
 #import <CoreServices/CoreServices.h>
 #include <sys/stat.h>
+#import "NSObject+Additions.h"
 @implementation HelperClass
 
 #pragma mark version checking
@@ -75,6 +76,58 @@
     return ([FM fileExistsAtPath:@"/usr/local/bin/brew"]);
 }
 
++ (NSString *)mountImage:(NSString *)irString {
+    NSTask *irTask = [[NSTask alloc] init];
+    NSPipe *hdip = [[NSPipe alloc] init];
+    NSFileHandle *hdih = [hdip fileHandleForReading];
+    NSMutableArray *irArgs = [[NSMutableArray alloc] init];
+    [irArgs addObject:@"attach"];
+    [irArgs addObject:@"-plist"];
+    
+    [irArgs addObject:irString];
+    
+    [irArgs addObject:@"-owners"];
+    [irArgs addObject:@"off"];
+    
+    [irTask setLaunchPath:@"/usr/bin/hdiutil"];
+    
+    [irTask setArguments:irArgs];
+    
+    
+    [irTask setStandardError:hdip];
+    [irTask setStandardOutput:hdip];
+    //NSLog(@"hdiutil %@", [[irTask arguments] componentsJoinedByString:@" "]);
+    [irTask launch];
+    [irTask waitUntilExit];
+    
+    NSData *outData = nil;
+    outData = [hdih readDataToEndOfFile];
+    NSDictionary *plist = [outData safeDictionaryRepresentation];
+    //NSLog(@"plist: %@", plist);
+    NSArray *plistArray = [plist objectForKey:@"system-entities"];
+    //int theItem = ([plistArray count] - 1);
+    int i = 0;
+    NSString *mountPath = nil;
+    for (i = 0; i < [plistArray count]; i++) {
+        NSDictionary *mountDict = [plistArray objectAtIndex:i];
+        mountPath = [mountDict objectForKey:@"mount-point"];
+        if (mountPath != nil)
+        {
+            //NSLog(@"Mount Point: %@", mountPath);
+            int rValue = [irTask terminationStatus];
+            if (rValue == 0)
+            {
+                irTask = nil;
+                hdip = nil;
+                return mountPath;
+            }
+        }
+    }
+    irTask = nil;
+    hdip = nil;
+    return nil;
+}
+
 + (NCSystemVersionType)currentVersion {
     SInt32 major = 0;
     SInt32 minor = 0;
@@ -108,6 +161,7 @@
 + (NSURL *)moreDownloadsURL {
     return [NSURL URLWithString:@"https://developer.apple.com/download/more/"];
 }
+
 
 + (void)openDeveloperAccountSite {
     [[NSWorkspace sharedWorkspace] openURL:self.developerAccountSite];
@@ -148,8 +202,10 @@
 }
 
 + (BOOL)xcodeInstalled {
-    NSString *returnVals = [self singleLineReturnForProcess:@"/usr/bin/which xcode-select"];
-    if (returnVals.length > 0){
+    
+    NSString *path = [[NSWorkspace sharedWorkspace] fullPathForApplication:@"Xcode.app"];
+    NSLog(@"path: %@", path);
+    if (path.length > 0){
         return true;
     }
     return false;

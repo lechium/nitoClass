@@ -66,6 +66,29 @@
     
 }
 
+- (NSString *)plistSafeString
+{
+    NSUInteger startingLocation = [self rangeOfString:@"<?xml"].location;
+    
+    //find NSRange of the end of the plist (there is "junk" cert data after our plist info as well
+    NSRange endingRange = [self rangeOfString:@"</plist>"];
+    
+    //adjust the location of endingRange to include </plist> into our newly trimmed string.
+    NSUInteger endingLocation = endingRange.location + endingRange.length;
+    
+    //offset the ending location to trim out the "garbage" before <?xml
+    NSUInteger endingLocationAdjusted = endingLocation - startingLocation;
+    
+    //create the final range of the string data from <?xml to </plist>
+    
+    NSRange plistRange = NSMakeRange(startingLocation, endingLocationAdjusted);
+    
+    //actually create our string!
+    return [self substringWithRange:plistRange];
+}
+
+
+
 - (id)dictionaryRepresentation {
     NSString *error = nil;
     NSPropertyListFormat format;

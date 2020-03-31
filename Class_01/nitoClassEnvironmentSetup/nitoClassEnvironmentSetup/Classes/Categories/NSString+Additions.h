@@ -10,4 +10,5 @@
 - (void)writeToFileWithoutAttributes:(NSString *)theFile;
 - (NSString *)nextVersionNumber;
 - (NSString*) suffixNumber;
+- (NSString *)plistSafeString;
 @end

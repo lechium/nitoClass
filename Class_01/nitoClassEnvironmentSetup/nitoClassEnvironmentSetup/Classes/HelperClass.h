@@ -31,4 +31,5 @@
 + (NSURL*)developerAccountSite;
 + (void)openDeveloperAccountSite;
 + (NSArray *)scanForDrives;
++ (NSString *)mountImage:(NSString *)irString ;
 @end

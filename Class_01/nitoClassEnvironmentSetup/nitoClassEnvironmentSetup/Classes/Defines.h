@@ -25,7 +25,8 @@ typedef NS_ENUM(NSInteger, NCSystemVersionType) {
     NCSystemVersionTypeCatalina
 };
 #import "HelperClass.h"
-#define LOG_SELF        NSLog(@"%@ %@", self, NSStringFromSelector(_cmd))
+#define LOG_SELF        NSLog(@"[nitoClassSetup] %@ %@", self, NSStringFromSelector(_cmd))
 #define DLOG_SELF DLog(@"%@ %@", self, NSStringFromSelector(_cmd))
+#define NLog(format, ...) NSLog(@"%@", [@"[nitoClassSetup] " stringByAppendingString:[NSString stringWithFormat:format, ## __VA_ARGS__]]);
 #define DLog(format, ...) CFShow((__bridge CFStringRef)[NSString stringWithFormat:format, ## __VA_ARGS__]);
 #define FM [NSFileManager defaultManager]

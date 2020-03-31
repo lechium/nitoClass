@@ -47,6 +47,18 @@
     
 }
 
+- (void)downloadFileURL:(NSURL *)url {
+    
+    self.downloader = [URLDownloader new];
+     NSString *dlLocation = [[HelperClass tempFolder] stringByAppendingPathComponent:[url lastPathComponent]];
+    [self.downloader downloadFileWithURL:url toLocation:dlLocation withCredential:nil completed:^(NSString *downloadedFile) {
+        
+        DLog(@"downloaded file: %@", dlLocation);
+        
+        
+    }];
+}
+
 - (void)downloadFileType:(FileDownloadType)type {
     self.downloader = [URLDownloader new];
     NSString *file = nil;

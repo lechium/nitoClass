@@ -28,5 +28,6 @@ FileDownloadType;
 @property NSString *xcodeDownloadURL;
 @property NSString *commandLineURL;
 - (void)downloadFileType:(FileDownloadType)type;
+- (void)downloadFileURL:(NSURL *)url;
 
 @end
