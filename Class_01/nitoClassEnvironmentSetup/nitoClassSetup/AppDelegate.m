@@ -87,8 +87,6 @@
                     }]] lastObject] ;
                     NSLog(@"chosen: %@", chosen);
                     [[NSWorkspace sharedWorkspace] openFile:[heyo stringByAppendingPathComponent:chosen]];
-                    
-                    
                 });
                 //[[NSWorkspace sharedWorkspace] openFile:downloadedFile];
             });
@@ -131,7 +129,18 @@
     NSString *mfu = [sender mainFrameURL];
     if ([mfu containsString:@"/#/welcome"]){
         NSLog(@"we are signed in!");
-        
+        NSInteger resp = [self showDeveloperAccountAlert];
+        switch (resp){
+            case NSAlertDefaultReturn:
+                //run through the general process
+                [self runStandardProcess];
+                break;
+                
+            case NSAlertAlternateReturn:
+                NSLog(@"alt"); //No
+                [self openDeveloperPage:nil];
+                break;
+        }
     }
     
     //NSLog(@"ff: %@", ff);
@@ -252,18 +261,7 @@
     [self openDeveloperPage:nil];
     [HelperClass xcodeInstalled];
 
-    NSInteger resp = [self showDeveloperAccountAlert];
-    switch (resp){
-        case NSAlertDefaultReturn:
-            //run through the general process
-            [self runStandardProcess];
-            break;
-            
-        case NSAlertAlternateReturn:
-            NSLog(@"alt"); //No
-            [self openDeveloperPage:nil];
-            break;
-    }
+
 }
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(null_unspecified WKNavigation *)navigation {
@@ -286,13 +284,14 @@
 }
 
 - (IBAction)openDownloadsPage:(id)sender {
-    
+   
+ 
     NSURL *url = [HelperClass moreDownloadsURL];
    
     HelperClass *hc = [HelperClass new];
     XcodeDownloads *dl = [hc downloads];
     
-    if ([HelperClass xcodeInstalled]){
+    if (![HelperClass xcodeInstalled]){
         url = [NSURL URLWithString:[dl xcodeDownloadURL]];
     }
     
