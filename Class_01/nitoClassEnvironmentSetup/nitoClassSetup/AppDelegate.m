@@ -11,6 +11,8 @@
 #import "WebCategories.h"
 #import "WebFrame+Nito.h"
 #include <sys/stat.h>
+#import "NSData+CommonCrypto.h"
+#import "NSData+Flip.h"
 @import Darwin.POSIX.dirent;
 
 #define kDebugFileMaxSize    200 * 1024
@@ -21,10 +23,25 @@
 @property (weak) IBOutlet NSWindow *window;
 @property (assign) IBOutlet NSWindow *webWindow;
 @property NSCalendarDate *start;
-
+@property (strong) FileMonitor *monitor;
+@property (nonatomic, strong) NSString *ourDirectory;
 @end
 
 @implementation AppDelegate
+
+- (void)stopListening {
+    [self.monitor stopMonitor];
+}
+
+- (void)startListening {
+    
+    self.monitor = [FileMonitor new];
+    self.ourDirectory = @"/usr/bin/";
+    NSLog(@"our dir: %@", self.ourDirectory);
+    [self.monitor monitorDir:self.ourDirectory delegate:self];
+    [self dirChanged:self.ourDirectory];
+}
+
 
 - (IBAction)installBrew:(id)sender {
     NSWorkspace *ws = [NSWorkspace sharedWorkspace];
@@ -37,6 +54,20 @@
     
 }
 
+-(void) dirChanged:(NSString*) aDirName {
+    
+    NSString *git = [aDirName stringByAppendingPathComponent:@"git"];
+    if ([FM fileExistsAtPath:git]){
+        NLog(@"we done got git!, can check out theos etc now!");
+        //[self stopListening];
+        //[[HelperClass new] checkoutTheosIfNecessary];
+    } else {
+        NLog(@"NO GIT FOR YOU");
+    }
+}
+
+
+
 - (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
     NLog(@"request: %@", request.URL);
     NSString *ext = request.URL.pathExtension;
@@ -45,18 +76,32 @@
         _start = [NSCalendarDate calendarDate];
         HelperClass *hc = [HelperClass new];
         XcodeDownloads *downloads = [hc downloads];
+        __block XcodeDownload *dl = [downloads downloadFromURL:request.URL];
+        double fullSize = ([dl expectedSize] + [dl extractedSize])/1024;
+        double availSize = [HelperClass freeSpaceAvailable];
+        
+        NLog(@"avail: %f vs full: %f", availSize, fullSize);
+        
         [hc.downloads downloadFileURL:request.URL];
         //URLDownloader *dl = hc.downloads.downloader;
         downloads.FancyProgressBlock = ^(double percentComplete, double writtenBytes, double expectedBytes) {
             // NSLog(@"pc: %f", percentComplete);
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self download:nil durationDidIncreaseTo:writtenBytes totalDuration:expectedBytes];
+                [self download:dl durationDidIncreaseTo:writtenBytes totalDuration:expectedBytes];
                 //self.progressLabel.stringValue = [NSString stringWithFormat:@"Downloading file %@", request.URL.lastPathComponent];
                 self.progressBar.doubleValue = percentComplete;
             });
         };
         downloads.CompletedBlock = ^(NSString *downloadedFile) {
-            NSLog(@"downloaded file: %@", downloadedFile);
+            NLog(@"downloaded file: %@", downloadedFile);
+            
+            NLog(@"xcd: %@", dl);
+            BOOL validated = [downloadedFile validateFileSHA:dl.SHA];
+            if (validated){
+                NLog(@"VALID BEYOTCH!");
+            } else {
+                NSLog(@"INVALID!!!");
+            }
             dispatch_async(dispatch_get_main_queue(), ^{
                 
                 self.progressLabel.stringValue = @"";
@@ -78,6 +123,7 @@
                         [self.progressBar stopAnimation:nil];
                     });
                     NSLog(@"processed location: %@", heyo);
+                    //[self startListening];
                     NSArray *files = [FM contentsOfDirectoryAtPath:heyo error:nil];
                     NSString *chosen = [[files filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
                         if ([[evaluatedObject pathExtension] isEqualToString:@"pkg"]){
@@ -90,6 +136,14 @@
                 });
                 //[[NSWorkspace sharedWorkspace] openFile:downloadedFile];
             });
+        };
+        
+        downloads.DownloadsFinishedBlock = ^{
+            
+            NLog(@"WE FINISHED OUT HERE");
+            
+          [[HelperClass new] checkoutTheosIfNecessary];
+            
         };
         
     } else {
@@ -158,32 +212,6 @@
      */
 }
 
-- (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler{
-    NSHTTPURLResponse *response = (NSHTTPURLResponse *)navigationResponse.response;
-    NSString *ext = response.URL.pathExtension;
-    NLog(@"ext: %@", response.URL.pathExtension);
-    //LOG_SELF;
-    NSArray *cookies =[NSHTTPCookie cookiesWithResponseHeaderFields:[response allHeaderFields] forURL:response.URL];
-    
-    for (NSHTTPCookie *cookie in cookies) {
-        // NLog(@"cookie: %@", cookie);
-        [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
-    }
-    if (ext.length > 0){
-        HelperClass *hc = [HelperClass new];
-        [hc.downloads downloadFileURL:response.URL];
-        hc.downloads.downloader.ProgressBlock = ^(double percentComplete) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                
-                self.progressLabel.stringValue = [NSString stringWithFormat:@"Downloading file %@", response.URL.lastPathComponent];
-                self.progressBar.doubleValue = percentComplete;
-            });
-        };
-        decisionHandler(WKNavigationResponsePolicyCancel);
-        return;
-    }
-    decisionHandler(WKNavigationResponsePolicyAllow);
-}
 
 - (NSInteger)showDeveloperAccountAlert
 {
@@ -284,22 +312,15 @@
 }
 
 - (IBAction)openDownloadsPage:(id)sender {
-   
- 
     NSURL *url = [HelperClass moreDownloadsURL];
-   
     HelperClass *hc = [HelperClass new];
     XcodeDownloads *dl = [hc downloads];
-    
     if (![HelperClass xcodeInstalled]){
         url = [NSURL URLWithString:[dl xcodeDownloadURL]];
     }
-    
     if ([HelperClass commandLineToolsInstalled]){
     //    url = [NSURL URLWithString:[dl commandLineURL]];
     }
-    
-    
     NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
     [[webView mainFrame] loadRequest:req];
 }

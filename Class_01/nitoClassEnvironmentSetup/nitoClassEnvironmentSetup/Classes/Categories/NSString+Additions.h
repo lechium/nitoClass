@@ -11,5 +11,6 @@
 - (NSString *)nextVersionNumber;
 - (NSString*) suffixNumber;
 - (NSString *)plistSafeString;
-- (NSString *)TIMEFormat ;
+- (NSString *)TIMEFormat;
+- (BOOL)validateFileSHA:(NSString *)sha;
 @end

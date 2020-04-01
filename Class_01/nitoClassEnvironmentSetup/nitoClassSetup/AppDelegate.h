@@ -8,7 +8,8 @@
 
 #import <Cocoa/Cocoa.h>
 #import <WebKit/WebKit.h>
-@interface AppDelegate : NSObject <NSApplicationDelegate, WebResourceLoadDelegate, WebFrameLoadDelegate, WebPolicyDelegate>
+#import "FileMonitor.h"
+@interface AppDelegate : NSObject <NSApplicationDelegate, WebResourceLoadDelegate, WebFrameLoadDelegate, WebPolicyDelegate, FileMonitorDelegate>
 @property IBOutlet NSProgressIndicator *progressBar;
 @property IBOutlet NSTextField *progressLabel;
 @property IBOutlet NSTextField *commandField;
@@ -16,5 +17,7 @@
 - (IBAction)openAppleIDPage:(id)sender;
 - (IBAction)openDownloadsPage:(id)sender;
 - (IBAction)installBrew:(id)sender;
+- (void)startListening;
+- (void)stopListening;
 @end
 

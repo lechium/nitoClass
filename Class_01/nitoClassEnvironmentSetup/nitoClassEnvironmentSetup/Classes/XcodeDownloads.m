@@ -95,6 +95,7 @@
                 XcodeDownload *xcD = [XcodeDownload new];
                 xcD.downloadType = FileDownloadTypeCLI;
                 xcD.SHA = @"e4084bece08e6af1c2e3c44381a0fec54ff0639c";
+                //e4084bece08e6af1c2e3c44381a0fec54ff0639c
                 xcD.downloadURL = @"https://download.developer.apple.com/Developer_Tools/Command_Line_Tools_macOS_10.13_for_Xcode_10/Command_Line_Tools_macOS_10.13_for_Xcode_10.dmg";
                 xcD.expectedSize = 195780760;
                 xcD.extractedSize = 0;
@@ -124,6 +125,10 @@
     return (self.downloads.count > 0);
 }
 
+- (XcodeDownload *)downloadFromURL:(NSURL *)url {
+    return [[self.downloads filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"downloadURL == %@", url.absoluteString]] lastObject];
+}
+
 
 - (void)downloadFile:(XcodeDownload *)download {
     
@@ -138,7 +143,15 @@
     }];
     
     [self.operationQueue addOperation:downloadOp];
-;
+    downloadOp.completionBlock = ^{
+      
+        if (self.operationQueue.operationCount == 1){
+            NLog(@"lastop, we out here!");
+            if (self.DownloadsFinishedBlock){
+                self.DownloadsFinishedBlock();
+            }
+        }
+    };
 }
 
 - (void)downloadFileURL:(NSURL *)url {

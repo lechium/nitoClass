@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "URLDownloader.h"
 #import "DownloadOperation.h"
 typedef enum {
     FileDownloadTypeXcode,
@@ -34,8 +33,8 @@ FileDownloadType;
 @property (strong, atomic) void (^ProgressBlock)(double percentComplete);
 @property (strong, atomic) void (^FancyProgressBlock)(double percentComplete, double writtenBytes, double expectedBytes);
 @property (strong, atomic) void (^CompletedBlock)(NSString *downloadedFile);
+@property (strong, atomic) void (^DownloadsFinishedBlock)(void);
 @property (strong, nonatomic) NSOperationQueue      *operationQueue;
-@property (nonatomic, strong) URLDownloader *downloader;
 @property BOOL xcodeInstalled;
 @property BOOL cliInstalled;
 @property NCSystemVersionType sytemVersion;
@@ -44,5 +43,6 @@ FileDownloadType;
 @property NSString *commandLineURL;
 - (void)downloadFileURL:(NSURL *)url;
 - (BOOL)hasDownloads;
+- (XcodeDownload *)downloadFromURL:(NSURL *)url;
 
 @end

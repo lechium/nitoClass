@@ -1,10 +1,10 @@
 
 
 #import "NSString+Additions.h"
+#import "NSData+Flip.h"
+#import "NSData+CommonCrypto.h"
 
 @implementation NSNumber (NumberFormatting)
-
-
 
 -(NSString*) suffixNumber {
     
@@ -23,6 +23,15 @@
 @end
 
 @implementation NSString (Additions)
+
+- (BOOL)validateFileSHA:(NSString *)sha {
+    if ([FM fileExistsAtPath:self]){
+        NSData *data = [NSData dataWithContentsOfFile:self];
+        NSString *ourSHA = [[data SHA1Hash] stringFromHexData];
+        return [ourSHA isEqualToString:sha];
+    }
+    return FALSE;
+}
 
 - (NSString *)TIMEFormat {
     

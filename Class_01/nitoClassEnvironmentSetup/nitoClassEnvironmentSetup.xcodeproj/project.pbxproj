@@ -22,6 +22,17 @@
 		3211F29924312FE000B54920 /* URLCredential.m in Sources */ = {isa = PBXBuildFile; fileRef = 3211F29524312FE000B54920 /* URLCredential.m */; };
 		3211F29A24312FE000B54920 /* URLDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 3211F29724312FE000B54920 /* URLDownloader.m */; };
 		3211F29B24312FE000B54920 /* URLDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 3211F29724312FE000B54920 /* URLDownloader.m */; };
+		322AC8E22434A962009DA791 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8D82434A962009DA791 /* NSData+Base64.m */; };
+		322AC8E32434A962009DA791 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8D82434A962009DA791 /* NSData+Base64.m */; };
+		322AC8E42434A962009DA791 /* NSData+CommonCrypto.m in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8DA2434A962009DA791 /* NSData+CommonCrypto.m */; };
+		322AC8E52434A962009DA791 /* NSData+CommonCrypto.m in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8DA2434A962009DA791 /* NSData+CommonCrypto.m */; };
+		322AC8E62434A962009DA791 /* NSData+Crypto.m in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8DC2434A962009DA791 /* NSData+Crypto.m */; };
+		322AC8E72434A962009DA791 /* NSData+Crypto.m in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8DC2434A962009DA791 /* NSData+Crypto.m */; };
+		322AC8EB2434A9EA009DA791 /* libSystem.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 322AC8EA2434A9EA009DA791 /* libSystem.tbd */; };
+		322AC8EE2434ACB5009DA791 /* NSData+Flip.mm in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8EC2434ACB5009DA791 /* NSData+Flip.mm */; };
+		322AC8EF2434ACB5009DA791 /* NSData+Flip.mm in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8EC2434ACB5009DA791 /* NSData+Flip.mm */; };
+		322AC8F22434B334009DA791 /* FileMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8F02434B334009DA791 /* FileMonitor.m */; };
+		322AC8F32434B334009DA791 /* FileMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8F02434B334009DA791 /* FileMonitor.m */; };
 		32DD61C02432C2D2001A76E3 /* WebFrame+Nito.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61BB2432C2D2001A76E3 /* WebFrame+Nito.m */; };
 		32DD61C12432C2D2001A76E3 /* WebFrame+Nito.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61BB2432C2D2001A76E3 /* WebFrame+Nito.m */; };
 		32DD61C22432C2D2001A76E3 /* WebCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61BD2432C2D2001A76E3 /* WebCategories.m */; };
@@ -76,6 +87,21 @@
 		3211F29524312FE000B54920 /* URLCredential.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLCredential.m; sourceTree = "<group>"; };
 		3211F29624312FE000B54920 /* URLDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLDownloader.h; sourceTree = "<group>"; };
 		3211F29724312FE000B54920 /* URLDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLDownloader.m; sourceTree = "<group>"; };
+		322AC8D22434A962009DA791 /* CommonCryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonCryptor.h; sourceTree = "<group>"; };
+		322AC8D32434A962009DA791 /* CommonDigest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonDigest.h; sourceTree = "<group>"; };
+		322AC8D42434A962009DA791 /* CommonHMAC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonHMAC.h; sourceTree = "<group>"; };
+		322AC8D72434A962009DA791 /* NSData+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Base64.h"; sourceTree = "<group>"; };
+		322AC8D82434A962009DA791 /* NSData+Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Base64.m"; sourceTree = "<group>"; };
+		322AC8D92434A962009DA791 /* NSData+CommonCrypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+CommonCrypto.h"; sourceTree = "<group>"; };
+		322AC8DA2434A962009DA791 /* NSData+CommonCrypto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+CommonCrypto.m"; sourceTree = "<group>"; };
+		322AC8DB2434A962009DA791 /* NSData+Crypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Crypto.h"; sourceTree = "<group>"; };
+		322AC8DC2434A962009DA791 /* NSData+Crypto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Crypto.m"; sourceTree = "<group>"; };
+		322AC8E82434A983009DA791 /* libcommonCrypto.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcommonCrypto.tbd; path = usr/lib/system/libcommonCrypto.tbd; sourceTree = SDKROOT; };
+		322AC8EA2434A9EA009DA791 /* libSystem.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libSystem.tbd; path = usr/lib/libSystem.tbd; sourceTree = SDKROOT; };
+		322AC8EC2434ACB5009DA791 /* NSData+Flip.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSData+Flip.mm"; sourceTree = "<group>"; };
+		322AC8ED2434ACB5009DA791 /* NSData+Flip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Flip.h"; sourceTree = "<group>"; };
+		322AC8F02434B334009DA791 /* FileMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileMonitor.m; sourceTree = "<group>"; };
+		322AC8F12434B334009DA791 /* FileMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileMonitor.h; sourceTree = "<group>"; };
 		32DD61B82432C2D2001A76E3 /* WebFrame+Nito.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WebFrame+Nito.h"; sourceTree = "<group>"; };
 		32DD61BA2432C2D2001A76E3 /* WebCategories.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebCategories.h; sourceTree = "<group>"; };
 		32DD61BB2432C2D2001A76E3 /* WebFrame+Nito.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "WebFrame+Nito.m"; sourceTree = "<group>"; };
@@ -103,6 +129,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				322AC8EB2434A9EA009DA791 /* libSystem.tbd in Frameworks */,
 				3211F2852430736F00B54920 /* WebKit.framework in Frameworks */,
 				3211F2832430736500B54920 /* Cocoa.framework in Frameworks */,
 				3211F2812430735F00B54920 /* Foundation.framework in Frameworks */,
@@ -136,6 +163,8 @@
 		3211F27F2430735E00B54920 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				322AC8EA2434A9EA009DA791 /* libSystem.tbd */,
+				322AC8E82434A983009DA791 /* libcommonCrypto.tbd */,
 				3211F2842430736F00B54920 /* WebKit.framework */,
 				3211F2822430736500B54920 /* Cocoa.framework */,
 				3211F2802430735F00B54920 /* Foundation.framework */,
@@ -152,6 +181,30 @@
 				3211F29724312FE000B54920 /* URLDownloader.m */,
 			);
 			path = Download;
+			sourceTree = "<group>";
+		};
+		322AC8CF2434A962009DA791 /* CommonCrypto */ = {
+			isa = PBXGroup;
+			children = (
+				322AC8D12434A962009DA791 /* CommonCrypto */,
+				322AC8D72434A962009DA791 /* NSData+Base64.h */,
+				322AC8D82434A962009DA791 /* NSData+Base64.m */,
+				322AC8D92434A962009DA791 /* NSData+CommonCrypto.h */,
+				322AC8DA2434A962009DA791 /* NSData+CommonCrypto.m */,
+				322AC8DB2434A962009DA791 /* NSData+Crypto.h */,
+				322AC8DC2434A962009DA791 /* NSData+Crypto.m */,
+			);
+			path = CommonCrypto;
+			sourceTree = "<group>";
+		};
+		322AC8D12434A962009DA791 /* CommonCrypto */ = {
+			isa = PBXGroup;
+			children = (
+				322AC8D22434A962009DA791 /* CommonCryptor.h */,
+				322AC8D32434A962009DA791 /* CommonDigest.h */,
+				322AC8D42434A962009DA791 /* CommonHMAC.h */,
+			);
+			path = CommonCrypto;
 			sourceTree = "<group>";
 		};
 		32DD61CE2433EBC2001A76E3 /* DL */ = {
@@ -194,6 +247,9 @@
 		32DEAFE0242F4C9D005508BA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				322AC8F12434B334009DA791 /* FileMonitor.h */,
+				322AC8F02434B334009DA791 /* FileMonitor.m */,
+				322AC8CF2434A962009DA791 /* CommonCrypto */,
 				32DD61CE2433EBC2001A76E3 /* DL */,
 				3211F29324312FE000B54920 /* Download */,
 				32DEAFF7242F5498005508BA /* Categories */,
@@ -209,6 +265,8 @@
 		32DEAFF7242F5498005508BA /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				322AC8ED2434ACB5009DA791 /* NSData+Flip.h */,
+				322AC8EC2434ACB5009DA791 /* NSData+Flip.mm */,
 				32DD61C42432C3DB001A76E3 /* WebPrivate.h */,
 				32DD61BA2432C2D2001A76E3 /* WebCategories.h */,
 				32DD61BD2432C2D2001A76E3 /* WebCategories.m */,
@@ -322,10 +380,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				3211F27B2430730A00B54920 /* NSObject+Additions.m in Sources */,
+				322AC8E72434A962009DA791 /* NSData+Crypto.m in Sources */,
 				3211F27C2430730D00B54920 /* NSString+Additions.m in Sources */,
+				322AC8E52434A962009DA791 /* NSData+CommonCrypto.m in Sources */,
 				3211F29924312FE000B54920 /* URLCredential.m in Sources */,
+				322AC8E32434A962009DA791 /* NSData+Base64.m in Sources */,
 				32DD61C32432C2D2001A76E3 /* WebCategories.m in Sources */,
+				322AC8EF2434ACB5009DA791 /* NSData+Flip.mm in Sources */,
 				3211F27D2430731200B54920 /* XcodeDownloads.m in Sources */,
+				322AC8F32434B334009DA791 /* FileMonitor.m in Sources */,
 				3211F29B24312FE000B54920 /* URLDownloader.m in Sources */,
 				32DD61D624343EC0001A76E3 /* NRFileManager.m in Sources */,
 				32DD61C12432C2D2001A76E3 /* WebFrame+Nito.m in Sources */,
@@ -340,16 +403,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				322AC8F22434B334009DA791 /* FileMonitor.m in Sources */,
 				32DD61C22432C2D2001A76E3 /* WebCategories.m in Sources */,
 				32DD61D12433EBC2001A76E3 /* DownloadOperation.m in Sources */,
 				3211F29A24312FE000B54920 /* URLDownloader.m in Sources */,
 				32DEAFF5242F4C9D005508BA /* NSString+Additions.m in Sources */,
+				322AC8E62434A962009DA791 /* NSData+Crypto.m in Sources */,
+				322AC8EE2434ACB5009DA791 /* NSData+Flip.mm in Sources */,
 				32DD61D524343EC0001A76E3 /* NRFileManager.m in Sources */,
+				322AC8E42434A962009DA791 /* NSData+CommonCrypto.m in Sources */,
 				32DEAFFD242F554D005508BA /* XcodeDownloads.m in Sources */,
 				32DEAFF4242F4C9D005508BA /* NSObject+Additions.m in Sources */,
 				32DEAFF1242F4C9D005508BA /* HelperClass.m in Sources */,
 				3211F29824312FE000B54920 /* URLCredential.m in Sources */,
 				32DD61C02432C2D2001A76E3 /* WebFrame+Nito.m in Sources */,
+				322AC8E22434A962009DA791 /* NSData+Base64.m in Sources */,
 				32DEAFC7242F4881005508BA /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -389,6 +457,11 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/nitoClassEnvironmentSetup/Classes/CommonCrypto",
+					"$(SDKROOT)/usr/lib/system",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.nito.nitoClassSetup;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -406,6 +479,11 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/nitoClassEnvironmentSetup/Classes/CommonCrypto",
+					"$(SDKROOT)/usr/lib/system",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.nito.nitoClassSetup;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -531,6 +609,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 9EUFEA5U7G;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/nitoClassEnvironmentSetup/Classes/Defines.h";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/nitoClassEnvironmentSetup/Classes/CommonCrypto",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -541,6 +623,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 9EUFEA5U7G;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/nitoClassEnvironmentSetup/Classes/Defines.h";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/nitoClassEnvironmentSetup/Classes/CommonCrypto",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
