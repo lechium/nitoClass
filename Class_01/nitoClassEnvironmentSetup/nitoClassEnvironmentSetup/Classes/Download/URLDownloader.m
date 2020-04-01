@@ -195,6 +195,7 @@
 
     [self setState:URLDownloaderStateDownloading];
     NSLog(@"[URLDownloader] Downloading %@ ...", [[response URL] absoluteString]);
+    NSLog(@"[URLDownloader] to location: %@", [self downloadLocation]);
     if ([self.delegate respondsToSelector:@selector(urlDownloaderDidStart:)])
     {
         [self.delegate urlDownloaderDidStart:self];

@@ -128,6 +128,24 @@
     return nil;
 }
 
++ (NSString *)processDownload:(NSString *)download {
+    
+    NSString *fileExt = [[download pathExtension] lowercaseString];
+    if ([fileExt isEqualToString:@"dmg"]){
+       return [self mountImage:download];
+    } else if ([fileExt isEqualToString:@"xip"]){
+        
+        NSInteger bro = [self runTask:[NSString stringWithFormat:@"/usr/bin/xip -x %@", download] inFolder:NSHomeDirectory()];
+        if (bro == 0){
+            return @"success";
+        } else {
+            return [NSString stringWithFormat:@"returned with status %lu", bro];
+        }
+        //return [self singleLineReturnForProcess:[NSString stringWithFormat:@"/usr/bin/xip -x %@", download]];
+    }
+    return nil;
+}
+
 + (NCSystemVersionType)currentVersion {
     SInt32 major = 0;
     SInt32 minor = 0;
@@ -143,6 +161,7 @@
     return NCSystemVersionTypeUnsupported;
 }
 + (BOOL)commandLineToolsInstalled {
+    return false;
     return ([[NSFileManager defaultManager] fileExistsAtPath:@"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/SDKSettings.plist"]);
 }
 
@@ -202,7 +221,7 @@
 }
 
 + (BOOL)xcodeInstalled {
-    
+    return false;
     NSString *path = [[NSWorkspace sharedWorkspace] fullPathForApplication:@"Xcode.app"];
     NSLog(@"path: %@", path);
     if (path.length > 0){
@@ -259,7 +278,7 @@
     [task setCurrentDirectoryPath:targetFolder];
     [task launch];
     [task waitUntilExit];
-    NSTaskTerminationReason retStatus = [task terminationReason];
+    NSInteger retStatus = [task terminationStatus];
     return retStatus;
 }
 

@@ -4,6 +4,8 @@
 
 @implementation NSNumber (NumberFormatting)
 
+
+
 -(NSString*) suffixNumber {
     
     long long num = [self longLongValue];
@@ -21,6 +23,15 @@
 @end
 
 @implementation NSString (Additions)
+
+- (NSString *)TIMEFormat {
+    
+    NSInteger secondsLeft = [self integerValue];
+    NSInteger _hours = (NSInteger)secondsLeft / 3600;
+    NSInteger _minutes = (NSInteger)secondsLeft / 60 % 60;
+    NSInteger _seconds = (NSInteger)secondsLeft % 60;
+    return [NSString stringWithFormat:@"%02li:%02li:%02li", (long)_hours, (long)_minutes, (long)_seconds];
+}
 
 -(NSString*) suffixNumber {
     

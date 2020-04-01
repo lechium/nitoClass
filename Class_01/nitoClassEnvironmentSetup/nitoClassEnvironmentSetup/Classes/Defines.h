@@ -2,6 +2,7 @@
 #import <Foundation/Foundation.h>
 #import "NSObject+Additions.h"
 #import "NSString+Additions.h"
+#import "NRFileManager.h"
 
 typedef NS_ENUM(NSInteger, BSPackageFileType)
 {

@@ -27,6 +27,10 @@
 		32DD61C22432C2D2001A76E3 /* WebCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61BD2432C2D2001A76E3 /* WebCategories.m */; };
 		32DD61C32432C2D2001A76E3 /* WebCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61BD2432C2D2001A76E3 /* WebCategories.m */; };
 		32DD61C72432F71A001A76E3 /* nitoClassEnvironmentSetup in Resources */ = {isa = PBXBuildFile; fileRef = 32DEAFC3242F4881005508BA /* nitoClassEnvironmentSetup */; };
+		32DD61D12433EBC2001A76E3 /* DownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61D02433EBC2001A76E3 /* DownloadOperation.m */; };
+		32DD61D22433EBC2001A76E3 /* DownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61D02433EBC2001A76E3 /* DownloadOperation.m */; };
+		32DD61D524343EC0001A76E3 /* NRFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61D424343EC0001A76E3 /* NRFileManager.m */; };
+		32DD61D624343EC0001A76E3 /* NRFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61D424343EC0001A76E3 /* NRFileManager.m */; };
 		32DEAFC7242F4881005508BA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFC6242F4881005508BA /* main.m */; };
 		32DEAFF1242F4C9D005508BA /* HelperClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFE5242F4C9D005508BA /* HelperClass.m */; };
 		32DEAFF4242F4C9D005508BA /* NSObject+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFEB242F4C9D005508BA /* NSObject+Additions.m */; };
@@ -77,6 +81,10 @@
 		32DD61BB2432C2D2001A76E3 /* WebFrame+Nito.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "WebFrame+Nito.m"; sourceTree = "<group>"; };
 		32DD61BD2432C2D2001A76E3 /* WebCategories.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebCategories.m; sourceTree = "<group>"; };
 		32DD61C42432C3DB001A76E3 /* WebPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebPrivate.h; sourceTree = "<group>"; };
+		32DD61CF2433EBC2001A76E3 /* DownloadOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadOperation.h; sourceTree = "<group>"; };
+		32DD61D02433EBC2001A76E3 /* DownloadOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadOperation.m; sourceTree = "<group>"; };
+		32DD61D324343EC0001A76E3 /* NRFileManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NRFileManager.h; sourceTree = "<group>"; };
+		32DD61D424343EC0001A76E3 /* NRFileManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NRFileManager.m; sourceTree = "<group>"; };
 		32DEAFC3242F4881005508BA /* nitoClassEnvironmentSetup */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = nitoClassEnvironmentSetup; sourceTree = BUILT_PRODUCTS_DIR; };
 		32DEAFC6242F4881005508BA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32DEAFE1242F4C9D005508BA /* Defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Defines.h; sourceTree = "<group>"; };
@@ -146,6 +154,15 @@
 			path = Download;
 			sourceTree = "<group>";
 		};
+		32DD61CE2433EBC2001A76E3 /* DL */ = {
+			isa = PBXGroup;
+			children = (
+				32DD61CF2433EBC2001A76E3 /* DownloadOperation.h */,
+				32DD61D02433EBC2001A76E3 /* DownloadOperation.m */,
+			);
+			path = DL;
+			sourceTree = "<group>";
+		};
 		32DEAFBA242F4880005508BA = {
 			isa = PBXGroup;
 			children = (
@@ -177,6 +194,7 @@
 		32DEAFE0242F4C9D005508BA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				32DD61CE2433EBC2001A76E3 /* DL */,
 				3211F29324312FE000B54920 /* Download */,
 				32DEAFF7242F5498005508BA /* Categories */,
 				32DEAFE1242F4C9D005508BA /* Defines.h */,
@@ -200,6 +218,8 @@
 				32DEAFEB242F4C9D005508BA /* NSObject+Additions.m */,
 				32DEAFEC242F4C9D005508BA /* NSString+Additions.h */,
 				32DEAFED242F4C9D005508BA /* NSString+Additions.m */,
+				32DD61D324343EC0001A76E3 /* NRFileManager.h */,
+				32DD61D424343EC0001A76E3 /* NRFileManager.m */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -307,9 +327,11 @@
 				32DD61C32432C2D2001A76E3 /* WebCategories.m in Sources */,
 				3211F27D2430731200B54920 /* XcodeDownloads.m in Sources */,
 				3211F29B24312FE000B54920 /* URLDownloader.m in Sources */,
+				32DD61D624343EC0001A76E3 /* NRFileManager.m in Sources */,
 				32DD61C12432C2D2001A76E3 /* WebFrame+Nito.m in Sources */,
 				3211F2762430730000B54920 /* main.m in Sources */,
 				3211F27E2430731500B54920 /* HelperClass.m in Sources */,
+				32DD61D22433EBC2001A76E3 /* DownloadOperation.m in Sources */,
 				3211F26E243072F900B54920 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -319,8 +341,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				32DD61C22432C2D2001A76E3 /* WebCategories.m in Sources */,
+				32DD61D12433EBC2001A76E3 /* DownloadOperation.m in Sources */,
 				3211F29A24312FE000B54920 /* URLDownloader.m in Sources */,
 				32DEAFF5242F4C9D005508BA /* NSString+Additions.m in Sources */,
+				32DD61D524343EC0001A76E3 /* NRFileManager.m in Sources */,
 				32DEAFFD242F554D005508BA /* XcodeDownloads.m in Sources */,
 				32DEAFF4242F4C9D005508BA /* NSObject+Additions.m in Sources */,
 				32DEAFF1242F4C9D005508BA /* HelperClass.m in Sources */,

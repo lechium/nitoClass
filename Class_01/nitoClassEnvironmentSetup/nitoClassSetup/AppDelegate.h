@@ -15,7 +15,6 @@
 - (IBAction)openDeveloperPage:(id)sender;
 - (IBAction)openAppleIDPage:(id)sender;
 - (IBAction)openDownloadsPage:(id)sender;
-- (IBAction)testRun:(id)sender;
-- (IBAction)sendData:(id)sender;
+- (IBAction)installBrew:(id)sender;
 @end
 

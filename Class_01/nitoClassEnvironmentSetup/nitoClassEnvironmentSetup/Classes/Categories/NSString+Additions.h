@@ -11,4 +11,5 @@
 - (NSString *)nextVersionNumber;
 - (NSString*) suffixNumber;
 - (NSString *)plistSafeString;
+- (NSString *)TIMEFormat ;
 @end

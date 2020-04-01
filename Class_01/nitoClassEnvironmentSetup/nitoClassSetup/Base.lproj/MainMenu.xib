@@ -734,7 +734,7 @@
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
-                            <action selector="testRun:" target="Voe-Tx-rLC" id="TV8-uu-V7O"/>
+                            <action selector="installBrew:" target="Voe-Tx-rLC" id="xA9-0w-XK9"/>
                         </connections>
                     </button>
                     <progressIndicator wantsLayer="YES" maxValue="1" displayedWhenStopped="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="csr-CE-KVt">
