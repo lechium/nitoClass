@@ -94,11 +94,30 @@
     fullCmd = [NSString stringWithFormat:@"/bin/mv %@/* %@", [path stringByAppendingPathComponent:@"theos/sdk/sdks"], [path stringByAppendingPathComponent:@"theos/sdks/"]];
     NLog(@"moving tvOS theos sdks...\n");
     [HelperClass singleLineReturnForProcess:fullCmd];
-    
+    //https://raw.githubusercontent.com/lechium/TVControlCenter/master/tvos_control_center_bundle.nic.tar
+    [[self downloads] downloadFileURL:[NSURL URLWithString:@"https://raw.githubusercontent.com/lechium/TVControlCenter/master/tvos_control_center_bundle.nic.tar"]];
+    self.downloads.CompletedBlock = ^(NSString *downloadedFile) {
+      
+        NLog(@"downloadedFile: %@", downloadedFile);
+        NSString *fileName = [downloadedFile lastPathComponent];
+        NSString *templates = [self->_theosPath stringByAppendingPathComponent:@"templates/tvos"];
+        [FM createDirectoryAtPath:templates withIntermediateDirectories:true attributes:nil error:nil];
+        [FM moveItemAtPath:downloadedFile toPath:[templates stringByAppendingPathComponent:fileName] error:nil];
+        //mkdir([ot UTF8String], 0755);
+        //NSString *extract = [NSString stringWithFormat:@"/usr/bin/tar fxp %@ -C %@", downloadedFile, ot];
+        //NLog(@"extract command: %@", extract);
+        //[HelperClass singleLineReturnForProcess:extract];
+
+        
+        
+        
+    };
     //[HelperClass runTask:fullCmd inFolder:NSHomeDirectory()];
     
     //TODO: need to check out custom nic files
 }
+
+//post brew install: ldid, dpkg, other issues SDKs v make files. also some linking issues with my sdks
 
 + (BOOL)brewInstalled {
     return ([FM fileExistsAtPath:@"/usr/local/bin/brew"]);

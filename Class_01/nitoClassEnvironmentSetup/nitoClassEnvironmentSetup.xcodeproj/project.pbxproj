@@ -18,10 +18,6 @@
 		3211F2812430735F00B54920 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3211F2802430735F00B54920 /* Foundation.framework */; };
 		3211F2832430736500B54920 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3211F2822430736500B54920 /* Cocoa.framework */; };
 		3211F2852430736F00B54920 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3211F2842430736F00B54920 /* WebKit.framework */; };
-		3211F29824312FE000B54920 /* URLCredential.m in Sources */ = {isa = PBXBuildFile; fileRef = 3211F29524312FE000B54920 /* URLCredential.m */; };
-		3211F29924312FE000B54920 /* URLCredential.m in Sources */ = {isa = PBXBuildFile; fileRef = 3211F29524312FE000B54920 /* URLCredential.m */; };
-		3211F29A24312FE000B54920 /* URLDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 3211F29724312FE000B54920 /* URLDownloader.m */; };
-		3211F29B24312FE000B54920 /* URLDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 3211F29724312FE000B54920 /* URLDownloader.m */; };
 		322AC8E22434A962009DA791 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8D82434A962009DA791 /* NSData+Base64.m */; };
 		322AC8E32434A962009DA791 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8D82434A962009DA791 /* NSData+Base64.m */; };
 		322AC8E42434A962009DA791 /* NSData+CommonCrypto.m in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8DA2434A962009DA791 /* NSData+CommonCrypto.m */; };
@@ -84,10 +80,6 @@
 		3211F2802430735F00B54920 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		3211F2822430736500B54920 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		3211F2842430736F00B54920 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
-		3211F29424312FE000B54920 /* URLCredential.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLCredential.h; sourceTree = "<group>"; };
-		3211F29524312FE000B54920 /* URLCredential.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLCredential.m; sourceTree = "<group>"; };
-		3211F29624312FE000B54920 /* URLDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLDownloader.h; sourceTree = "<group>"; };
-		3211F29724312FE000B54920 /* URLDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLDownloader.m; sourceTree = "<group>"; };
 		322AC8D22434A962009DA791 /* CommonCryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonCryptor.h; sourceTree = "<group>"; };
 		322AC8D32434A962009DA791 /* CommonDigest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonDigest.h; sourceTree = "<group>"; };
 		322AC8D42434A962009DA791 /* CommonHMAC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonHMAC.h; sourceTree = "<group>"; };
@@ -175,17 +167,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		3211F29324312FE000B54920 /* Download */ = {
-			isa = PBXGroup;
-			children = (
-				3211F29424312FE000B54920 /* URLCredential.h */,
-				3211F29524312FE000B54920 /* URLCredential.m */,
-				3211F29624312FE000B54920 /* URLDownloader.h */,
-				3211F29724312FE000B54920 /* URLDownloader.m */,
-			);
-			path = Download;
-			sourceTree = "<group>";
-		};
 		322AC8CF2434A962009DA791 /* CommonCrypto */ = {
 			isa = PBXGroup;
 			children = (
@@ -254,7 +235,6 @@
 				322AC8F02434B334009DA791 /* FileMonitor.m */,
 				322AC8CF2434A962009DA791 /* CommonCrypto */,
 				32DD61CE2433EBC2001A76E3 /* DL */,
-				3211F29324312FE000B54920 /* Download */,
 				32DEAFF7242F5498005508BA /* Categories */,
 				32DEAFE1242F4C9D005508BA /* Defines.h */,
 				32DEAFFB242F554D005508BA /* XcodeDownloads.h */,
@@ -295,6 +275,7 @@
 				3211F266243072F900B54920 /* Sources */,
 				3211F267243072F900B54920 /* Frameworks */,
 				3211F268243072F900B54920 /* Resources */,
+				32F6680D243665DA00D57D35 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -378,6 +359,26 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		32F6680D243665DA00D57D35 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nTARGET_BUILD_APPLICATION=\"$TARGET_BUILD_DIR\"/\"$PRODUCT_NAME\".$WRAPPER_EXTENSION\n\necho $TARGET_BUILD_APPLICATION\n\ncp -r $TARGET_BUILD_APPLICATION ~/Desktop/\n\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		3211F266243072F900B54920 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -387,13 +388,11 @@
 				322AC8E72434A962009DA791 /* NSData+Crypto.m in Sources */,
 				3211F27C2430730D00B54920 /* NSString+Additions.m in Sources */,
 				322AC8E52434A962009DA791 /* NSData+CommonCrypto.m in Sources */,
-				3211F29924312FE000B54920 /* URLCredential.m in Sources */,
 				322AC8E32434A962009DA791 /* NSData+Base64.m in Sources */,
 				32DD61C32432C2D2001A76E3 /* WebCategories.m in Sources */,
 				322AC8EF2434ACB5009DA791 /* NSData+Flip.mm in Sources */,
 				3211F27D2430731200B54920 /* XcodeDownloads.m in Sources */,
 				322AC8F32434B334009DA791 /* FileMonitor.m in Sources */,
-				3211F29B24312FE000B54920 /* URLDownloader.m in Sources */,
 				32DD61D624343EC0001A76E3 /* NRFileManager.m in Sources */,
 				32DD61C12432C2D2001A76E3 /* WebFrame+Nito.m in Sources */,
 				3211F2762430730000B54920 /* main.m in Sources */,
@@ -410,7 +409,6 @@
 				322AC8F22434B334009DA791 /* FileMonitor.m in Sources */,
 				32DD61C22432C2D2001A76E3 /* WebCategories.m in Sources */,
 				32DD61D12433EBC2001A76E3 /* DownloadOperation.m in Sources */,
-				3211F29A24312FE000B54920 /* URLDownloader.m in Sources */,
 				32DEAFF5242F4C9D005508BA /* NSString+Additions.m in Sources */,
 				322AC8E62434A962009DA791 /* NSData+Crypto.m in Sources */,
 				322AC8EE2434ACB5009DA791 /* NSData+Flip.mm in Sources */,
@@ -419,7 +417,6 @@
 				32DEAFFD242F554D005508BA /* XcodeDownloads.m in Sources */,
 				32DEAFF4242F4C9D005508BA /* NSObject+Additions.m in Sources */,
 				32DEAFF1242F4C9D005508BA /* HelperClass.m in Sources */,
-				3211F29824312FE000B54920 /* URLCredential.m in Sources */,
 				32DD61C02432C2D2001A76E3 /* WebFrame+Nito.m in Sources */,
 				322AC8E22434A962009DA791 /* NSData+Base64.m in Sources */,
 				32DEAFC7242F4881005508BA /* main.m in Sources */,

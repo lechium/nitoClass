@@ -80,7 +80,7 @@
         return;
     }
     
-    NSLog(@"starting task...");
+    NLog(@"starting task...");
     /*
      Create a new download task using the URL session. Tasks start in the “suspended” state; to start a task you need to explicitly call -resume on a task after creating it.
      */
@@ -98,7 +98,7 @@
     
     if (downloadTask == self.downloadTask) {
         double progress = (double)totalBytesWritten / (double)totalBytesExpectedToWrite;
-        //NSLog(@"DownloadTask: %@ progress: %lf", downloadTask, progress);
+        //NLog(@"DownloadTask: %@ progress: %lf", downloadTask, progress);
         dispatch_async(dispatch_get_main_queue(), ^{
             if (self.FancyProgressBlock){
                 self.FancyProgressBlock(progress, totalBytesWritten, totalBytesExpectedToWrite);
@@ -115,7 +115,7 @@
      As an example, copy the file to the Documents directory of your app.
      */
 
-    NSLog(@"downloaded file to url: %@", downloadURL);
+    NLog(@"downloaded file to url: %@", downloadURL);
     NSURL *destinationURL = [NSURL fileURLWithPath:[self downloadLocation]];
     NSError *errorCopy;
     
@@ -124,7 +124,7 @@
     BOOL success = [FM copyItemAtURL:downloadURL toURL:destinationURL error:&errorCopy];
     if (success){
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@"Task: %@ completed successfully", downloadTask);
+            NLog(@"Task: %@ completed successfully", downloadTask);
             if (self.CompletedBlock != nil)
             {
                 self.CompletedBlock(self->downloadLocation);
@@ -134,7 +134,7 @@
         /*
          In the general case, what you might do in the event of failure depends on the error and the specifics of your application.
          */
-        NSLog(@"Error during the copy: %@", [errorCopy localizedDescription]);
+        NLog(@"Error during the copy: %@", [errorCopy localizedDescription]);
     }
     [self willChangeValueForKey:@"executing"];
     __ourExecuting = false;
@@ -147,13 +147,13 @@
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
     if (error == nil) {
      /*
-        NSLog(@"Task: %@ completed successfully", task);
+        NLog(@"Task: %@ completed successfully", task);
         if (self.CompletedBlock != nil) {
             self.CompletedBlock(downloadLocation);
         }
       */
     } else {
-        NSLog(@"Task: %@ completed with error: %@", task, [error localizedDescription]);
+        NLog(@"Task: %@ completed with error: %@", task, [error localizedDescription]);
         if (self.CompletedBlock != nil) {
             self.CompletedBlock(downloadLocation);
         }
