@@ -1,7 +1,10 @@
 #import "XcodeDownloads.h"
 
 @interface HelperClass: NSObject
++ (NSString *)theosPath;
 + (NSString *)freeSpaceString;
++ (NSString *)aliasPath;
++ (NSString *)defaultShell;
 + (float)freeSpaceAvailable;
 @property XcodeDownloads *downloads;
 @property BOOL hasAppleId;

@@ -67,6 +67,15 @@
 }
 
 
+- (void)updateProgressLabel:(NSString *)text {
+    if (![NSThread isMainThread]){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.progressLabel.stringValue = text;
+        });
+    } else {
+        self.progressLabel.stringValue = text;
+    }
+}
 
 - (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
     NLog(@"request: %@", request.URL);
@@ -81,7 +90,11 @@
         double availSize = [HelperClass freeSpaceAvailable];
         
         NLog(@"avail: %f vs full: %f", availSize, fullSize);
-        
+        if (availSize < fullSize){
+            NLog(@"not enough space, this is probably bad!");
+            [self showInsufficientSpaceAlert];
+            return;
+        }
         [hc.downloads downloadFileURL:request.URL];
         //URLDownloader *dl = hc.downloads.downloader;
         downloads.FancyProgressBlock = ^(double percentComplete, double writtenBytes, double expectedBytes) {
@@ -96,12 +109,14 @@
             NLog(@"downloaded file: %@", downloadedFile);
             
             NLog(@"xcd: %@", dl);
-            BOOL validated = [downloadedFile validateFileSHA:dl.SHA];
-            if (validated){
-                NLog(@"VALID BEYOTCH!");
-            } else {
-                NSLog(@"INVALID!!!");
-            }
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+                BOOL validated = [downloadedFile validateFileSHA:dl.SHA];
+                if (validated){
+                    NLog(@"VALID!");
+                } else {
+                    NSLog(@"INVALID!!!");
+                }
+            });
             dispatch_async(dispatch_get_main_queue(), ^{
                 
                 self.progressLabel.stringValue = @"";
@@ -140,9 +155,7 @@
         
         downloads.DownloadsFinishedBlock = ^{
             
-            NLog(@"WE FINISHED OUT HERE");
-            
-          [[HelperClass new] checkoutTheosIfNecessary];
+            [self runPostXcodeProcess];
             
         };
         
@@ -153,33 +166,6 @@
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame; {
     
-    
-    //id ff = [frame findFrameNamed:@"aid-auth-widget"];
-    DOMHTMLDivElement *div = (DOMHTMLDivElement*)[[frame DOMDocument] getElementById:@"auth-container"];
-    NSLog(@"div : %@", [(DOMHTMLIFrameElement *)[div querySelector:@"iframe"] src]);
-    NSLog(@"url: %@", [sender mainFrameURL]);
-    
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        DOMHTMLElement *bro = [[frame DOMDocument] getElementById:@"grid_downloads_body"];
-        NLog(@"bro: %@", bro);
-        if (bro){
-            NSArray <DOMHTMLTableRowElement*> *things = [[bro querySelectorAll:@"td.w2ui-grid-data"] allObjects];
-            NLog(@"things: %@", things);
-            DOMHTMLElement *yo = [things objectAtIndex:3];
-            [yo click];
-            /*
-            [things enumerateObjectsUsingBlock:^(DOMHTMLTableRowElement * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                
-                DOMHTMLDivElement *kid = [obj firstElementChild];
-                
-                NLog(@"title: %@", kid);
-                
-            }];
-             */
-        }
-    });
-   
     NSString *mfu = [sender mainFrameURL];
     if ([mfu containsString:@"/#/welcome"]){
         NSLog(@"we are signed in!");
@@ -199,19 +185,12 @@
     
     //NSLog(@"ff: %@", ff);
     NSLog(@"title: %@", [[frame DOMDocument] title]);
-    // NSLog(@"form: %@", [[[[frame DOMDocument] forms] firstObject] innerHTML]);
-    // WebFrame *wf = [[frame childFrames] lastObject];
-    //NSLog(@"email: %@", [[wf DOMDocument] inputElementOfType:@"email"] );
-    //NSLog(@"password: %@", [[wf DOMDocument] inputElementOfType:@"password"] );
-    /*
-     NSLog(@"links: %@",[[[frame DOMDocument] links] allObjects] );
-     NSArray <DOMHTMLAnchorElement *>*links = [[[frame DOMDocument] links] allObjects];
-     [links enumerateObjectsUsingBlock:^(DOMHTMLAnchorElement * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-     NSLog(@"link %@ at index %lu",[obj innerText], idx);
-     }];
-     */
 }
 
+- (void)showInsufficientSpaceAlert {
+    NSAlert *developerAccountAlert = [NSAlert alertWithMessageText:NSLocalizedString(@"Insufficient Free Space",@"") defaultButton:NSLocalizedString(@"OK",@"") alternateButton:nil otherButton:nil informativeTextWithFormat:NSLocalizedString(@"There is insufficient free space to install the development environment.",@"")];
+    [developerAccountAlert runModal];
+}
 
 - (NSInteger)showDeveloperAccountAlert
 {
@@ -287,9 +266,33 @@
     // Insert code here to initialize your application
     [self _createViews];
     [self openDeveloperPage:nil];
-    [HelperClass xcodeInstalled];
+    [self scanEnvironment];
+
+}
 
 
+- (void)runPostXcodeProcess {
+    [self updateProgressLabel:@"Post Xcode Processing, checkinging out theos & sdks..."];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        [[HelperClass new] checkoutTheosIfNecessary];
+    });
+    
+}
+
+- (void)runAuthBasedProcess {
+    [self.window makeKeyAndOrderFront:nil];
+}
+
+
+- (void)scanEnvironment {
+    
+    if (![HelperClass xcodeInstalled] || ![HelperClass commandLineToolsInstalled]){
+        NLog(@"either Xcode or the command line tools are missing, need to authenticate!");
+        [self runAuthBasedProcess];
+    } else {
+        [self runPostXcodeProcess];
+    }
+    
 }
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(null_unspecified WKNavigation *)navigation {
@@ -298,14 +301,14 @@
 }
 
 - (void)runStandardProcess {
-   
+    
     //_start = [NSCalendarDate calendarDate];
     HelperClass *hc = [HelperClass new];
     XcodeDownloads *xcdl = [hc downloads];
     NSArray <XcodeDownload *> *dl = [xcdl downloads];
     
     [dl enumerateObjectsUsingBlock:^(XcodeDownload * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-       
+        
         NSURLRequest *req = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:obj.downloadURL]];
         [[self->webView mainFrame] loadRequest:req];
     }];
@@ -319,7 +322,7 @@
         url = [NSURL URLWithString:[dl xcodeDownloadURL]];
     }
     if ([HelperClass commandLineToolsInstalled]){
-    //    url = [NSURL URLWithString:[dl commandLineURL]];
+        //    url = [NSURL URLWithString:[dl commandLineURL]];
     }
     NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
     [[webView mainFrame] loadRequest:req];

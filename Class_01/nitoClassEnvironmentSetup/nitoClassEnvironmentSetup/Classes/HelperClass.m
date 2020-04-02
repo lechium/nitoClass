@@ -12,12 +12,21 @@
     self = [super init];
     if (self){
         _downloads = [XcodeDownloads new];
-        _theosPath = [HelperClass singleLineReturnForProcess:@"printenv THEOS"];
+        _theosPath = [[HelperClass theosPath] stringByExpandingTildeInPath];
+        NSLog(@"theosPath: %@", _theosPath);
         _username = [HelperClass singleLineReturnForProcess:@"whoami"];
         _dpkgPath = [HelperClass singleLineReturnForProcess:@"which dpkg-deb"];
     }
     return self;
 }
+
++ (NSString *)theosPath {
+    
+    NSString *alias = [HelperClass aliasPath];
+    NSString *envRun = [NSString stringWithFormat:@"cat %@ | grep -m 1 THEOS= | cut -d \"=\" -f 2", alias];
+    return [HelperClass singleLineReturnForProcess:envRun];
+}
+
 
 + (NSString *)freeSpaceString {
     float space = [self freeSpaceAvailable];
@@ -36,13 +45,31 @@
     return (avail2 < 60);
 }
 
++ (NSString *)defaultShell {
+    return [HelperClass singleLineReturnForProcess:@"printenv SHELL"];
+}
+
++ (NSString *)aliasPath {
+    NSString *shell = [self defaultShell];
+    NSString *aliasFile = nil;
+    if ([shell containsString:@"bash"]){
+        aliasFile = [NSHomeDirectory() stringByAppendingPathComponent:@".bash_profile"];
+    } else if ([shell containsString:@"zsh"]){
+        aliasFile = [NSHomeDirectory() stringByAppendingPathComponent:@".config/aliasrc"];
+        if (![FM fileExistsAtPath:aliasFile]){
+            aliasFile = [NSHomeDirectory() stringByAppendingPathComponent:@".zshrc"];
+        }
+    }
+    return aliasFile;
+}
+
 //base theos + our SDKs requires about 170 MB
 - (void)checkoutTheosIfNecessary {
     if ([FM fileExistsAtPath:_theosPath]){
-        DLog(@"theos detected! skip installation...\n");
+        NLog(@"theos detected! skip installation...\n");
         return;
     }
-    DLog(@"\nchecking out theos master...\n");
+    NLog(@"\nchecking out theos master...\n");
     NSString *theosCheckout = @"https://github.com/theos/theos.git";//@"git@github.com:theos/theos.git";
     NSString *sdks = @"https://github.com/lechium/sdks.git";//@"git@github.com:lechium/sdks.git";
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
@@ -50,24 +77,25 @@
     if ([FM fileExistsAtPath:path]){
         mkdir([path UTF8String], 755);
     }
-    NSString *fullCmd = [NSString stringWithFormat:@"/usr/bin/git clone %@", theosCheckout];
+    NSString *fullCmd = [NSString stringWithFormat:@"/usr/bin/git clone --recursive %@", theosCheckout];
     [HelperClass runTask:fullCmd inFolder:path];
-    NSString *shell = [HelperClass singleLineReturnForProcess:@"printenv SHELL"];
-    NSString *aliasFile = nil;
-    if ([shell containsString:@"bash"]){
-        aliasFile = [NSHomeDirectory() stringByAppendingPathComponent:@".bash_profile"];
-    } else if ([shell containsString:@"zsh"]){
-        aliasFile = [NSHomeDirectory() stringByAppendingPathComponent:@".zshrc"];
-    }
+    NSString *aliasFile = [HelperClass aliasPath];
     if (aliasFile.length > 0){
         fullCmd = [NSString stringWithFormat:@"echo \"export THEOS=%@/theos\" >> %@", path, aliasFile];
+        [HelperClass singleLineReturnForProcess:fullCmd];
+        fullCmd = [NSString stringWithFormat:@"echo \"export PATH=$PATH:$THEOS/bin\" >> %@", aliasFile];
         [HelperClass singleLineReturnForProcess:fullCmd];
     }
     //reuse fullCmd - waste not want not!
     
-    DLog(@"\nchecking out tvOS theos sdks...\n");
+    NLog(@"\nchecking out tvOS theos sdks...\n");
     fullCmd = [NSString stringWithFormat:@"/usr/bin/git clone %@", sdks];
-    [HelperClass runTask:fullCmd inFolder:[path stringByAppendingPathComponent:@"theos/sdks"]];
+    [HelperClass runTask:fullCmd inFolder:[path stringByAppendingPathComponent:@"theos/sdk"]];
+    fullCmd = [NSString stringWithFormat:@"/bin/mv %@/* %@", [path stringByAppendingPathComponent:@"theos/sdk/sdks"], [path stringByAppendingPathComponent:@"theos/sdks/"]];
+    NLog(@"moving tvOS theos sdks...\n");
+    [HelperClass singleLineReturnForProcess:fullCmd];
+    
+    //[HelperClass runTask:fullCmd inFolder:NSHomeDirectory()];
     
     //TODO: need to check out custom nic files
 }
@@ -135,7 +163,7 @@
        return [self mountImage:download];
     } else if ([fileExt isEqualToString:@"xip"]){
         
-        NSInteger bro = [self runTask:[NSString stringWithFormat:@"/usr/bin/xip -x %@", download] inFolder:NSHomeDirectory()];
+        NSInteger bro = [self runTask:[NSString stringWithFormat:@"/usr/bin/xip -x %@", download] inFolder:[NSHomeDirectory() stringByAppendingPathComponent:@"Desktop"]];
         if (bro == 0){
             return @"success";
         } else {
@@ -161,7 +189,6 @@
     return NCSystemVersionTypeUnsupported;
 }
 + (BOOL)commandLineToolsInstalled {
-    return false;
     return ([[NSFileManager defaultManager] fileExistsAtPath:@"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/SDKSettings.plist"]);
 }
 
@@ -221,7 +248,6 @@
 }
 
 + (BOOL)xcodeInstalled {
-    return false;
     NSString *path = [[NSWorkspace sharedWorkspace] fullPathForApplication:@"Xcode.app"];
     NSLog(@"path: %@", path);
     if (path.length > 0){
@@ -265,13 +291,14 @@
 + (NSInteger)runTask:(NSString *)fullCommand inFolder:(NSString *)targetFolder {
     
     if (![FM fileExistsAtPath:targetFolder]){
-        DLog(@"folder missing: %@", targetFolder);
-        return -1;
+        NLog(@"folder missing: %@", targetFolder);
+        [FM createDirectoryAtPath:targetFolder withIntermediateDirectories:true attributes:nil error:nil];
+        //return -1;
     }
     NSArray *args = [fullCommand componentsSeparatedByString:@" "];
     NSString *taskBinary = args[0];
     NSArray *taskArguments = [args subarrayWithRange:NSMakeRange(1, args.count-1)];
-    NSLog(@"%@ %@", taskBinary, [taskArguments componentsJoinedByString:@" "]);
+    NLog(@"%@ %@", taskBinary, [taskArguments componentsJoinedByString:@" "]);
     NSTask *task = [[NSTask alloc] init];
     [task setLaunchPath:taskBinary];
     [task setArguments:taskArguments];

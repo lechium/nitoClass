@@ -47,6 +47,7 @@
 		32DEAFF4242F4C9D005508BA /* NSObject+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFEB242F4C9D005508BA /* NSObject+Additions.m */; };
 		32DEAFF5242F4C9D005508BA /* NSString+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFED242F4C9D005508BA /* NSString+Additions.m */; };
 		32DEAFFD242F554D005508BA /* XcodeDownloads.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFFC242F554D005508BA /* XcodeDownloads.m */; };
+		32F6680C2435A64F00D57D35 /* tester.sh in Resources */ = {isa = PBXBuildFile; fileRef = 32F6680B2435A64F00D57D35 /* tester.sh */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -122,6 +123,7 @@
 		32DEAFED242F4C9D005508BA /* NSString+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Additions.m"; sourceTree = "<group>"; };
 		32DEAFFB242F554D005508BA /* XcodeDownloads.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XcodeDownloads.h; sourceTree = "<group>"; };
 		32DEAFFC242F554D005508BA /* XcodeDownloads.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XcodeDownloads.m; sourceTree = "<group>"; };
+		32F6680B2435A64F00D57D35 /* tester.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = tester.sh; path = ../../../../../tester.sh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -155,6 +157,7 @@
 				3211F2712430730000B54920 /* MainMenu.xib */,
 				3211F2742430730000B54920 /* Info.plist */,
 				3211F2752430730000B54920 /* main.m */,
+				32F6680B2435A64F00D57D35 /* tester.sh */,
 				3211F2772430730000B54920 /* nitoClassSetup.entitlements */,
 			);
 			path = nitoClassSetup;
@@ -367,6 +370,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3211F2702430730000B54920 /* Assets.xcassets in Resources */,
+				32F6680C2435A64F00D57D35 /* tester.sh in Resources */,
 				3211F2732430730000B54920 /* MainMenu.xib in Resources */,
 				32DD61C72432F71A001A76E3 /* nitoClassEnvironmentSetup in Resources */,
 			);
