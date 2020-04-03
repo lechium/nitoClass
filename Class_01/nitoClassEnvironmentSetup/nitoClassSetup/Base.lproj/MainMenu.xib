@@ -17,7 +17,7 @@
             <connections>
                 <outlet property="progressBar" destination="Z5B-iv-2Jz" id="0EJ-y8-YO1"/>
                 <outlet property="progressLabel" destination="XO5-mV-IE0" id="a0L-jm-Hve"/>
-                <outlet property="webWindow" destination="5pL-uq-IbM" id="TUc-3f-t92"/>
+                <outlet property="progressWindow" destination="5pL-uq-IbM" id="da7-8u-AFz"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -678,11 +678,37 @@
                                     <action selector="showHelp:" target="-1" id="y7X-2Q-9no"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="RKT-Mm-cXK"/>
+                            <menuItem title="Open Apple ID Sign Up" id="xv5-vP-JJJ">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="openAppleIDPage:" target="Voe-Tx-rLC" id="Kwd-fP-dUq"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Open developer account portal" id="RbT-mY-L36">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="openDeveloperPage:" target="Voe-Tx-rLC" id="uSJ-4M-dcM"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Open developer downloads page" id="ToX-yi-HeA">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="openDownloadsPage:" target="Voe-Tx-rLC" id="xB4-Xu-RZD"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="whP-oA-a7C"/>
+                            <menuItem title="Install Homebrew" id="wHr-Ew-PaB">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="installBrew:" target="Voe-Tx-rLC" id="9yV-Ep-n8g"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>
             </items>
-            <point key="canvasLocation" x="78" y="521"/>
+            <point key="canvasLocation" x="-149" y="518"/>
         </menu>
         <window title="nitoClass" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
@@ -693,40 +719,9 @@
                 <rect key="frame" x="0.0" y="0.0" width="480" height="360"/>
                 <autoresizingMask key="autoresizingMask"/>
             </view>
-            <point key="canvasLocation" x="109" y="392"/>
+            <point key="canvasLocation" x="-36" y="408"/>
         </window>
-        <window title="nitoClassSetup" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="3Zs-6c-AYg">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
-            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="335" y="390" width="727" height="258"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
-            <view key="contentView" wantsLayer="YES" id="cva-xm-PSV">
-                <rect key="frame" x="0.0" y="0.0" width="727" height="258"/>
-                <autoresizingMask key="autoresizingMask"/>
-                <subviews>
-                    <progressIndicator wantsLayer="YES" maxValue="1" displayedWhenStopped="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="csr-CE-KVt">
-                        <rect key="frame" x="71" y="4" width="582" height="20"/>
-                    </progressIndicator>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mpK-PI-1he">
-                        <rect key="frame" x="362" y="30" width="4" height="17"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" id="d4H-Ud-w1U">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                </subviews>
-                <constraints>
-                    <constraint firstAttribute="bottom" secondItem="csr-CE-KVt" secondAttribute="bottom" constant="5" id="8Hp-L0-UnL"/>
-                    <constraint firstItem="csr-CE-KVt" firstAttribute="leading" secondItem="cva-xm-PSV" secondAttribute="leading" constant="71" id="LzQ-Bm-dbd"/>
-                    <constraint firstItem="mpK-PI-1he" firstAttribute="centerX" secondItem="cva-xm-PSV" secondAttribute="centerX" id="gQ4-LG-HMh"/>
-                    <constraint firstItem="csr-CE-KVt" firstAttribute="top" secondItem="mpK-PI-1he" secondAttribute="bottom" constant="7" id="uQG-Bf-pnE"/>
-                    <constraint firstAttribute="trailing" secondItem="csr-CE-KVt" secondAttribute="trailing" constant="74" id="xMG-Ay-GQj"/>
-                </constraints>
-            </view>
-            <point key="canvasLocation" x="-72" y="802"/>
-        </window>
-        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="" animationBehavior="default" id="5pL-uq-IbM" customClass="NSPanel">
+        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="5pL-uq-IbM" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="136" y="163" width="634" height="120"/>
@@ -736,10 +731,10 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <progressIndicator wantsLayer="YES" maxValue="1" displayedWhenStopped="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="Z5B-iv-2Jz">
-                        <rect key="frame" x="32" y="50" width="570" height="20"/>
+                        <rect key="frame" x="32" y="44" width="570" height="20"/>
                     </progressIndicator>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XO5-mV-IE0">
-                        <rect key="frame" x="315" y="76" width="4" height="17"/>
+                        <rect key="frame" x="315" y="83" width="4" height="17"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" id="EMn-uZ-ogt">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -748,9 +743,9 @@
                     </textField>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="Z5B-iv-2Jz" firstAttribute="top" secondItem="XO5-mV-IE0" secondAttribute="bottom" constant="7" id="3HX-h8-yd5"/>
+                    <constraint firstItem="XO5-mV-IE0" firstAttribute="top" secondItem="RfB-Pd-wBY" secondAttribute="top" constant="20" id="0Jr-ug-fXb"/>
+                    <constraint firstItem="Z5B-iv-2Jz" firstAttribute="top" secondItem="XO5-mV-IE0" secondAttribute="bottom" constant="20" id="3HX-h8-yd5"/>
                     <constraint firstItem="Z5B-iv-2Jz" firstAttribute="centerX" secondItem="RfB-Pd-wBY" secondAttribute="centerX" id="Pnm-yJ-EkJ"/>
-                    <constraint firstItem="Z5B-iv-2Jz" firstAttribute="centerY" secondItem="RfB-Pd-wBY" secondAttribute="centerY" id="dCh-YC-h9R"/>
                     <constraint firstItem="Z5B-iv-2Jz" firstAttribute="width" secondItem="RfB-Pd-wBY" secondAttribute="width" multiplier="9/10" id="mGb-5X-8VJ"/>
                     <constraint firstItem="XO5-mV-IE0" firstAttribute="centerX" secondItem="Z5B-iv-2Jz" secondAttribute="centerX" id="sfa-vf-nXb"/>
                 </constraints>

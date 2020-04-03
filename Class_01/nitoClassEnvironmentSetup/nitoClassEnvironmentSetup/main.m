@@ -86,10 +86,10 @@ int main(int argc, const char * argv[]) {
             }];;
         }
         if (!hc.downloads.xcodeInstalled){
-            DLog(@"Xcode missing, download link: %@\n", hc.downloads.xcodeDownloadURL);
+            //DLog(@"Xcode missing, download link: %@\n", hc.downloads.xcodeDownloadURL);
         }
         if (!hc.downloads.cliInstalled){
-            DLog(@"cli tools missing, download link: %@\n", hc.downloads.commandLineURL);
+            //DLog(@"cli tools missing, download link: %@\n", hc.downloads.commandLineURL);
         }
         hc.hasAppleId = [HelperClass queryUserWithString:@"Do you have a Apple ID set up?"];
         if (!hc.hasAppleId){

@@ -17,10 +17,12 @@
 #define kDebugFileMaxSize    200 * 1024
 @interface AppDelegate () {
     WebView *webView;
+    NSView *infoView;
+    NSTextView *infoText;
 }
 
 @property (weak) IBOutlet NSWindow *window;
-@property (assign) IBOutlet NSWindow *webWindow;
+@property (assign) IBOutlet NSWindow *progressWindow;
 @property NSCalendarDate *start;
 @property NSDate *startDate;
 @property (strong) FileMonitor *monitor;
@@ -69,6 +71,12 @@
 
 
 - (void)updateProgressLabel:(NSString *)text {
+    if (text.length == 0){
+        [self.progressWindow close];
+        [self.window makeKeyWindow];
+    } else {
+        [self.progressWindow makeKeyAndOrderFront:nil];
+    }
     if (![NSThread isMainThread]){
         dispatch_async(dispatch_get_main_queue(), ^{
             self.progressLabel.stringValue = text;
@@ -78,9 +86,18 @@
     }
 }
 
+- (void)webView:(WebView *)webView decidePolicyForNewWindowAction:(NSDictionary *)actionInformation
+        request:(NSURLRequest *)request
+   newFrameName:(NSString *)frameName
+decisionListener:(id<WebPolicyDecisionListener>)listener {
+     NLog(@"decidePolicyForNewWindowAction: %@ request: %@", actionInformation, request);
+    [listener use];
+    [[webView mainFrame] loadRequest:request];
+}
+
 
 - (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
-    //NLog(@"request: %@ headers: %@ body: %@", request, request.allHTTPHeaderFields, request.HTTPBody);
+    NLog(@"request: %@ headers: %@ body: %@", request, request.allHTTPHeaderFields, request.HTTPBody);
     NSString *ext = request.URL.pathExtension;
     
     if (ext.length > 0){
@@ -168,23 +185,16 @@
     }
 }
 
+- (void)showAccountAlert {
+    
+}
+
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame; {
     
     NSString *mfu = [sender mainFrameURL];
     if ([mfu containsString:@"/#/welcome"]){
         NSLog(@"we are signed in!");
-        NSInteger resp = [self showDeveloperAccountAlert];
-        switch (resp){
-            case NSAlertDefaultReturn:
-                //run through the general process
-                [self runStandardProcess];
-                break;
-                
-            case NSAlertAlternateReturn:
-                NSLog(@"alt"); //No
-                [self openDeveloperPage:nil];
-                break;
-        }
+        [self runStandardProcess];
     }
     
     
@@ -197,7 +207,7 @@
     [developerAccountAlert runModal];
 }
 
-- (NSInteger)showDeveloperAccountAlert
+- (NSInteger)_showDeveloperAccountAlert
 {
     NSAlert *developerAccountAlert = [NSAlert alertWithMessageText:NSLocalizedString(@"Developer Account Required",@"") defaultButton:NSLocalizedString(@"Yes",@"") alternateButton:NSLocalizedString(@"No", @"") otherButton:nil informativeTextWithFormat:NSLocalizedString(@"Development for deployment to any mobile apple device requires an Apple Developer account. Do you have one? (Free ones are sufficient). \n\nIf you have an Apple ID, signing in to the developer portal with this apple ID will enable you to sign up for the free account.",@"")];
     return [developerAccountAlert runModal];
@@ -224,7 +234,7 @@
         
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self->_progressLabel setStringValue:[NSString stringWithFormat:NSLocalizedString(@"About %.1f%% Complete <%@>", nil), percent, leftString]];
+            [self->_progressLabel setStringValue:[NSString stringWithFormat:NSLocalizedString(@"Downloading %@...\nAbout %.1f%% Complete <%@>", nil), download.downloadURL.lastPathComponent, percent, leftString]];
             
         });
     }
@@ -236,7 +246,7 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
     [self _createViews];
-    [self openDeveloperPage:nil];
+    //[self openDeveloperPage:nil];
     [self scanEnvironment];
 }
 
@@ -327,6 +337,9 @@
 
 - (void)runStandardProcess {
     
+    dispatch_async(dispatch_get_main_queue(), ^{
+       [self.progressWindow makeKeyAndOrderFront:nil];
+    });
     HelperClass *hc = [self helperSharedInstance];
     XcodeDownloads *xcdl = [hc downloads];
     NSArray <XcodeDownload *> *dl = [xcdl downloads];
@@ -339,27 +352,25 @@
 }
 
 - (IBAction)openDownloadsPage:(id)sender {
+    [self.window makeKeyAndOrderFront:nil];
     NSURL *url = [HelperClass moreDownloadsURL];
-    HelperClass *hc = [self helperSharedInstance];
-    XcodeDownloads *dl = [hc downloads];
-    if (![HelperClass xcodeInstalled]){
-        url = [NSURL URLWithString:[dl xcodeDownloadURL]];
-    }
-    if ([HelperClass commandLineToolsInstalled]){
-        //    url = [NSURL URLWithString:[dl commandLineURL]];
-    }
     NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
     [[webView mainFrame] loadRequest:req];
 }
 
 - (IBAction)openDeveloperPage:(id)sender {
-    
-    NSURL *url = [HelperClass developerAccountSite];
-    NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
-    [[webView mainFrame] loadRequest:req];
+   
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.window makeKeyAndOrderFront:nil];
+        NSURL *url = [HelperClass developerAccountSite];
+        NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
+        [[webView mainFrame] loadRequest:req];
+    });
+   
 }
 
 - (IBAction)openAppleIDPage:(id)sender {
+    [self.window makeKeyAndOrderFront:nil];
     NSURL *url = [HelperClass appleIDPage];
     NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
     [[webView mainFrame] loadRequest:req];
@@ -377,8 +388,57 @@
     webView = [[WebView alloc] initWithFrame:contentView.frame];
     webView.policyDelegate = self;
     webView.frameLoadDelegate = self;
-    [webView setAutoresizingMask:(NSViewHeightSizable | NSViewWidthSizable)];
+    webView.translatesAutoresizingMaskIntoConstraints = false;
     [contentView addSubview:webView];
+    [webView.widthAnchor constraintEqualToAnchor:contentView.widthAnchor multiplier:1.0].active = true;
+    [webView.heightAnchor constraintEqualToAnchor:contentView.heightAnchor multiplier:1.0].active = true;
+    [webView.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = true;
+    [webView.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = true;
+    [webView.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = true;
+    [webView.bottomAnchor constraintEqualToAnchor:contentView.bottomAnchor].active = true;
+    webView.alphaValue = 0;
+    infoText = [[NSTextView alloc] init];
+    infoText.editable = false;
+    infoText.alignment = NSTextAlignmentCenter;
+    infoText.translatesAutoresizingMaskIntoConstraints = false;
+    infoText.font = [NSFont systemFontOfSize:24];
+    infoText.backgroundColor = [NSColor clearColor];
+    infoText.string = @"Welcome to nito class session 1\n\nThank you for joining us.\n\nThis application will step you through the process of setting up your environment to be able to create and deploy all the applications, tweaks and assorted projects throughout the course of this class.\n\nIf you don't already have an apple ID select the 'Create yours now.' link on the next page.\n\nYour Apple ID must be signed up as a developer account (free or otherwise) to continue.\n\nYou will be presented with the developer portal to login upon pressing continue.\n\nYou will need to fill out whatever forms presented upon login if you aren't already signed up as a developer.\n The application will take it from there, Enjoy!";
+    infoView = [[NSView alloc] initWithFrame:contentView.frame];
+    infoView.translatesAutoresizingMaskIntoConstraints = false;
+    [infoView addSubview:infoText];
+    [contentView addSubview:infoView];
+    
+    [infoView.widthAnchor constraintEqualToAnchor:contentView.widthAnchor multiplier:1.0].active = true;
+    [infoView.heightAnchor constraintEqualToAnchor:contentView.heightAnchor multiplier:1.0].active = true;
+    [infoText.widthAnchor constraintEqualToAnchor:infoView.widthAnchor multiplier:0.8].active = true;
+    [infoText.heightAnchor constraintEqualToAnchor:infoView.heightAnchor multiplier:0.8].active = true;
+    [infoText.centerXAnchor constraintEqualToAnchor:infoView.centerXAnchor].active = true;
+    [infoText.centerYAnchor constraintEqualToAnchor:infoView.centerYAnchor].active = true;
+    
+    NSButton *continueButton = [[NSButton alloc] init];
+    continueButton.translatesAutoresizingMaskIntoConstraints = false;
+    [continueButton.widthAnchor constraintEqualToConstant:100].active = true;
+    [continueButton.heightAnchor constraintEqualToConstant:40].active = true;
+    [continueButton setTitle:@"Continue"];
+    [continueButton setTarget:self];
+    [continueButton setAction:@selector(continueProcess:)];
+    [infoView addSubview:continueButton];
+    [continueButton.centerXAnchor constraintEqualToAnchor:infoView.centerXAnchor].active = true;
+    [continueButton.topAnchor constraintEqualToAnchor:infoText.bottomAnchor constant:15].active = true;
+    continueButton.bezelStyle = NSBezelStyleTexturedRounded;
+    continueButton.keyEquivalent = @"\r";
+    self.progressLabel.alignment = NSTextAlignmentCenter;
+    self.progressLabel.textColor = [NSColor whiteColor];
 }
+
+- (void)continueProcess:(id)sender {
+    
+    [self openDeveloperPage:nil];
+    [infoView removeFromSuperview];
+    [webView setAlphaValue:1.0];
+    
+}
+
 
 @end

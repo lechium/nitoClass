@@ -328,8 +328,8 @@
 
 + (BOOL)xcodeInstalled {
     NSString *path = [[NSWorkspace sharedWorkspace] fullPathForApplication:@"Xcode.app"];
-    NSLog(@"path: %@", path);
-    if (path.length > 0){
+    NLog(@"xcode path: %@", path);
+    if (path.length > 0 && [FM fileExistsAtPath:path]){
         return true;
     }
     return false;
