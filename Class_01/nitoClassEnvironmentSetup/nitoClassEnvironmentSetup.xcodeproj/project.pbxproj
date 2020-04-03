@@ -29,6 +29,12 @@
 		322AC8EF2434ACB5009DA791 /* NSData+Flip.mm in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8EC2434ACB5009DA791 /* NSData+Flip.mm */; };
 		322AC8F22434B334009DA791 /* FileMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8F02434B334009DA791 /* FileMonitor.m */; };
 		322AC8F32434B334009DA791 /* FileMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8F02434B334009DA791 /* FileMonitor.m */; };
+		32D2FC452436FCA600F81C4C /* EXTRuntimeExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 32D2FC412436FCA600F81C4C /* EXTRuntimeExtensions.m */; };
+		32D2FC462436FCA600F81C4C /* EXTRuntimeExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 32D2FC412436FCA600F81C4C /* EXTRuntimeExtensions.m */; };
+		32D2FC472436FCA600F81C4C /* EXTScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 32D2FC432436FCA600F81C4C /* EXTScope.m */; };
+		32D2FC482436FCA600F81C4C /* EXTScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 32D2FC432436FCA600F81C4C /* EXTScope.m */; };
+		32D2FC4C24370BA100F81C4C /* FindProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 32D2FC4B24370BA100F81C4C /* FindProcess.m */; };
+		32D2FC4D24370BA100F81C4C /* FindProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 32D2FC4B24370BA100F81C4C /* FindProcess.m */; };
 		32DD61C02432C2D2001A76E3 /* WebFrame+Nito.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61BB2432C2D2001A76E3 /* WebFrame+Nito.m */; };
 		32DD61C12432C2D2001A76E3 /* WebFrame+Nito.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61BB2432C2D2001A76E3 /* WebFrame+Nito.m */; };
 		32DD61C22432C2D2001A76E3 /* WebCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61BD2432C2D2001A76E3 /* WebCategories.m */; };
@@ -95,6 +101,14 @@
 		322AC8ED2434ACB5009DA791 /* NSData+Flip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Flip.h"; sourceTree = "<group>"; };
 		322AC8F02434B334009DA791 /* FileMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileMonitor.m; sourceTree = "<group>"; };
 		322AC8F12434B334009DA791 /* FileMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileMonitor.h; sourceTree = "<group>"; };
+		32D2FC3F2436FCA600F81C4C /* EXTKeyPathCoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTKeyPathCoding.h; sourceTree = "<group>"; };
+		32D2FC402436FCA600F81C4C /* EXTRuntimeExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTRuntimeExtensions.h; sourceTree = "<group>"; };
+		32D2FC412436FCA600F81C4C /* EXTRuntimeExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTRuntimeExtensions.m; sourceTree = "<group>"; };
+		32D2FC422436FCA600F81C4C /* EXTScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTScope.h; sourceTree = "<group>"; };
+		32D2FC432436FCA600F81C4C /* EXTScope.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTScope.m; sourceTree = "<group>"; };
+		32D2FC442436FCA600F81C4C /* metamacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = metamacros.h; sourceTree = "<group>"; };
+		32D2FC4A24370BA100F81C4C /* FindProcess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FindProcess.h; sourceTree = "<group>"; };
+		32D2FC4B24370BA100F81C4C /* FindProcess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FindProcess.m; sourceTree = "<group>"; };
 		32DD61B82432C2D2001A76E3 /* WebFrame+Nito.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WebFrame+Nito.h"; sourceTree = "<group>"; };
 		32DD61BA2432C2D2001A76E3 /* WebCategories.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebCategories.h; sourceTree = "<group>"; };
 		32DD61BB2432C2D2001A76E3 /* WebFrame+Nito.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "WebFrame+Nito.m"; sourceTree = "<group>"; };
@@ -191,6 +205,28 @@
 			path = CommonCrypto;
 			sourceTree = "<group>";
 		};
+		32D2FC3E2436FCA600F81C4C /* extobjc */ = {
+			isa = PBXGroup;
+			children = (
+				32D2FC3F2436FCA600F81C4C /* EXTKeyPathCoding.h */,
+				32D2FC402436FCA600F81C4C /* EXTRuntimeExtensions.h */,
+				32D2FC412436FCA600F81C4C /* EXTRuntimeExtensions.m */,
+				32D2FC422436FCA600F81C4C /* EXTScope.h */,
+				32D2FC432436FCA600F81C4C /* EXTScope.m */,
+				32D2FC442436FCA600F81C4C /* metamacros.h */,
+			);
+			path = extobjc;
+			sourceTree = "<group>";
+		};
+		32D2FC4924370BA100F81C4C /* Process */ = {
+			isa = PBXGroup;
+			children = (
+				32D2FC4A24370BA100F81C4C /* FindProcess.h */,
+				32D2FC4B24370BA100F81C4C /* FindProcess.m */,
+			);
+			path = Process;
+			sourceTree = "<group>";
+		};
 		32DD61CE2433EBC2001A76E3 /* DL */ = {
 			isa = PBXGroup;
 			children = (
@@ -231,6 +267,8 @@
 		32DEAFE0242F4C9D005508BA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				32D2FC4924370BA100F81C4C /* Process */,
+				32D2FC3E2436FCA600F81C4C /* extobjc */,
 				322AC8F12434B334009DA791 /* FileMonitor.h */,
 				322AC8F02434B334009DA791 /* FileMonitor.m */,
 				322AC8CF2434A962009DA791 /* CommonCrypto */,
@@ -390,6 +428,8 @@
 				322AC8E52434A962009DA791 /* NSData+CommonCrypto.m in Sources */,
 				322AC8E32434A962009DA791 /* NSData+Base64.m in Sources */,
 				32DD61C32432C2D2001A76E3 /* WebCategories.m in Sources */,
+				32D2FC462436FCA600F81C4C /* EXTRuntimeExtensions.m in Sources */,
+				32D2FC482436FCA600F81C4C /* EXTScope.m in Sources */,
 				322AC8EF2434ACB5009DA791 /* NSData+Flip.mm in Sources */,
 				3211F27D2430731200B54920 /* XcodeDownloads.m in Sources */,
 				322AC8F32434B334009DA791 /* FileMonitor.m in Sources */,
@@ -398,6 +438,7 @@
 				3211F2762430730000B54920 /* main.m in Sources */,
 				3211F27E2430731500B54920 /* HelperClass.m in Sources */,
 				32DD61D22433EBC2001A76E3 /* DownloadOperation.m in Sources */,
+				32D2FC4D24370BA100F81C4C /* FindProcess.m in Sources */,
 				3211F26E243072F900B54920 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -406,7 +447,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				32D2FC472436FCA600F81C4C /* EXTScope.m in Sources */,
+				32D2FC4C24370BA100F81C4C /* FindProcess.m in Sources */,
 				322AC8F22434B334009DA791 /* FileMonitor.m in Sources */,
+				32D2FC452436FCA600F81C4C /* EXTRuntimeExtensions.m in Sources */,
 				32DD61C22432C2D2001A76E3 /* WebCategories.m in Sources */,
 				32DD61D12433EBC2001A76E3 /* DownloadOperation.m in Sources */,
 				32DEAFF5242F4C9D005508BA /* NSString+Additions.m in Sources */,

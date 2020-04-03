@@ -15,9 +15,9 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
-                <outlet property="progressBar" destination="csr-CE-KVt" id="CYT-Jl-Xlk"/>
-                <outlet property="progressLabel" destination="mpK-PI-1he" id="WXC-aq-Ubv"/>
-                <outlet property="webWindow" destination="3Zs-6c-AYg" id="jjW-YX-Fdy"/>
+                <outlet property="progressBar" destination="Z5B-iv-2Jz" id="0EJ-y8-YO1"/>
+                <outlet property="progressLabel" destination="XO5-mV-IE0" id="a0L-jm-Hve"/>
+                <outlet property="webWindow" destination="5pL-uq-IbM" id="TUc-3f-t92"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -684,7 +684,7 @@
             </items>
             <point key="canvasLocation" x="78" y="521"/>
         </menu>
-        <window title="main" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
+        <window title="nitoClass" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="480" height="360"/>
@@ -695,7 +695,7 @@
             </view>
             <point key="canvasLocation" x="109" y="392"/>
         </window>
-        <window title="nitoClassSetup" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="3Zs-6c-AYg">
+        <window title="nitoClassSetup" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="3Zs-6c-AYg">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="727" height="258"/>
@@ -704,39 +704,6 @@
                 <rect key="frame" x="0.0" y="0.0" width="727" height="258"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="f9v-Zb-gx0">
-                        <rect key="frame" x="122" y="204" width="126" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Apple ID Page" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="O61-IB-jqc">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="openAppleIDPage:" target="Voe-Tx-rLC" id="x0L-RB-9b2"/>
-                        </connections>
-                    </button>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uIZ-vB-vZa">
-                        <rect key="frame" x="122" y="140" width="141" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Download Files" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vwm-rW-yES">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="openDownloadsPage:" target="Voe-Tx-rLC" id="N06-Zr-Y7m"/>
-                        </connections>
-                    </button>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2bU-WW-6Ug">
-                        <rect key="frame" x="494" y="140" width="141" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Install brew" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="8N9-7e-NKN">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="installBrew:" target="Voe-Tx-rLC" id="xA9-0w-XK9"/>
-                        </connections>
-                    </button>
                     <progressIndicator wantsLayer="YES" maxValue="1" displayedWhenStopped="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="csr-CE-KVt">
                         <rect key="frame" x="71" y="4" width="582" height="20"/>
                     </progressIndicator>
@@ -748,17 +715,6 @@
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="v1L-SP-EgH">
-                        <rect key="frame" x="499" y="204" width="136" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Developer Page" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="JQY-RE-lxd">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="openDeveloperPage:" target="Voe-Tx-rLC" id="CYk-7g-k9J"/>
-                        </connections>
-                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="bottom" secondItem="csr-CE-KVt" secondAttribute="bottom" constant="5" id="8Hp-L0-UnL"/>
@@ -768,7 +724,38 @@
                     <constraint firstAttribute="trailing" secondItem="csr-CE-KVt" secondAttribute="trailing" constant="74" id="xMG-Ay-GQj"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="232.5" y="735"/>
+            <point key="canvasLocation" x="-72" y="802"/>
+        </window>
+        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="" animationBehavior="default" id="5pL-uq-IbM" customClass="NSPanel">
+            <windowStyleMask key="styleMask" titled="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="136" y="163" width="634" height="120"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
+            <view key="contentView" id="RfB-Pd-wBY">
+                <rect key="frame" x="0.0" y="0.0" width="634" height="120"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <progressIndicator wantsLayer="YES" maxValue="1" displayedWhenStopped="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="Z5B-iv-2Jz">
+                        <rect key="frame" x="32" y="50" width="570" height="20"/>
+                    </progressIndicator>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XO5-mV-IE0">
+                        <rect key="frame" x="315" y="76" width="4" height="17"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" id="EMn-uZ-ogt">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="Z5B-iv-2Jz" firstAttribute="top" secondItem="XO5-mV-IE0" secondAttribute="bottom" constant="7" id="3HX-h8-yd5"/>
+                    <constraint firstItem="Z5B-iv-2Jz" firstAttribute="centerX" secondItem="RfB-Pd-wBY" secondAttribute="centerX" id="Pnm-yJ-EkJ"/>
+                    <constraint firstItem="Z5B-iv-2Jz" firstAttribute="centerY" secondItem="RfB-Pd-wBY" secondAttribute="centerY" id="dCh-YC-h9R"/>
+                    <constraint firstItem="Z5B-iv-2Jz" firstAttribute="width" secondItem="RfB-Pd-wBY" secondAttribute="width" multiplier="9/10" id="mGb-5X-8VJ"/>
+                    <constraint firstItem="XO5-mV-IE0" firstAttribute="centerX" secondItem="Z5B-iv-2Jz" secondAttribute="centerX" id="sfa-vf-nXb"/>
+                </constraints>
+            </view>
+            <point key="canvasLocation" x="-56" y="955"/>
         </window>
     </objects>
 </document>

@@ -4,6 +4,10 @@
 #import <CoreServices/CoreServices.h>
 #include <sys/stat.h>
 #import "NSObject+Additions.h"
+#include <sys/stat.h>
+#import "FindProcess.h"
+@import Darwin.POSIX.dirent;
+
 @implementation HelperClass
 
 #pragma mark version checking
@@ -51,6 +55,7 @@
 
 + (NSString *)aliasPath {
     NSString *shell = [self defaultShell];
+    NLog(@"defaultShell: %@", shell);
     NSString *aliasFile = nil;
     if ([shell containsString:@"bash"]){
         aliasFile = [NSHomeDirectory() stringByAppendingPathComponent:@".bash_profile"];
@@ -63,56 +68,111 @@
     return aliasFile;
 }
 
++ (long long) folderSizeAtPath: (const char*)folderPath {
+    long long folderSize = 0;
+    DIR* dir = opendir(folderPath);
+    if (dir == NULL) return 0;
+    struct dirent* child;
+    while ((child = readdir(dir))!=NULL) {
+        if (child->d_type == DT_DIR
+            && child->d_name[0] == '.'
+            && (child->d_name[1] == 0 // ignore .
+                ||
+                (child->d_name[1] == '.' && child->d_name[2] == 0) // ignore dir ..
+                ))
+            continue;
+        
+        size_t folderPathLength = strlen(folderPath);
+        char childPath[1024]; // child
+        stpcpy(childPath, folderPath);
+        if (folderPath[folderPathLength-1] != '/'){
+            childPath[folderPathLength] = '/';
+            folderPathLength++;
+        }
+        stpcpy(childPath+folderPathLength, child->d_name);
+        childPath[folderPathLength + child->d_namlen] = 0;
+        if (child->d_type == DT_DIR){ // directory
+            folderSize += [self folderSizeAtPath:childPath]; //
+            // add folder size
+            struct stat st;
+            if (lstat(childPath, &st) == 0)
+                folderSize += st.st_size;
+        } else if (child->d_type == DT_REG || child->d_type == DT_LNK){ // file or link
+            struct stat st;
+            if (lstat(childPath, &st) == 0)
+                folderSize += st.st_size;
+        }
+    }
+    return folderSize;
+}
+
+- (void)upgradeTextProgress:(NSString *)progress indeterminate:(BOOL)ind percent:(double)percentComplete {
+    if (self.BasicProgressBlock){
+        self.BasicProgressBlock(progress, ind, percentComplete);
+    }
+}
+
 //base theos + our SDKs requires about 170 MB
-- (void)checkoutTheosIfNecessary {
+- (void)checkoutTheosIfNecessary:(void(^)(BOOL success))block {
+    BOOL theosNeeded = true;
     if ([FM fileExistsAtPath:_theosPath]){
-        NLog(@"theos detected! skip installation...\n");
-        return;
+        theosNeeded = false;
+        NLog(@"theos detected! checking for tvOS SDK's\n");
+        NSString *path = [_theosPath stringByAppendingPathComponent:@"sdks/AppleTVOS12.4.sdk"];
+        if ([FM fileExistsAtPath:path]){
+            NLog(@"AppleTV SDK's detected, no theos checkout is necessary\n");
+           [self upgradeTextProgress:@"" indeterminate:true percent:0];
+            if (block){
+                block(true);
+            }
+            return;
+        }
+  
     }
-    NLog(@"\nchecking out theos master...\n");
-    NSString *theosCheckout = @"https://github.com/theos/theos.git";//@"git@github.com:theos/theos.git";
+  
     NSString *sdks = @"https://github.com/lechium/sdks.git";//@"git@github.com:lechium/sdks.git";
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-    NSString *path = paths[0];
-    if ([FM fileExistsAtPath:path]){
-        mkdir([path UTF8String], 755);
+    NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+    NSString *libraryPath = [libraryPaths firstObject];
+    NSString *fullCmd = nil;
+    if (theosNeeded){
+        [self upgradeTextProgress:@"checking out theos master..." indeterminate:true percent:0];
+        [self upgradeTextProgress:@"checking out theos master..." indeterminate:true percent:0];
+        NSString *theosCheckout = @"https://github.com/theos/theos.git";//@"git@github.com:theos/theos.git";
+        fullCmd = [NSString stringWithFormat:@"/usr/bin/git clone --recursive %@", theosCheckout];
+        [HelperClass runTask:fullCmd inFolder:libraryPath];
     }
-    NSString *fullCmd = [NSString stringWithFormat:@"/usr/bin/git clone --recursive %@", theosCheckout];
-    [HelperClass runTask:fullCmd inFolder:path];
     NSString *aliasFile = [HelperClass aliasPath];
-    if (aliasFile.length > 0){
-        fullCmd = [NSString stringWithFormat:@"echo \"export THEOS=%@/theos\" >> %@", path, aliasFile];
+    NSString *contents = [NSString stringWithContentsOfFile:aliasFile encoding:NSUTF8StringEncoding error:nil];
+    if (aliasFile.length > 0 && ![contents containsString:@"export THEOS="]){
+        fullCmd = [NSString stringWithFormat:@"echo \"export THEOS=%@/theos\" >> %@", libraryPath, aliasFile];
         [HelperClass singleLineReturnForProcess:fullCmd];
         fullCmd = [NSString stringWithFormat:@"echo \"export PATH=$PATH:$THEOS/bin\" >> %@", aliasFile];
         [HelperClass singleLineReturnForProcess:fullCmd];
     }
     //reuse fullCmd - waste not want not!
     
-    NLog(@"\nchecking out tvOS theos sdks...\n");
+    [self upgradeTextProgress:@"checking out tvOS theos sdks..." indeterminate:true percent:0];
     fullCmd = [NSString stringWithFormat:@"/usr/bin/git clone %@", sdks];
-    [HelperClass runTask:fullCmd inFolder:[path stringByAppendingPathComponent:@"theos/sdk"]];
-    fullCmd = [NSString stringWithFormat:@"/bin/mv %@/* %@", [path stringByAppendingPathComponent:@"theos/sdk/sdks"], [path stringByAppendingPathComponent:@"theos/sdks/"]];
-    NLog(@"moving tvOS theos sdks...\n");
+    [HelperClass runTask:fullCmd inFolder:[libraryPath stringByAppendingPathComponent:@"theos/sdk"]];
+    fullCmd = [NSString stringWithFormat:@"/bin/mv %@/* %@", [libraryPath stringByAppendingPathComponent:@"theos/sdk/sdks"], [libraryPath stringByAppendingPathComponent:@"theos/sdks/"]];
+    //NLog(@"moving tvOS theos sdks...\n");
+    [self upgradeTextProgress:@"moving tvOS theos sdks..." indeterminate:true percent:0];
     [HelperClass singleLineReturnForProcess:fullCmd];
     //https://raw.githubusercontent.com/lechium/TVControlCenter/master/tvos_control_center_bundle.nic.tar
+    @weakify(self);
     [[self downloads] downloadFileURL:[NSURL URLWithString:@"https://raw.githubusercontent.com/lechium/TVControlCenter/master/tvos_control_center_bundle.nic.tar"]];
     self.downloads.CompletedBlock = ^(NSString *downloadedFile) {
       
         NLog(@"downloadedFile: %@", downloadedFile);
         NSString *fileName = [downloadedFile lastPathComponent];
-        NSString *templates = [self->_theosPath stringByAppendingPathComponent:@"templates/tvos"];
+        NSString *templates = [self_weak_.theosPath stringByAppendingPathComponent:@"templates/tvos"];
         [FM createDirectoryAtPath:templates withIntermediateDirectories:true attributes:nil error:nil];
         [FM moveItemAtPath:downloadedFile toPath:[templates stringByAppendingPathComponent:fileName] error:nil];
-        //mkdir([ot UTF8String], 0755);
-        //NSString *extract = [NSString stringWithFormat:@"/usr/bin/tar fxp %@ -C %@", downloadedFile, ot];
-        //NLog(@"extract command: %@", extract);
-        //[HelperClass singleLineReturnForProcess:extract];
-
-        
-        
+        if (block){
+            block(true);
+        }
         
     };
-    //[HelperClass runTask:fullCmd inFolder:NSHomeDirectory()];
     
     //TODO: need to check out custom nic files
 }
@@ -182,7 +242,7 @@
        return [self mountImage:download];
     } else if ([fileExt isEqualToString:@"xip"]){
         
-        NSInteger bro = [self runTask:[NSString stringWithFormat:@"/usr/bin/xip -x %@", download] inFolder:[NSHomeDirectory() stringByAppendingPathComponent:@"Desktop"]];
+        NSInteger bro = [self runTask:[NSString stringWithFormat:@"/usr/bin/xip -x %@", download] inFolder:[NSHomeDirectory() stringByAppendingPathComponent:@"Applications"]];
         if (bro == 0){
             return @"success";
         } else {

@@ -52,6 +52,9 @@
                 xcD.SHA = @"7c1151670760be55c5c8b09be1aa2a17291dc468";
                 xcD.expectedSize =  8111919274;
                 xcD.extractedSize = 16830997095;
+                //26430173184
+                //16830997095
+                //8111919274
                 xcD.downloadType = FileDownloadTypeXcode;
                 [_backingArray addObject:xcD];
             }

@@ -7,7 +7,6 @@
 //
 
 #import "AppDelegate.h"
-#import "URLDownloader.h"
 #import "WebCategories.h"
 #import "WebFrame+Nito.h"
 #include <sys/stat.h>
@@ -23,8 +22,10 @@
 @property (weak) IBOutlet NSWindow *window;
 @property (assign) IBOutlet NSWindow *webWindow;
 @property NSCalendarDate *start;
+@property NSDate *startDate;
 @property (strong) FileMonitor *monitor;
 @property (nonatomic, strong) NSString *ourDirectory;
+@property (nonatomic, strong) HelperClass *helperInstance;
 @end
 
 @implementation AppDelegate
@@ -44,14 +45,14 @@
 
 
 - (IBAction)installBrew:(id)sender {
-    NSWorkspace *ws = [NSWorkspace sharedWorkspace];
     NSString *fileContents = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://raw.githubusercontent.com/Homebrew/install/master/install.sh"] encoding:NSUTF8StringEncoding error:nil];
+    fileContents = [fileContents stringByAppendingString:@"\necho 'installing nitoClass extras'\n\nbrew install ldid xz dpkg\n"];
     NSString *outFile = [NSTemporaryDirectory() stringByAppendingPathComponent:@"brew.sh"];
     [fileContents writeToFile:outFile atomically:true encoding:NSUTF8StringEncoding error:nil];
     chmod([outFile UTF8String], 0755);
-    [ws openFile:outFile withApplication:@"Terminal" andDeactivate:false];
-    
-    
+    [[NSWorkspace sharedWorkspace] openFile:outFile withApplication:@"Terminal" andDeactivate:false];
+    [self updateProgressLabel:@""];
+    [self updateProgressValue:1 indeterminate:true];
 }
 
 -(void) dirChanged:(NSString*) aDirName {
@@ -60,7 +61,7 @@
     if ([FM fileExistsAtPath:git]){
         NLog(@"we done got git!, can check out theos etc now!");
         //[self stopListening];
-        //[[HelperClass new] checkoutTheosIfNecessary];
+        //[[self helperSharedInstance] checkoutTheosIfNecessary];
     } else {
         NLog(@"NO GIT FOR YOU");
     }
@@ -77,16 +78,18 @@
     }
 }
 
+
 - (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
-    NLog(@"request: %@", request.URL);
+    //NLog(@"request: %@ headers: %@ body: %@", request, request.allHTTPHeaderFields, request.HTTPBody);
     NSString *ext = request.URL.pathExtension;
     
     if (ext.length > 0){
+        _startDate = [NSDate date];
         _start = [NSCalendarDate calendarDate];
-        HelperClass *hc = [HelperClass new];
+        HelperClass *hc = [self helperSharedInstance];
         XcodeDownloads *downloads = [hc downloads];
         __block XcodeDownload *dl = [downloads downloadFromURL:request.URL];
-        double fullSize = ([dl expectedSize] + [dl extractedSize])/1024;
+        double fullSize = (([dl expectedSize]/1024) + ([dl extractedSize])/1024);
         double availSize = [HelperClass freeSpaceAvailable];
         
         NLog(@"avail: %f vs full: %f", availSize, fullSize);
@@ -109,6 +112,7 @@
             NLog(@"downloaded file: %@", downloadedFile);
             
             NLog(@"xcd: %@", dl);
+            /*
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
                 BOOL validated = [downloadedFile validateFileSHA:dl.SHA];
                 if (validated){
@@ -116,7 +120,7 @@
                 } else {
                     NSLog(@"INVALID!!!");
                 }
-            });
+            });*/
             dispatch_async(dispatch_get_main_queue(), ^{
                 
                 self.progressLabel.stringValue = @"";
@@ -183,6 +187,7 @@
         }
     }
     
+    
     //NSLog(@"ff: %@", ff);
     NSLog(@"title: %@", [[frame DOMDocument] title]);
 }
@@ -204,7 +209,9 @@
     float currentLevel = (float)((double)writtenDuration/(double)sourceDuration);
     float percent = currentLevel*100.0;
     NSInteger rSeconds = 0;
+    NSTimeInterval interval = [[NSDate date] timeIntervalSinceDate:_startDate];
     [[NSCalendarDate calendarDate] years:nil months:nil days:nil hours:nil minutes:nil seconds:&rSeconds sinceDate:_start];
+    NLog(@"r seconds: %lu interval: %.2f", rSeconds, interval);
     float speed = (float)writtenDuration/(float)rSeconds;
     float left = ((float)sourceDuration - (float)writtenDuration)/speed;
     NSString *leftString = nil;
@@ -224,57 +231,31 @@
     
 }
 
-+ (long long) folderSizeAtPath: (const char*)folderPath {
-    long long folderSize = 0;
-    DIR* dir = opendir(folderPath);
-    if (dir == NULL) return 0;
-    struct dirent* child;
-    while ((child = readdir(dir))!=NULL) {
-        if (child->d_type == DT_DIR
-            && child->d_name[0] == '.'
-            && (child->d_name[1] == 0 // ignore .
-                ||
-                (child->d_name[1] == '.' && child->d_name[2] == 0) // ignore dir ..
-                ))
-            continue;
-        
-        int folderPathLength = strlen(folderPath);
-        char childPath[1024]; // child
-        stpcpy(childPath, folderPath);
-        if (folderPath[folderPathLength-1] != '/'){
-            childPath[folderPathLength] = '/';
-            folderPathLength++;
-        }
-        stpcpy(childPath+folderPathLength, child->d_name);
-        childPath[folderPathLength + child->d_namlen] = 0;
-        if (child->d_type == DT_DIR){ // directory
-            folderSize += [self folderSizeAtPath:childPath]; //
-            // add folder size
-            struct stat st;
-            if (lstat(childPath, &st) == 0)
-                folderSize += st.st_size;
-        } else if (child->d_type == DT_REG || child->d_type == DT_LNK){ // file or link
-            struct stat st;
-            if (lstat(childPath, &st) == 0)
-                folderSize += st.st_size;
-        }
-    }
-    return folderSize;
-}
+
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
     [self _createViews];
     [self openDeveloperPage:nil];
     [self scanEnvironment];
-
 }
 
 
 - (void)runPostXcodeProcess {
     [self updateProgressLabel:@"Post Xcode Processing, checkinging out theos & sdks..."];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        [[HelperClass new] checkoutTheosIfNecessary];
+        [[self helperSharedInstance] checkoutTheosIfNecessary:^(BOOL success) {
+            NLog(@"theos is done with status %d", success);
+            if (![HelperClass brewInstalled]){
+                [self updateProgressLabel:@"Attempting to run brew install script..."];
+                [self updateProgressValue:0 indeterminate:true];
+                [self installBrew:nil];
+                
+            } else {
+                [self updateProgressLabel:@""];
+                [self updateProgressValue:1 indeterminate:true];
+            }
+        }];
     });
     
 }
@@ -285,7 +266,9 @@
 
 
 - (void)scanEnvironment {
-    
+  
+    NSInteger freeSpace = [HelperClass freeSpaceAvailable];
+    NLog(@"free space: %lu", freeSpace);
     if (![HelperClass xcodeInstalled] || ![HelperClass commandLineToolsInstalled]){
         NLog(@"either Xcode or the command line tools are missing, need to authenticate!");
         [self runAuthBasedProcess];
@@ -300,10 +283,51 @@
     NSLog(@"props: %@", [webView properties]);
 }
 
+- (void)updateProgressValue:(double)value indeterminate:(BOOL)indy {
+    if (![NSThread isMainThread]){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (value == 0 && indy == true){
+                [self.progressBar startAnimation:nil];
+                self.progressBar.indeterminate = indy;
+                
+            } else if (indy == true && value == 1){
+                [self.progressBar stopAnimation:nil];
+            } else {
+                [self.progressBar startAnimation:nil];
+                self.progressBar.doubleValue = value;
+            }
+            
+        });
+    } else {
+        if (value == 0 && indy == true){
+            [self.progressBar startAnimation:nil];
+            self.progressBar.indeterminate = indy;
+            
+        } else if (indy == true && value == 1){
+            [self.progressBar stopAnimation:nil];
+        } else {
+            [self.progressBar startAnimation:nil];
+            self.progressBar.doubleValue = value;
+        }
+    }
+}
+
+- (HelperClass *)helperSharedInstance {
+    if (!self.helperInstance){
+        self.helperInstance = [HelperClass new];
+        @weakify(self);
+        self.helperInstance.BasicProgressBlock = ^(NSString *progressDetails, BOOL indeterminate, double percentComplete) {
+            [self_weak_ updateProgressLabel:progressDetails];
+            [self_weak_ updateProgressValue:percentComplete indeterminate:indeterminate];
+            NLog(@"%@", progressDetails);
+        };
+    }
+    return self.helperInstance;
+}
+
 - (void)runStandardProcess {
     
-    //_start = [NSCalendarDate calendarDate];
-    HelperClass *hc = [HelperClass new];
+    HelperClass *hc = [self helperSharedInstance];
     XcodeDownloads *xcdl = [hc downloads];
     NSArray <XcodeDownload *> *dl = [xcdl downloads];
     
@@ -316,7 +340,7 @@
 
 - (IBAction)openDownloadsPage:(id)sender {
     NSURL *url = [HelperClass moreDownloadsURL];
-    HelperClass *hc = [HelperClass new];
+    HelperClass *hc = [self helperSharedInstance];
     XcodeDownloads *dl = [hc downloads];
     if (![HelperClass xcodeInstalled]){
         url = [NSURL URLWithString:[dl xcodeDownloadURL]];

@@ -81,7 +81,9 @@ int main(int argc, const char * argv[]) {
             
         } else {
             DLog(@"THEOS is not installed!\n");
-            [hc checkoutTheosIfNecessary];
+            [hc checkoutTheosIfNecessary:^(BOOL success) {
+                NLog(@"theos is done with status %d", success);
+            }];;
         }
         if (!hc.downloads.xcodeInstalled){
             DLog(@"Xcode missing, download link: %@\n", hc.downloads.xcodeDownloadURL);

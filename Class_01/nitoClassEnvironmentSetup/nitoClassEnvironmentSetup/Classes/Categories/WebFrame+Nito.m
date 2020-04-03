@@ -109,7 +109,7 @@
     __block BOOL _found = false;
     __block NSDate *referenceDate = [NSDate date];
     __block BOOL _finished = false;
-    NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:0.5 repeats:true block:^(NSTimer * _Nonnull timer) {
+    __block NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:0.5 repeats:true block:^(NSTimer * _Nonnull timer) {
         
         NSTimeInterval interval = [[NSDate date] timeIntervalSinceDate:referenceDate];
         //NSLog(@"timer block: %f", interval);

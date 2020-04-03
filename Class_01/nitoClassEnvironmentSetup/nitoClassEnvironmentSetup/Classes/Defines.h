@@ -3,6 +3,7 @@
 #import "NSObject+Additions.h"
 #import "NSString+Additions.h"
 #import "NRFileManager.h"
+#import "EXTScope.h"
 
 typedef NS_ENUM(NSInteger, BSPackageFileType)
 {
