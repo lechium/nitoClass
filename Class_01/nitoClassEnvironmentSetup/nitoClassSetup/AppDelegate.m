@@ -235,11 +235,12 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
                             [[NSWorkspace sharedWorkspace] openFile:[heyo stringByAppendingPathComponent:chosen]];
                             [self updateProgressLabel:@""];
                         }
+                        if (downloads.operationQueue.operationCount == 0){
+                            DDLogInfo(@"no operations left, continue forward!");
+                            [self runPostXcodeProcess];
+                        }
                     });
-                    if (downloads.operationQueue.operationCount == 0){
-                        DDLogInfo(@"no operations left, continue forward!");
-                        [self runPostXcodeProcess];
-                    }
+                   
                     //[[NSWorkspace sharedWorkspace] openFile:downloadedFile];
                 });
             }
