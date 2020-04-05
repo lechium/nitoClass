@@ -30,7 +30,7 @@ typedef NS_ENUM(NSInteger, NCSystemVersionType) {
     NCSystemVersionTypeCatalina
 };
 #import "HelperClass.h"
-#define LOG_SELF        NSLog(@"[nitoClassSetup] %@ %@", self, NSStringFromSelector(_cmd))
+#define LOG_SELF        DDLogInfo(@"%@ %@", self, NSStringFromSelector(_cmd))
 #define DLOG_SELF DLog(@"%@ %@", self, NSStringFromSelector(_cmd))
 //#define NLog(format, ...) NSLog(@"%@", [@"[nitoClassSetup] " stringByAppendingString:[NSString stringWithFormat:format, ## __VA_ARGS__]]);
 #define NLog(format, ...) DDLogInfo(@"%@", [NSString stringWithFormat:format, ## __VA_ARGS__]);

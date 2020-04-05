@@ -8,13 +8,15 @@
 
 #import "DownloadOperation.h"
 #import "HelperClass.h"
-
+#import "XcodeDownloads.h"
 @interface DownloadOperation ()
 
 @property BOOL _ourExecuting;
 @property BOOL _ourFinished;
 @property (nonatomic) NSURLSession *session;
 @property (nonatomic) NSURLSessionDownloadTask *downloadTask;
+
+
 @end
 
 //download operation class, handles file downloads.
@@ -22,7 +24,7 @@
 
 @implementation DownloadOperation
 
-@synthesize downloadLocation, CompletedBlock;
+@synthesize downloadLocation, CompletedBlock, xcodeDownload;
 
 - (BOOL)isAsynchronous {
     return true;
@@ -50,6 +52,10 @@
 - (void)cancel {
     [super cancel];
     [[self downloadTask] cancel];
+    [[self session] invalidateAndCancel];
+    [[self session] flushWithCompletionHandler:^{
+       NLog(@"flushed cache");
+    }];
     [self _setFinished:true];
     [self _setExecuting:false];
 }
@@ -100,7 +106,7 @@
         //NLog(@"DownloadTask: %@ progress: %lf", downloadTask, progress);
         dispatch_async(dispatch_get_main_queue(), ^{
             if (self.FancyProgressBlock){
-                self.FancyProgressBlock(progress, totalBytesWritten, totalBytesExpectedToWrite);
+                self.FancyProgressBlock(self.downloadURL.lastPathComponent, progress, totalBytesWritten, totalBytesExpectedToWrite);
             }
         });
     }
@@ -126,7 +132,7 @@
             NLog(@"Task: %@ completed successfully", downloadTask);
             if (self.CompletedBlock != nil)
             {
-                self.CompletedBlock(self->downloadLocation);
+                self.CompletedBlock(self->downloadLocation, self->xcodeDownload);
             }
         });
     } else {
@@ -146,7 +152,7 @@
     } else {
         NLog(@"Task: %@ completed with error: %@", task, [error localizedDescription]);
         if (self.CompletedBlock != nil) {
-            self.CompletedBlock(downloadLocation);
+            self.CompletedBlock(downloadLocation, xcodeDownload);
         }
     }
     

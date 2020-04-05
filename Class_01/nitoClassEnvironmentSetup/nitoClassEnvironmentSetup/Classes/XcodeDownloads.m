@@ -137,22 +137,24 @@
 }
 
 - (XcodeDownload *)downloadFromURL:(NSURL *)url {
+    //NLog(@"downloads: %@ downloadFromURL: %@", self.downloads, url.absoluteString);
     return [[self.downloads filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"downloadURL == %@", url.absoluteString]] lastObject];
 }
 
 
 - (void)downloadFile:(XcodeDownload *)download {
-    
-    DownloadOperation *downloadOp = [[DownloadOperation alloc] initWithURL:[NSURL URLWithString:download.downloadURL] progresss:^(double percentComplete, double writtenBytes, double expectedBytes) {
+   
+    NLog(@"downloading file: %@", download);
+    DownloadOperation *downloadOp = [[DownloadOperation alloc] initWithURL:[NSURL URLWithString:download.downloadURL] progresss:^(NSString *name, double percentComplete, double writtenBytes, double expectedBytes) {
         if (self.FancyProgressBlock){
-            self.FancyProgressBlock(percentComplete, writtenBytes, expectedBytes);
+            self.FancyProgressBlock(name, percentComplete, writtenBytes, expectedBytes);
         }
-    } completed:^(NSString *downloadedFile) {
+    } completed:^(NSString *downloadedFile, XcodeDownload *object) {
         if (self.CompletedBlock){
-            self.CompletedBlock(downloadedFile);
+            self.CompletedBlock(downloadedFile, object);
         }
     }];
-    
+    downloadOp.xcodeDownload = download;
     [self.operationQueue addOperation:downloadOp];
     downloadOp.completionBlock = ^{
         
@@ -167,14 +169,14 @@
 
 - (void)downloadFileURL:(NSURL *)url {
     
-    DownloadOperation *downloadOp = [[DownloadOperation alloc] initWithURL:url progresss:^(double percentComplete, double writtenBytes, double expectedBytes) {
+    DownloadOperation *downloadOp = [[DownloadOperation alloc] initWithURL:url progresss:^(NSString *name, double percentComplete, double writtenBytes, double expectedBytes) {
         
         if (self.FancyProgressBlock){
-            self.FancyProgressBlock(percentComplete, writtenBytes, expectedBytes);
+            self.FancyProgressBlock(name, percentComplete, writtenBytes, expectedBytes);
         }
-    } completed:^(NSString *downloadedFile) {
+    } completed:^(NSString *downloadedFile, id object) {
         if (self.CompletedBlock){
-            self.CompletedBlock(downloadedFile);
+            self.CompletedBlock(downloadedFile, nil);
         }
     }];
    

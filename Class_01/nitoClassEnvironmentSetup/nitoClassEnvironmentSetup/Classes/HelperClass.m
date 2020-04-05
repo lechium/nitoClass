@@ -111,6 +111,19 @@
         self.BasicProgressBlock(progress, ind, percentComplete);
     }
 }
+///Users/js/Library/Caches/com.apple.nsurlsessiond/Downloads
++ (NSString *)cacheFolder {
+    NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    return [libraryPaths firstObject];
+}
+
++ (long long)sessionCacheSize {
+    return [self folderSizeAtPath:[[self sessionCache] UTF8String]];
+}
+
++ (NSString *)sessionCache {
+    return [[self cacheFolder] stringByAppendingPathComponent:@"com.apple.nsurlsessiond/Downloads"];
+}
 
 //base theos + our SDKs requires about 170 MB
 - (void)checkoutTheosIfNecessary:(void(^)(BOOL success))block {
@@ -323,9 +336,6 @@
     return NSTemporaryDirectory();
 }
 
-- (void)installXcode {
-    
-}
 
 + (BOOL)xcodeInstalled {
     NSString *path = [[NSWorkspace sharedWorkspace] fullPathForApplication:@"Xcode.app"];

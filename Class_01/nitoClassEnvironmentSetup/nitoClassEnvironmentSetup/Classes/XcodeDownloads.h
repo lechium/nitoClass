@@ -32,8 +32,8 @@ FileDownloadType;
 
 @property (nonatomic, strong) NSArray <XcodeDownload *>* downloads;
 @property (strong, atomic) void (^ProgressBlock)(double percentComplete);
-@property (strong, atomic) void (^FancyProgressBlock)(double percentComplete, double writtenBytes, double expectedBytes);
-@property (strong, atomic) void (^CompletedBlock)(NSString *downloadedFile);
+@property (strong, atomic) void (^FancyProgressBlock)(NSString *fileName, double percentComplete, double writtenBytes, double expectedBytes);
+@property (strong, atomic) void (^CompletedBlock)(NSString *downloadedFile, id downloadObject);
 @property (strong, atomic) void (^DownloadsFinishedBlock)(void);
 @property (strong, nonatomic) NSOperationQueue      *operationQueue;
 @property BOOL xcodeInstalled;
@@ -46,4 +46,5 @@ FileDownloadType;
 - (BOOL)hasDownloads;
 - (XcodeDownload *)downloadFromURL:(NSURL *)url;
 - (void)cancelAllDownloads;
+- (void)downloadFile:(XcodeDownload *)download;
 @end

@@ -24,7 +24,6 @@
 + (NSInteger)runTask:(NSString *)fullCommand inFolder:(NSString *)targetFolder;
 - (void)waitForReturnWithMessage:(NSString *)message;
 + (BOOL)xcodeInstalled;
-- (void)installXcode;
 + (BOOL)brewInstalled;
 + (BOOL)commandLineToolsInstalled;
 + (BOOL)queryUserWithString:(NSString *)query;
@@ -40,4 +39,7 @@
 + (NSArray *)scanForDrives;
 + (NSString *)mountImage:(NSString *)irString;
 - (NSString *)processDownload:(NSString *)download;
++ (NSString *)cacheFolder ;
++ (NSString *)sessionCache;
++ (long long)sessionCacheSize;
 @end

@@ -697,6 +697,12 @@
                                     <action selector="openDownloadsPage:" target="Voe-Tx-rLC" id="xB4-Xu-RZD"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Show progress window" id="YEc-vo-djs">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="makeKeyAndOrderFront:" target="5pL-uq-IbM" id="b9H-HY-cRy"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="whP-oA-a7C"/>
                             <menuItem title="Install Homebrew" id="wHr-Ew-PaB">
                                 <modifierMask key="keyEquivalentModifierMask"/>
@@ -708,18 +714,18 @@
                     </menu>
                 </menuItem>
             </items>
-            <point key="canvasLocation" x="-149" y="518"/>
+            <point key="canvasLocation" x="-158" y="662"/>
         </menu>
         <window title="nitoClass" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="335" y="390" width="480" height="360"/>
+            <rect key="contentRect" x="335" y="390" width="815" height="616"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="480" height="360"/>
+                <rect key="frame" x="0.0" y="0.0" width="815" height="616"/>
                 <autoresizingMask key="autoresizingMask"/>
             </view>
-            <point key="canvasLocation" x="-36" y="408"/>
+            <point key="canvasLocation" x="-41.5" y="517"/>
         </window>
         <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="5pL-uq-IbM" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" miniaturizable="YES" utility="YES" HUD="YES"/>
