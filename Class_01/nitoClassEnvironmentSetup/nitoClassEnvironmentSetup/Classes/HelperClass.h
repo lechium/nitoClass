@@ -39,5 +39,5 @@
 + (void)openDeveloperAccountSite;
 + (NSArray *)scanForDrives;
 + (NSString *)mountImage:(NSString *)irString;
-+ (NSString *)processDownload:(NSString *)download;
+- (NSString *)processDownload:(NSString *)download;
 @end

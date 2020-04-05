@@ -11,6 +11,7 @@
 typedef enum {
     FileDownloadTypeXcode,
     FileDownloadTypeCLI,
+    FileDownloadTypeStandard, //any other file, when processing these we don't care about the download block.
 }
 FileDownloadType;
 //11.4 SHASUM = 7c1151670760be55c5c8b09be1aa2a17291dc468, xip size 8111919274, extracted size: 16.83 GB
@@ -44,5 +45,5 @@ FileDownloadType;
 - (void)downloadFileURL:(NSURL *)url;
 - (BOOL)hasDownloads;
 - (XcodeDownload *)downloadFromURL:(NSURL *)url;
-
+- (void)cancelAllDownloads;
 @end

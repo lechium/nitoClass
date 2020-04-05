@@ -17,7 +17,7 @@
     if (self){
         _downloads = [XcodeDownloads new];
         _theosPath = [[HelperClass theosPath] stringByExpandingTildeInPath];
-        NSLog(@"theosPath: %@", _theosPath);
+        NLog(@"theosPath: %@", _theosPath);
         _username = [HelperClass singleLineReturnForProcess:@"whoami"];
         _dpkgPath = [HelperClass singleLineReturnForProcess:@"which dpkg-deb"];
     }
@@ -121,15 +121,15 @@
         NSString *path = [_theosPath stringByAppendingPathComponent:@"sdks/AppleTVOS12.4.sdk"];
         if ([FM fileExistsAtPath:path]){
             NLog(@"AppleTV SDK's detected, no theos checkout is necessary\n");
-           [self upgradeTextProgress:@"" indeterminate:true percent:0];
+            [self upgradeTextProgress:@"" indeterminate:true percent:0];
             if (block){
                 block(true);
             }
             return;
         }
-  
+        
     }
-  
+    
     NSString *sdks = @"https://github.com/lechium/sdks.git";//@"git@github.com:lechium/sdks.git";
     NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
     NSString *libraryPath = [libraryPaths firstObject];
@@ -153,28 +153,26 @@
     
     [self upgradeTextProgress:@"checking out tvOS theos sdks..." indeterminate:true percent:0];
     fullCmd = [NSString stringWithFormat:@"/usr/bin/git clone %@", sdks];
-    [HelperClass runTask:fullCmd inFolder:[libraryPath stringByAppendingPathComponent:@"theos/sdk"]];
-    fullCmd = [NSString stringWithFormat:@"/bin/mv %@/* %@", [libraryPath stringByAppendingPathComponent:@"theos/sdk/sdks"], [libraryPath stringByAppendingPathComponent:@"theos/sdks/"]];
-    //NLog(@"moving tvOS theos sdks...\n");
+    NSString *_tempPath = [libraryPath stringByAppendingPathComponent:@"theos/sdk"];
+    NSString *_targetPath = [libraryPath stringByAppendingPathComponent:@"theos/sdks/"];
+    [HelperClass runTask:fullCmd inFolder:_tempPath];
+    fullCmd = [NSString stringWithFormat:@"/bin/mv %@/* %@", [_tempPath stringByAppendingPathComponent:@"sdks"], _targetPath];
     [self upgradeTextProgress:@"moving tvOS theos sdks..." indeterminate:true percent:0];
     [HelperClass singleLineReturnForProcess:fullCmd];
-    //https://raw.githubusercontent.com/lechium/TVControlCenter/master/tvos_control_center_bundle.nic.tar
-    @weakify(self);
-    [[self downloads] downloadFileURL:[NSURL URLWithString:@"https://raw.githubusercontent.com/lechium/TVControlCenter/master/tvos_control_center_bundle.nic.tar"]];
-    self.downloads.CompletedBlock = ^(NSString *downloadedFile) {
-      
-        NLog(@"downloadedFile: %@", downloadedFile);
-        NSString *fileName = [downloadedFile lastPathComponent];
-        NSString *templates = [self_weak_.theosPath stringByAppendingPathComponent:@"templates/tvos"];
-        [FM createDirectoryAtPath:templates withIntermediateDirectories:true attributes:nil error:nil];
-        [FM moveItemAtPath:downloadedFile toPath:[templates stringByAppendingPathComponent:fileName] error:nil];
-        if (block){
-            block(true);
-        }
-        
-    };
     
-    //TODO: need to check out custom nic files
+    //checkout templates
+    [self upgradeTextProgress:@"checking out tvOS templates..." indeterminate:true percent:0];
+    NSString *templates = @"https://github.com/lechium/tvOS-templates.git";
+    fullCmd = [NSString stringWithFormat:@"/usr/bin/git clone %@", templates];
+    _tempPath = [libraryPath stringByAppendingPathComponent:@"theos/template"];
+    _targetPath = [libraryPath stringByAppendingPathComponent:@"theos/templates/"];
+    [HelperClass runTask:fullCmd inFolder:_tempPath];
+    fullCmd = [NSString stringWithFormat:@"/bin/mv %@/* %@", _tempPath, _targetPath];
+    [self upgradeTextProgress:@"moving tvOS templates..." indeterminate:true percent:0];
+    [HelperClass singleLineReturnForProcess:fullCmd];
+    if (block){
+        block(true);
+    }
 }
 
 //post brew install: ldid, dpkg, other issues SDKs v make files. also some linking issues with my sdks
@@ -203,14 +201,14 @@
     
     [irTask setStandardError:hdip];
     [irTask setStandardOutput:hdip];
-    //NSLog(@"hdiutil %@", [[irTask arguments] componentsJoinedByString:@" "]);
+    //NLog(@"hdiutil %@", [[irTask arguments] componentsJoinedByString:@" "]);
     [irTask launch];
     [irTask waitUntilExit];
     
     NSData *outData = nil;
     outData = [hdih readDataToEndOfFile];
     NSDictionary *plist = [outData safeDictionaryRepresentation];
-    //NSLog(@"plist: %@", plist);
+    //NLog(@"plist: %@", plist);
     NSArray *plistArray = [plist objectForKey:@"system-entities"];
     //int theItem = ([plistArray count] - 1);
     int i = 0;
@@ -220,7 +218,7 @@
         mountPath = [mountDict objectForKey:@"mount-point"];
         if (mountPath != nil)
         {
-            //NSLog(@"Mount Point: %@", mountPath);
+            //NLog(@"Mount Point: %@", mountPath);
             int rValue = [irTask terminationStatus];
             if (rValue == 0)
             {
@@ -235,20 +233,23 @@
     return nil;
 }
 
-+ (NSString *)processDownload:(NSString *)download {
+- (NSString *)processDownload:(NSString *)download {
     
     NSString *fileExt = [[download pathExtension] lowercaseString];
     if ([fileExt isEqualToString:@"dmg"]){
-       return [self mountImage:download];
+        return [HelperClass mountImage:download];
     } else if ([fileExt isEqualToString:@"xip"]){
-        
-        NSInteger bro = [self runTask:[NSString stringWithFormat:@"/usr/bin/xip -x %@", download] inFolder:[NSHomeDirectory() stringByAppendingPathComponent:@"Applications"]];
+        [self upgradeTextProgress:[NSString stringWithFormat:@"Extacting file %@", download.lastPathComponent] indeterminate:true percent:0];
+        NSInteger bro = [HelperClass runTask:[NSString stringWithFormat:@"/usr/bin/xip -x %@", download] inFolder:NSHomeDirectory()];
         if (bro == 0){
-            return @"success";
+            [FM removeItemAtPath:download error:nil];
+            NSString *outputPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Xcode.app"];
+            [self upgradeTextProgress:[NSString stringWithFormat:@"Extacting finished to %@", outputPath] indeterminate:true percent:0];
+            return outputPath;
+            
         } else {
             return [NSString stringWithFormat:@"returned with status %lu", bro];
         }
-        //return [self singleLineReturnForProcess:[NSString stringWithFormat:@"/usr/bin/xip -x %@", download]];
     }
     return nil;
 }
@@ -343,7 +344,7 @@
     while(c!='\n'){
         c=getchar();
     }
-    NSLog(@"return presssed, continuing...");
+    NLog(@"return presssed, continuing...");
 }
 
 + (BOOL)queryUserWithString:(NSString *)query {
@@ -389,7 +390,7 @@
 }
 
 + (NSArray *)arrayReturnForTask:(NSString *)taskBinary withArguments:(NSArray *)taskArguments {
-    NSLog(@"%@ %@", taskBinary, [taskArguments componentsJoinedByString:@" "]);
+    NLog(@"%@ %@", taskBinary, [taskArguments componentsJoinedByString:@" "]);
     NSTask *task = [[NSTask alloc] init];
     NSPipe *pipe = [[NSPipe alloc] init];
     NSFileHandle *handle = [pipe fileHandleForReading];
@@ -557,7 +558,7 @@
 //this is specifically if we need to find an external drive to extract / download some of the files to.
 
 + (NSArray *)scanForDrives {
-    //NSLog(@"%@ %s", self, _cmd);
+    //NLog(@"%@ %s", self, _cmd);
     NSMutableArray *deviceList = [[NSMutableArray alloc] init];
     NSTask *scanTask = [[NSTask alloc] init];
     NSPipe *pipe = [[NSPipe alloc] init];

@@ -23,7 +23,6 @@
 
 @property (weak) IBOutlet NSWindow *window;
 @property (assign) IBOutlet NSWindow *progressWindow;
-@property NSCalendarDate *start;
 @property NSDate *startDate;
 @property (strong) FileMonitor *monitor;
 @property (nonatomic, strong) NSString *ourDirectory;
@@ -90,75 +89,75 @@
         request:(NSURLRequest *)request
    newFrameName:(NSString *)frameName
 decisionListener:(id<WebPolicyDecisionListener>)listener {
-     NLog(@"decidePolicyForNewWindowAction: %@ request: %@", actionInformation, request);
+    NLog(@"decidePolicyForNewWindowAction: %@ request: %@", actionInformation, request);
     [listener use];
     [[webView mainFrame] loadRequest:request];
 }
 
 
 - (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
-    NLog(@"request: %@ headers: %@ body: %@", request, request.allHTTPHeaderFields, request.HTTPBody);
-    NSString *ext = request.URL.pathExtension;
+    //NLog(@"request: %@ headers: %@ body: %@", request, request.allHTTPHeaderFields, request.HTTPBody);
+    NSString *url = request.URL.absoluteString;
+    NSString *ext = url.pathExtension;
+    DDLogInfo(@"url: %@", url);
+    if ([url containsString:@"/#/welcome"]){
+        NLog(@"we are signed in!");
+        [self.window close];
+        [self loadURLInBackground:[HelperClass moreDownloadsURL]]; //this hopefully fixes some session issues where downloads wouldnt normally start
+        [self runStandardProcess];
+        
+    }
     
     if (ext.length > 0){
         _startDate = [NSDate date];
-        _start = [NSCalendarDate calendarDate];
         HelperClass *hc = [self helperSharedInstance];
         XcodeDownloads *downloads = [hc downloads];
         __block XcodeDownload *dl = [downloads downloadFromURL:request.URL];
+        NLog(@"dl: %@", dl);
         double fullSize = (([dl expectedSize]/1024) + ([dl extractedSize])/1024);
         double availSize = [HelperClass freeSpaceAvailable];
         
         NLog(@"avail: %f vs full: %f", availSize, fullSize);
         if (availSize < fullSize){
             NLog(@"not enough space, this is probably bad!");
+            //TODO: inform user how much free space there is vs how much is needed
             [self showInsufficientSpaceAlert];
             return;
         }
         [hc.downloads downloadFileURL:request.URL];
-        //URLDownloader *dl = hc.downloads.downloader;
         downloads.FancyProgressBlock = ^(double percentComplete, double writtenBytes, double expectedBytes) {
             // NSLog(@"pc: %f", percentComplete);
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self download:dl durationDidIncreaseTo:writtenBytes totalDuration:expectedBytes];
-                //self.progressLabel.stringValue = [NSString stringWithFormat:@"Downloading file %@", request.URL.lastPathComponent];
                 self.progressBar.doubleValue = percentComplete;
             });
         };
         downloads.CompletedBlock = ^(NSString *downloadedFile) {
             NLog(@"downloaded file: %@", downloadedFile);
-            
             NLog(@"xcd: %@", dl);
             /*
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-                BOOL validated = [downloadedFile validateFileSHA:dl.SHA];
-                if (validated){
-                    NLog(@"VALID!");
-                } else {
-                    NSLog(@"INVALID!!!");
-                }
-            });*/
+             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+             BOOL validated = [downloadedFile validateFileSHA:dl.SHA];
+             if (validated){
+             NLog(@"VALID!");
+             } else {
+             NSLog(@"INVALID!!!");
+             }
+             });*/
             dispatch_async(dispatch_get_main_queue(), ^{
                 
                 self.progressLabel.stringValue = @"";
                 self.progressBar.doubleValue = 1;
                 [self.progressBar stopAnimation:nil];
-                //NSArray *bruh = [HelperClass arrayReturnForTask:@"/usr/bin/hdituil" withArguments:@[@"attach", downloadedFile]];
-                if ([downloadedFile.pathExtension isEqualToString:@"xip"]){
-                    self.progressLabel.stringValue = [NSString stringWithFormat:@"Extacting file %@", request.URL.lastPathComponent];
-                    self.progressBar.indeterminate = true;
-                    [self.progressBar startAnimation:nil];
-                    
-                }
-                
+     
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
                     
-                    NSString *heyo = [HelperClass processDownload:downloadedFile];
+                    NSString *heyo = [[self helperInstance] processDownload:downloadedFile];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         self.progressBar.indeterminate = false;
                         [self.progressBar stopAnimation:nil];
                     });
-                    NSLog(@"processed location: %@", heyo);
+                    DDLogInfo(@"processed location: %@", heyo);
                     //[self startListening];
                     NSArray *files = [FM contentsOfDirectoryAtPath:heyo error:nil];
                     NSString *chosen = [[files filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
@@ -167,18 +166,20 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
                         }
                         return false;
                     }]] lastObject] ;
-                    NSLog(@"chosen: %@", chosen);
-                    [[NSWorkspace sharedWorkspace] openFile:[heyo stringByAppendingPathComponent:chosen]];
+                    DDLogInfo(@"chosen: %@", chosen);
+                    if (chosen){
+                        [[NSWorkspace sharedWorkspace] openFile:[heyo stringByAppendingPathComponent:chosen]];
+                        [self updateProgressLabel:@""];
+                    }
                 });
+                if (downloads.operationQueue.operationCount == 0){
+                    DDLogInfo(@"no operations left, continue forward!");
+                    [self runPostXcodeProcess];
+                }
                 //[[NSWorkspace sharedWorkspace] openFile:downloadedFile];
             });
         };
-        
-        downloads.DownloadsFinishedBlock = ^{
-            
-            [self runPostXcodeProcess];
-            
-        };
+      
         
     } else {
         [listener use];
@@ -192,14 +193,18 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame; {
     
     NSString *mfu = [sender mainFrameURL];
+    DDLogInfo(@"mfu: %@", mfu);
+   /*
     if ([mfu containsString:@"/#/welcome"]){
-        NSLog(@"we are signed in!");
+        NLog(@"we are signed in!");
+        [self.window close];
         [self runStandardProcess];
+        
     }
-    
+*/
     
     //NSLog(@"ff: %@", ff);
-    NSLog(@"title: %@", [[frame DOMDocument] title]);
+    NLog(@"title: %@", [[frame DOMDocument] title]);
 }
 
 - (void)showInsufficientSpaceAlert {
@@ -218,14 +223,11 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
 {
     float currentLevel = (float)((double)writtenDuration/(double)sourceDuration);
     float percent = currentLevel*100.0;
-    NSInteger rSeconds = 0;
     NSTimeInterval interval = [[NSDate date] timeIntervalSinceDate:_startDate];
-    [[NSCalendarDate calendarDate] years:nil months:nil days:nil hours:nil minutes:nil seconds:&rSeconds sinceDate:_start];
-    NLog(@"r seconds: %lu interval: %.2f", rSeconds, interval);
-    float speed = (float)writtenDuration/(float)rSeconds;
+    float speed = (float)writtenDuration/(float)interval;
     float left = ((float)sourceDuration - (float)writtenDuration)/speed;
     NSString *leftString = nil;
-    if(rSeconds < 15){
+    if(interval < 15){
         leftString = NSLocalizedString(@"ETR", @"ETR");
     } else {
         leftString = [[NSString stringWithFormat:@"%f",left] TIMEFormat];
@@ -241,15 +243,37 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     
 }
 
-
+- (void)applicationWillTerminate:(NSNotification *)notification {
+    
+    [[self.helperInstance downloads] cancelAllDownloads];
+    
+}
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
     [self _createViews];
-    //[self openDeveloperPage:nil];
+    [self openDeveloperPage:nil];
     [self scanEnvironment];
+    [DDLog addLogger:[DDASLLogger sharedInstance]];
+    [DDLog addLogger:[DDTTYLogger sharedInstance]];
+    DDLogFileManagerDefault *manager = [[DDLogFileManagerDefault alloc] initWithLogsDirectory:nil];
+    DDFileLogger *fileLogger = [[DDFileLogger alloc] initWithLogFileManager:manager];
+    fileLogger.rollingFrequency = 60 * 60 * 24; // 24 hour rolling
+    fileLogger.logFileManager.maximumNumberOfLogFiles = 7;
+    [DDLog addLogger:fileLogger];
+    DDLogInfo(@"file: %@", [manager logsDirectory]);
+    DDLogInfo(@"DDLOGTEST");
 }
 
+- (void)hideProgress {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.progressWindow close];
+        [self updateProgressLabel:@""];
+        [self updateProgressValue:1 indeterminate:true];
+
+    });
+
+}
 
 - (void)runPostXcodeProcess {
     [self updateProgressLabel:@"Post Xcode Processing, checkinging out theos & sdks..."];
@@ -262,8 +286,7 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
                 [self installBrew:nil];
                 
             } else {
-                [self updateProgressLabel:@""];
-                [self updateProgressValue:1 indeterminate:true];
+                [self hideProgress];
             }
         }];
     });
@@ -276,7 +299,7 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
 
 
 - (void)scanEnvironment {
-  
+    
     NSInteger freeSpace = [HelperClass freeSpaceAvailable];
     NLog(@"free space: %lu", freeSpace);
     if (![HelperClass xcodeInstalled] || ![HelperClass commandLineToolsInstalled]){
@@ -296,9 +319,9 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
 - (void)updateProgressValue:(double)value indeterminate:(BOOL)indy {
     if (![NSThread isMainThread]){
         dispatch_async(dispatch_get_main_queue(), ^{
+            self.progressBar.indeterminate = indy;
             if (value == 0 && indy == true){
                 [self.progressBar startAnimation:nil];
-                self.progressBar.indeterminate = indy;
                 
             } else if (indy == true && value == 1){
                 [self.progressBar stopAnimation:nil];
@@ -309,9 +332,10 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
             
         });
     } else {
+        self.progressBar.indeterminate = indy;
         if (value == 0 && indy == true){
             [self.progressBar startAnimation:nil];
-            self.progressBar.indeterminate = indy;
+            
             
         } else if (indy == true && value == 1){
             [self.progressBar stopAnimation:nil];
@@ -338,7 +362,7 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
 - (void)runStandardProcess {
     
     dispatch_async(dispatch_get_main_queue(), ^{
-       [self.progressWindow makeKeyAndOrderFront:nil];
+        [self.progressWindow makeKeyAndOrderFront:nil];
     });
     HelperClass *hc = [self helperSharedInstance];
     XcodeDownloads *xcdl = [hc downloads];
@@ -351,6 +375,11 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     }];
 }
 
+- (void)loadURLInBackground:(NSURL *)url {
+    NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
+    [[webView mainFrame] loadRequest:req];
+}
+
 - (IBAction)openDownloadsPage:(id)sender {
     [self.window makeKeyAndOrderFront:nil];
     NSURL *url = [HelperClass moreDownloadsURL];
@@ -359,14 +388,14 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
 }
 
 - (IBAction)openDeveloperPage:(id)sender {
-   
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.window makeKeyAndOrderFront:nil];
         NSURL *url = [HelperClass developerAccountSite];
         NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
         [[webView mainFrame] loadRequest:req];
     });
-   
+    
 }
 
 - (IBAction)openAppleIDPage:(id)sender {
@@ -377,10 +406,6 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     
 }
 
-- (void)applicationWillTerminate:(NSNotification *)aNotification {
-    // Insert code here to tear down your application
-}
-
 - (void)_createViews {
     NSView* contentView = _window.contentView;
     
@@ -388,14 +413,20 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     webView = [[WebView alloc] initWithFrame:contentView.frame];
     webView.policyDelegate = self;
     webView.frameLoadDelegate = self;
-    webView.translatesAutoresizingMaskIntoConstraints = false;
+    [webView setAutoresizingMask:(NSViewHeightSizable | NSViewWidthSizable)];
     [contentView addSubview:webView];
+    /*
+    webView.translatesAutoresizingMaskIntoConstraints = false;
     [webView.widthAnchor constraintEqualToAnchor:contentView.widthAnchor multiplier:1.0].active = true;
     [webView.heightAnchor constraintEqualToAnchor:contentView.heightAnchor multiplier:1.0].active = true;
     [webView.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = true;
     [webView.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = true;
     [webView.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = true;
     [webView.bottomAnchor constraintEqualToAnchor:contentView.bottomAnchor].active = true;
+     */
+    self.progressLabel.alignment = NSTextAlignmentCenter;
+    self.progressLabel.textColor = [NSColor whiteColor];
+    return;
     webView.alphaValue = 0;
     infoText = [[NSTextView alloc] init];
     infoText.editable = false;
@@ -428,15 +459,19 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     [continueButton.topAnchor constraintEqualToAnchor:infoText.bottomAnchor constant:15].active = true;
     continueButton.bezelStyle = NSBezelStyleTexturedRounded;
     continueButton.keyEquivalent = @"\r";
-    self.progressLabel.alignment = NSTextAlignmentCenter;
-    self.progressLabel.textColor = [NSColor whiteColor];
+
 }
 
 - (void)continueProcess:(id)sender {
     
-    [self openDeveloperPage:nil];
-    [infoView removeFromSuperview];
-    [webView setAlphaValue:1.0];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [infoView removeFromSuperview];
+        //infoView.alphaValue = 0.0;
+        [self openDeveloperPage:nil];
+        [webView setAlphaValue:1.0];
+
+    });
     
 }
 

@@ -29,12 +29,10 @@
 }
 
 - (BOOL)isExecuting {
-    LOG_SELF;
     return __ourExecuting;
 }
 
 - (BOOL)isFinished {
-    LOG_SELF;
     return __ourFinished;
 }
 
@@ -45,7 +43,6 @@
         _FancyProgressBlock = progressBlock;
         CompletedBlock = completedBlock;
         downloadLocation = [[HelperClass tempFolder] stringByAppendingPathComponent:[fileURL lastPathComponent]];
-        
     }
     return self;
 }
@@ -53,24 +50,26 @@
 - (void)cancel {
     [super cancel];
     [[self downloadTask] cancel];
-    [self willChangeValueForKey:@"finished"];
-    __ourFinished = true;
-    [self didChangeValueForKey:@"finished"];
+    [self _setFinished:true];
+    [self _setExecuting:false];
+}
+
+- (void)_setExecuting:(BOOL)executing {
     [self willChangeValueForKey:@"executing"];
-    __ourExecuting = false;
+    __ourExecuting = executing;
     [self didChangeValueForKey:@"executing"];
+}
+
+- (void)_setFinished:(BOOL)finished {
+    [self willChangeValueForKey:@"finished"];
+    __ourFinished = finished;
+    [self didChangeValueForKey:@"finished"];
 }
 
 - (void)main {
     [self start];
-    [self willChangeValueForKey:@"finished"];
-    __ourFinished = false;
-    [self didChangeValueForKey:@"finished"];
-    [self willChangeValueForKey:@"executing"];
-    __ourExecuting = true;
-    [self didChangeValueForKey:@"executing"];
-
-
+    [self _setFinished:false];
+    [self _setExecuting:true];
 }
 
 - (void)start {
@@ -114,7 +113,7 @@
      The download completed, you need to copy the file at targetPath before the end of this block.
      As an example, copy the file to the Documents directory of your app.
      */
-
+    
     NLog(@"downloaded file to url: %@", downloadURL);
     NSURL *destinationURL = [NSURL fileURLWithPath:[self downloadLocation]];
     NSError *errorCopy;
@@ -136,30 +135,30 @@
          */
         NLog(@"Error during the copy: %@", [errorCopy localizedDescription]);
     }
-    [self willChangeValueForKey:@"executing"];
-    __ourExecuting = false;
-    [self didChangeValueForKey:@"executing"];
-    [self willChangeValueForKey:@"finished"];
-    __ourFinished = true;
-    [self didChangeValueForKey:@"finished"];
+    
+    [self _setExecuting:false];
+    [self _setFinished:true];
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
     if (error == nil) {
-     /*
-        NLog(@"Task: %@ completed successfully", task);
-        if (self.CompletedBlock != nil) {
-            self.CompletedBlock(downloadLocation);
-        }
-      */
+        
     } else {
         NLog(@"Task: %@ completed with error: %@", task, [error localizedDescription]);
         if (self.CompletedBlock != nil) {
             self.CompletedBlock(downloadLocation);
         }
     }
-
+    
     self.downloadTask = nil;
+}
+
+- (NSURLSession *)defaultSession {
+    static NSURLSession *session = nil;
+    
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:nil];
+    return session;
 }
 
 - (NSURLSession *)backgroundSessionWithId:(NSString *)sessionID {

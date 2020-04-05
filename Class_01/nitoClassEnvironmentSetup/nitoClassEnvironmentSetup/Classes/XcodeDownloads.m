@@ -11,6 +11,14 @@
 
 
 @implementation XcodeDownload
+
+- (NSString *)description {
+    
+    NSString *orig = [super description];
+    return [NSString stringWithFormat:@"%@ url: %@ type: %u", orig, self.downloadURL, self.downloadType];
+    
+}
+
 @end
 
 @implementation XcodeDownloads {
@@ -147,7 +155,7 @@
     
     [self.operationQueue addOperation:downloadOp];
     downloadOp.completionBlock = ^{
-      
+        
         if (self.operationQueue.operationCount == 1){
             NLog(@"lastop, we out here!");
             if (self.DownloadsFinishedBlock){
@@ -171,6 +179,24 @@
     }];
    
     [self.operationQueue addOperation:downloadOp];
+    downloadOp.completionBlock = ^{
+        
+        if (self.operationQueue.operationCount == 1){
+            NLog(@"lastop, we out here!");
+            if (self.DownloadsFinishedBlock){
+                self.DownloadsFinishedBlock();
+            }
+        }
+    };
+}
+
+- (void)cancelAllDownloads {
+    
+    [[self.operationQueue operations] enumerateObjectsUsingBlock:^(__kindof NSOperation * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+       
+        [obj cancel];
+        DDLogInfo(@"cancelling: %@", obj);
+    }];
     
 }
 
