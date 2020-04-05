@@ -148,22 +148,12 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     //NLog(@"request: %@ headers: %@ body: %@", request, request.allHTTPHeaderFields, request.HTTPBody);
     NSString *url = request.URL.absoluteString;
     NSString *ext = url.pathExtension;
-    DDLogInfo(@"url: %@", url);
-    /*
-    if ([url containsString:@"/#/welcome"]){
-        NLog(@"we are signed in!");
-        [self.window close];
-        [self loadURLInBackground:[HelperClass moreDownloadsURL]]; //this hopefully fixes some session issues where downloads wouldnt normally start
-        [self runStandardProcess];
-        
-    }
-    */
+    DDLogInfo(@"decidePolicyForNavigationAction URL: %@", url);
     if (ext.length > 0){
         _startDate = [NSDate date];
         HelperClass *hc = [self helperSharedInstance];
         XcodeDownloads *downloads = [hc downloads];
         __block XcodeDownload *dl = [downloads downloadFromURL:request.URL];
-        NLog(@"dl: %@", dl);
         double fullSize = (([dl expectedSize]/1024) + ([dl extractedSize])/1024);
         double availSize = [HelperClass freeSpaceAvailable];
         
@@ -185,12 +175,11 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
         };
         downloads.CompletedBlock = ^(NSString *downloadedFile, XcodeDownload *object) {
             
-              __block BOOL errorOccured = false;
+            __block BOOL errorOccured = false;
             NLog(@"downloaded file: %@ xc: %@", downloadedFile, object);
             NSNumber *size = [FM attributesOfItemAtPath:downloadedFile error:nil][NSFileSize];
             NLog(@"downladed size: %@", size);
             NLog(@"expected size: %.2ld", (long)[object expectedSize]);
-            NLog(@"xcd: %@", dl);
             /*
              dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
              BOOL validated = [downloadedFile validateFileSHA:dl.SHA];
@@ -201,7 +190,7 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
              }
              });*/
             
-        
+            
             if (size.integerValue != [object expectedSize]){
                 errorOccured = true;
                 NLog(@"%ld != %ld", (long)size.integerValue, (long)[object expectedSize]);
@@ -231,23 +220,26 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
                             return false;
                         }]] lastObject] ;
                         DDLogInfo(@"chosen: %@", chosen);
-                        if (chosen){
-                            [[NSWorkspace sharedWorkspace] openFile:[heyo stringByAppendingPathComponent:chosen]];
-                            [self updateProgressLabel:@""];
+                        NSString *final = heyo;
+                        if (chosen.length > 0){
+                            final = [heyo stringByAppendingPathComponent:chosen];
                         }
+                        
+                        [self updateProgressLabel:[NSString stringWithFormat:@"opening %@", final]];
+                        [[NSWorkspace sharedWorkspace] openFile:final];
                         if (downloads.operationQueue.operationCount == 0){
                             DDLogInfo(@"no operations left, continue forward!");
                             [self runPostXcodeProcess];
                         }
                     });
-                   
-                    //[[NSWorkspace sharedWorkspace] openFile:downloadedFile];
+                    
+
                 });
             }
             
             
         };
-      
+        
         
     } else {
         [listener use];
@@ -269,7 +261,7 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     
     NSString *mfu = [sender mainFrameURL];
     DDLogInfo(@"mfu: %@", mfu);
-   
+    
     if ([mfu containsString:@"/#/welcome"] || [mfu containsString:@"#/overview"]){
         
         if (!_authed){
@@ -279,9 +271,9 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
             DDLogInfo(@"ALREADY AUTHED!!!");
         }
         
-
+        
     }
-
+    
     
     //NSLog(@"ff: %@", ff);
     NLog(@"title: %@", [[frame DOMDocument] title]);
@@ -352,19 +344,29 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     DDLogInfo(@"size: %llu", [HelperClass sessionCacheSize]);
 }
 
+- (IBAction)openConsoleLog:(id)sender {
+    
+    ///usr/bin/tail -f  "`/bin/ls -1td ~/Library/Logs/nitoClassSetup/*| /usr/bin/head -n1`"
+    NSString *fileContents = @"/usr/bin/tail -f  \"`/bin/ls -1td ~/Library/Logs/nitoClassSetup/*| /usr/bin/head -n1`\"";
+    NSString *outFile = [NSTemporaryDirectory() stringByAppendingPathComponent:@"tailLog.sh"];
+    [fileContents writeToFile:outFile atomically:true encoding:NSUTF8StringEncoding error:nil];
+    chmod([outFile UTF8String], 0755);
+    [[NSWorkspace sharedWorkspace] openFile:outFile withApplication:@"Terminal" andDeactivate:false];
+}
+
 - (void)hideProgress {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.progressWindow close];
         [self updateProgressLabel:@""];
         [self updateProgressValue:1 indeterminate:true];
-
+        
     });
-
+    
 }
 
 - (void)runPostXcodeProcess {
     dispatch_async(dispatch_get_main_queue(), ^{
-       [self.window close];
+        [self.window close];
     });
     [self updateProgressLabel:@"Post Xcode Processing, checkinging out theos & sdks..."];
     [self checkoutTheos];
@@ -494,13 +496,13 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     [webView setAutoresizingMask:(NSViewHeightSizable | NSViewWidthSizable)];
     [contentView addSubview:webView];
     /*
-    webView.translatesAutoresizingMaskIntoConstraints = false;
-    [webView.widthAnchor constraintEqualToAnchor:contentView.widthAnchor multiplier:1.0].active = true;
-    [webView.heightAnchor constraintEqualToAnchor:contentView.heightAnchor multiplier:1.0].active = true;
-    [webView.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = true;
-    [webView.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = true;
-    [webView.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = true;
-    [webView.bottomAnchor constraintEqualToAnchor:contentView.bottomAnchor].active = true;
+     webView.translatesAutoresizingMaskIntoConstraints = false;
+     [webView.widthAnchor constraintEqualToAnchor:contentView.widthAnchor multiplier:1.0].active = true;
+     [webView.heightAnchor constraintEqualToAnchor:contentView.heightAnchor multiplier:1.0].active = true;
+     [webView.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = true;
+     [webView.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = true;
+     [webView.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = true;
+     [webView.bottomAnchor constraintEqualToAnchor:contentView.bottomAnchor].active = true;
      */
     self.progressLabel.alignment = NSTextAlignmentCenter;
     self.progressLabel.textColor = [NSColor whiteColor];
@@ -537,18 +539,18 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     [continueButton.topAnchor constraintEqualToAnchor:infoText.bottomAnchor constant:15].active = true;
     continueButton.bezelStyle = NSBezelStyleTexturedRounded;
     continueButton.keyEquivalent = @"\r";
-
+    
 }
 
 - (void)continueProcess:(id)sender {
     
-
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [infoView removeFromSuperview];
         //infoView.alphaValue = 0.0;
         [self openDeveloperPage:nil];
         [webView setAlphaValue:1.0];
-
+        
     });
     
 }

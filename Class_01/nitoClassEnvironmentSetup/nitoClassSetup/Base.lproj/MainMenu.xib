@@ -703,6 +703,12 @@
                                     <action selector="makeKeyAndOrderFront:" target="5pL-uq-IbM" id="b9H-HY-cRy"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Show progress log" id="rzB-p8-J7c">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="openConsoleLog:" target="Voe-Tx-rLC" id="fMU-B2-4sB"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="whP-oA-a7C"/>
                             <menuItem title="Install Homebrew" id="wHr-Ew-PaB">
                                 <modifierMask key="keyEquivalentModifierMask"/>
