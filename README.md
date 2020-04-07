@@ -1,6 +1,8 @@
 # nitoClass
 Open source free class for tvOS (in progress)
 
+discord channel: https://discord.gg/G3EEpsS
+
 download episode 1 application:
 https://github.com/lechium/nitoClass/releases
 
