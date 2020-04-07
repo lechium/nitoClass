@@ -37,7 +37,7 @@
     // fetch key data
     unsigned long keyLength = [key length];
     if (keyLength > kCCKeySizeAES128) {
-        NSLog(@"Key is too long: %i", keyLength);
+        NSLog(@"Key is too long: %lu", keyLength);
         return nil;
     }
     memcpy(keyPtr, [key bytes], keyLength);

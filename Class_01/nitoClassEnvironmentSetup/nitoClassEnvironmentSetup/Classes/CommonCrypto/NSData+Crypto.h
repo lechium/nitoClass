@@ -10,7 +10,6 @@
 
 @interface NSData (Crypto)
 
-- (NSData *)decryptDeviceKey:(NSString *)deviceKeyBase64;
 - (NSData *)AES128DecryptWithKey:(NSData *)key;
 - (NSData *)SHA1HmacWithKey:(NSData *)key;
 

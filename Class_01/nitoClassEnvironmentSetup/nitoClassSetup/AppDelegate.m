@@ -89,18 +89,6 @@
     });
 }
 
--(void) dirChanged:(NSString*) aDirName {
-    
-    NSString *git = [aDirName stringByAppendingPathComponent:@"git"];
-    if ([FM fileExistsAtPath:git]){
-        NLog(@"we done got git!, can check out theos etc now!");
-        [self stopListening];
-        [self checkoutTheos];
-    } else {
-        NLog(@"NO GIT FOR YOU");
-    }
-}
-
 
 - (void)updateProgressLabel:(NSString *)text {
     if (text.length == 0){
@@ -227,9 +215,7 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
                 });
             }
             
-            
         };
-        
         
     } else {
         [listener use];
@@ -251,7 +237,6 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     
     NSString *mfu = [sender mainFrameURL];
     DDLogInfo(@"mfu: %@", mfu);
-    
     if ([mfu containsString:@"/#/welcome"] || [mfu containsString:@"#/overview"]){
         
         if (!_authed){
@@ -260,12 +245,7 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
         } else {
             DDLogInfo(@"ALREADY AUTHED!!!");
         }
-        
-        
     }
-    
-    
-    //NSLog(@"ff: %@", ff);
     NLog(@"title: %@", [[frame DOMDocument] title]);
 }
 
@@ -313,7 +293,6 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
 - (void)applicationWillTerminate:(NSNotification *)notification {
     
     [[self.helperInstance downloads] cancelAllDownloads];
-    
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
@@ -370,7 +349,6 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
 - (void)runAuthBasedProcess {
     [self.window makeKeyAndOrderFront:nil];
 }
-
 
 - (void)scanEnvironment {
     
@@ -467,7 +445,7 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
         [self.window makeKeyAndOrderFront:nil];
         NSURL *url = [HelperClass developerAccountSite];
         NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
-        [[webView mainFrame] loadRequest:req];
+        [[self->webView mainFrame] loadRequest:req];
     });
     
 }
@@ -538,16 +516,14 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
 
 - (void)continueProcess:(id)sender {
     
-    
     dispatch_async(dispatch_get_main_queue(), ^{
-        [infoView removeFromSuperview];
+        [self->infoView removeFromSuperview];
         //infoView.alphaValue = 0.0;
         [self openDeveloperPage:nil];
-        [webView setAlphaValue:1.0];
+        [self->webView setAlphaValue:1.0];
         
     });
     
 }
-
 
 @end
