@@ -13,4 +13,6 @@
 - (NSString *)plistSafeString;
 - (NSString *)TIMEFormat;
 - (BOOL)validateFileSHA:(NSString *)sha;
+- (NSString*)groupOctalWithDelimiter:(NSString *)delim;
+- (NSString*)permissionsOctalRepresentation;
 @end

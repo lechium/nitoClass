@@ -57,7 +57,7 @@ int main(int argc, const char * argv[]) {
         ///bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
         DLog(@"\n\nWelcome to the nitoClass environment setup tool!\n\n");
         DLog(@"System Info\n-----------\n\n")
-        DLog(@"Version: %@", hc.downloads.systemVersionCodename);
+        DLog(@"Version: %@", hc.xcDownloadInfo.systemVersionCodename);
         DLog(@"Username: %@", hc.username);
         DLog(@"Default Shell: %@\n\n", shell);
         DLog(@"Checking system environment...\n\n");
@@ -85,10 +85,10 @@ int main(int argc, const char * argv[]) {
                 NLog(@"theos is done with status %d", success);
             }];;
         }
-        if (!hc.downloads.xcodeInstalled){
+        if (!hc.xcDownloadInfo.xcodeInstalled){
             //DLog(@"Xcode missing, download link: %@\n", hc.downloads.xcodeDownloadURL);
         }
-        if (!hc.downloads.cliInstalled){
+        if (!hc.xcDownloadInfo.cliInstalled){
             //DLog(@"cli tools missing, download link: %@\n", hc.downloads.commandLineURL);
         }
         hc.hasAppleId = [HelperClass queryUserWithString:@"Do you have a Apple ID set up?"];

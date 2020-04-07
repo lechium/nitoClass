@@ -2,7 +2,7 @@
 
 @interface HelperClass: NSObject
 
-@property XcodeDownloads *downloads;
+@property XcodeDownloads *xcDownloadInfo;
 @property BOOL hasAppleId;
 @property BOOL hasDeveloperAccount;
 @property NSString *theosPath;
@@ -10,36 +10,41 @@
 @property NSString *username;
 @property (strong, atomic) void (^BasicProgressBlock)(NSString *progressDetails, BOOL indeterminate, double percentComplete);
 @property (strong, atomic) void (^HelperProgressBlock)(NSString *progressDetails, double percentComplete, double writtenBytes, double expectedBytes);
-+ (long long) folderSizeAtPath: (const char*)folderPath;
+
 + (NSString *)theosPath;
-+ (NSString *)freeSpaceString;
 + (NSString *)aliasPath;
 + (NSString *)defaultShell;
++ (NCSystemVersionType)currentVersion;
+
 + (float)freeSpaceAvailable;
-+ (BOOL)belowFreeSpaceThreshold;
-+ (NSURL *)moreDownloadsURL;
-+ (NSString *)tempFolder;
-- (void)installHomebrewIfNecessary;
++ (NSString *)freeSpaceString;
+
 - (void)checkoutTheosIfNecessary:(void(^)(BOOL success))block;
-+ (NSInteger)runTask:(NSString *)fullCommand inFolder:(NSString *)targetFolder;
-- (void)waitForReturnWithMessage:(NSString *)message;
+- (NSString *)processDownload:(NSString *)download;
+
++ (NSURL *)moreDownloadsURL;
++ (NSURL *)appleIDPage;
++ (NSURL *)developerAccountSite;
+
 + (BOOL)xcodeInstalled;
 + (BOOL)brewInstalled;
 + (BOOL)commandLineToolsInstalled;
+
+- (void)installHomebrewIfNecessary;
++ (void)openIDSignupPage;
++ (void)openDeveloperAccountSite;
+
 + (BOOL)queryUserWithString:(NSString *)query;
++ (NSInteger)runTask:(NSString *)fullCommand inFolder:(NSString *)targetFolder;
 + (NSArray *)returnForProcess:(NSString *)call;
-+ (NSString *)octalFromSymbols:(NSString *)theSymbols;
 + (NSString *)singleLineReturnForProcess:(NSString *)call;
 + (NSArray *)arrayReturnForTask:(NSString *)taskBinary withArguments:(NSArray *)taskArguments;
-+ (NCSystemVersionType)currentVersion;
-+ (void)openIDSignupPage;
-+ (NSURL *)appleIDPage;
-+ (NSURL*)developerAccountSite;
-+ (void)openDeveloperAccountSite;
-+ (NSArray *)scanForDrives;
+
 + (NSString *)mountImage:(NSString *)irString;
-- (NSString *)processDownload:(NSString *)download;
++ (NSArray *)scanForDrives;
+
 + (NSString *)cacheFolder ;
 + (NSString *)sessionCache;
 + (long long)sessionCacheSize;
++ (long long) folderSizeAtPath: (const char*)folderPath;
 @end

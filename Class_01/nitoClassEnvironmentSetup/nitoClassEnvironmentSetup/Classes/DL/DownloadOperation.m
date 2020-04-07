@@ -44,7 +44,7 @@
         _downloadURL = fileURL;
         _FancyProgressBlock = progressBlock;
         CompletedBlock = completedBlock;
-        downloadLocation = [[HelperClass tempFolder] stringByAppendingPathComponent:[fileURL lastPathComponent]];
+        downloadLocation = [NSTemporaryDirectory() stringByAppendingPathComponent:[fileURL lastPathComponent]];
     }
     return self;
 }

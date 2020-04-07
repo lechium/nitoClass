@@ -117,10 +117,9 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
 
 - (void)shutItDown {
     LOG_SELF;
-    [[[self helperInstance] downloads] cancelAllDownloads];
+    [[[self helperInstance] xcDownloadInfo] cancelAllDownloads];
     
 }
-
 
 - (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
     //NLog(@"request: %@ headers: %@ body: %@", request, request.allHTTPHeaderFields, request.HTTPBody);
@@ -130,7 +129,7 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     if (ext.length > 0){
         _startDate = [NSDate date];
         HelperClass *hc = [self helperSharedInstance];
-        XcodeDownloads *downloads = [hc downloads];
+        XcodeDownloads *downloads = [hc xcDownloadInfo];
         __block XcodeDownload *dl = [downloads downloadFromURL:request.URL];
         double fullSize = (([dl expectedSize]/1024) + ([dl extractedSize])/1024);
         double availSize = [HelperClass freeSpaceAvailable];
@@ -142,7 +141,7 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
             [self showInsufficientSpaceAlertWithExpectedSize:fullSize];
             return;
         }
-        [hc.downloads downloadFile:dl];
+        [hc.xcDownloadInfo downloadFile:dl];
         //[hc.downloads downloadFileURL:request.URL];
         downloads.FancyProgressBlock = ^(NSString *name, double percentComplete, double writtenBytes, double expectedBytes) {
             // NSLog(@"pc: %f", percentComplete);
@@ -292,7 +291,7 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
     
-    [[self.helperInstance downloads] cancelAllDownloads];
+    [[self.helperInstance xcDownloadInfo] cancelAllDownloads];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
@@ -363,10 +362,6 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     
 }
 
-- (void)webView:(WKWebView *)webView didFinishNavigation:(null_unspecified WKNavigation *)navigation {
-    NSLog(@"ivars: %@", [webView ivars]);
-    NSLog(@"props: %@", [webView properties]);
-}
 
 - (void)updateProgressValue:(double)value indeterminate:(BOOL)indy {
     if (![NSThread isMainThread]){
@@ -417,7 +412,7 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
         [self.progressWindow makeKeyAndOrderFront:nil];
     });
     HelperClass *hc = [self helperSharedInstance];
-    XcodeDownloads *xcdl = [hc downloads];
+    XcodeDownloads *xcdl = [hc xcDownloadInfo];
     NSArray <XcodeDownload *> *dl = [xcdl downloads];
     
     [dl enumerateObjectsUsingBlock:^(XcodeDownload * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {

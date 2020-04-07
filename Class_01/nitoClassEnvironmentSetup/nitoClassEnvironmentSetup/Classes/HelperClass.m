@@ -7,6 +7,24 @@
 #include <sys/stat.h>
 @import Darwin.POSIX.dirent;
 
+/**
+ 
+ NOTE: This class is definitely a 'ball of mud' anti-pattern, or one could reasonably defend the claim to it being one.
+ 
+ That being said, its not here a demonstration of how you should organize your code,
+ it's a quick and dirty implementation to get this process moving in a timely fashion.
+ 
+ Overview:
+ 
+ This is a multi purpose "helper" class that tracks / discerns important file locations, installation status of packages
+ convenience tasks for task operations (NSTask or popen) and will also track the XcodeDownload(s) classes
+ based on which OS you are currently running, and what components you already have installed.
+ 
+ I've tried to reorganize & make use of pragma marks throughout to make this code better organized and easier to trace.
+ 
+ 
+ */
+
 @implementation HelperClass
 
 #pragma mark version checking
@@ -14,7 +32,7 @@
 - (id)init {
     self = [super init];
     if (self){
-        _downloads = [XcodeDownloads new];
+        _xcDownloadInfo = [XcodeDownloads new];
         _theosPath = [[HelperClass theosPath] stringByExpandingTildeInPath];
         NLog(@"theosPath: %@", _theosPath);
         _username = [HelperClass singleLineReturnForProcess:@"whoami"];
@@ -23,34 +41,34 @@
     return self;
 }
 
+#pragma mark UI / progress management
+
+//currently the basic progress block is currently only implemented on the GUI app, but it enables core functions in here to relay data back to the AppDelegate.
+
+- (void)upgradeTextProgress:(NSString *)progress indeterminate:(BOOL)ind percent:(double)percentComplete {
+    if (self.BasicProgressBlock){ //since objective-c is a dynamic and 'loose' language, it is good practice to do nil checks.
+        self.BasicProgressBlock(progress, ind, percentComplete);
+    }
+}
+
+#pragma mark Important paths
+
+//determine if a THEOS environment variable already exists depending on the default shell
+
 + (NSString *)theosPath {
     
-    NSString *alias = [HelperClass aliasPath];
-    NSString *envRun = [NSString stringWithFormat:@"cat %@ | grep -m 1 THEOS= | cut -d \"=\" -f 2", alias];
-    return [HelperClass singleLineReturnForProcess:envRun];
+    NSString *alias = [HelperClass aliasPath]; //gets a default alias path based on the current shell (ie ~/.bash_profile, or ~/.zshrc etc)
+    NSString *envRun = [NSString stringWithFormat:@"cat %@ | grep -m 1 THEOS= | cut -d \"=\" -f 2", alias]; //use cat to read the file, and grep to match 'THEOS=' in the file, and use 'cut to return the important data
+    return [HelperClass singleLineReturnForProcess:envRun]; //this will run a line like the one above as if you were running it in a regular Terminal session.
 }
 
-
-+ (NSString *)freeSpaceString {
-    float space = [self freeSpaceAvailable];
-    return [[NSString stringWithFormat:@"%f", space] suffixNumber];
-}
-
-+ (float)freeSpaceAvailable {
-    float available = [[[FM attributesOfFileSystemForPath:@"/" error:nil] objectForKey:NSFileSystemFreeSize] floatValue];
-    float avail2 = available / 1024;
-    return avail2;
-}
-
-+ (BOOL)belowFreeSpaceThreshold {
-    float avail2 = [self freeSpaceAvailable];
-    DLog(@"avail: %f", avail2);
-    return (avail2 < 60);
-}
+//use printenv to determine default shell
 
 + (NSString *)defaultShell {
     return [HelperClass singleLineReturnForProcess:@"printenv SHELL"];
 }
+
+//take default shell and return the default alias path, only works with bash or zsh as defaults right now.
 
 + (NSString *)aliasPath {
     NSString *shell = [self defaultShell];
@@ -66,87 +84,79 @@
     }
     return aliasFile;
 }
+//environment var, fits close enough with important paths
 
-+ (long long) folderSizeAtPath: (const char*)folderPath {
-    long long folderSize = 0;
-    DIR* dir = opendir(folderPath);
-    if (dir == NULL) return 0;
-    struct dirent* child;
-    while ((child = readdir(dir))!=NULL) {
-        if (child->d_type == DT_DIR
-            && child->d_name[0] == '.'
-            && (child->d_name[1] == 0 // ignore .
-                ||
-                (child->d_name[1] == '.' && child->d_name[2] == 0) // ignore dir ..
-                ))
-            continue;
-        
-        size_t folderPathLength = strlen(folderPath);
-        char childPath[1024]; // child
-        stpcpy(childPath, folderPath);
-        if (folderPath[folderPathLength-1] != '/'){
-            childPath[folderPathLength] = '/';
-            folderPathLength++;
-        }
-        stpcpy(childPath+folderPathLength, child->d_name);
-        childPath[folderPathLength + child->d_namlen] = 0;
-        if (child->d_type == DT_DIR){ // directory
-            folderSize += [self folderSizeAtPath:childPath]; //
-            // add folder size
-            struct stat st;
-            if (lstat(childPath, &st) == 0)
-                folderSize += st.st_size;
-        } else if (child->d_type == DT_REG || child->d_type == DT_LNK){ // file or link
-            struct stat st;
-            if (lstat(childPath, &st) == 0)
-                folderSize += st.st_size;
-        }
++ (NCSystemVersionType)currentVersion {
+    SInt32 major = 0;
+    SInt32 minor = 0;
+    Gestalt(gestaltSystemVersionMajor, &major);
+    Gestalt(gestaltSystemVersionMinor, &minor);
+    if ((major == 10 && minor >= 15) || major >= 11) {
+        return NCSystemVersionTypeCatalina;
+    } else if (major == 10 && minor >= 14) {
+        return NCSystemVersionTypeMojave;
+    } else if(major == 10 && minor >= 13) {
+        return NCSystemVersionTypeHighSierra;
     }
-    return folderSize;
+    return NCSystemVersionTypeUnsupported;
 }
 
-- (void)upgradeTextProgress:(NSString *)progress indeterminate:(BOOL)ind percent:(double)percentComplete {
-    if (self.BasicProgressBlock){
-        self.BasicProgressBlock(progress, ind, percentComplete);
-    }
-}
-///Users/js/Library/Caches/com.apple.nsurlsessiond/Downloads
-+ (NSString *)cacheFolder {
-    NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    return [libraryPaths firstObject];
+#pragma mark Free space determination
+
+//returns a user readable value for the amount of hard drive space available on your main drive.
+
++ (NSString *)freeSpaceString {
+    float space = [self freeSpaceAvailable];
+    return [[NSString stringWithFormat:@"%f", space] suffixNumber];
 }
 
-+ (long long)sessionCacheSize {
-    return [self folderSizeAtPath:[[self sessionCache] UTF8String]];
++ (float)freeSpaceAvailable {
+    float available = [[[FM attributesOfFileSystemForPath:@"/" error:nil] objectForKey:NSFileSystemFreeSize] floatValue];
+    float avail2 = available / 1024;
+    return avail2;
 }
 
-+ (NSString *)sessionCache {
-    return [[self cacheFolder] stringByAppendingPathComponent:@"com.apple.nsurlsessiond/Downloads"];
-}
+#pragma mark Core Functions
 
-//base theos + our SDKs requires about 170 MB
+/**
+ 
+ This function will handle checking out theos + our fork of the SDK repo + our nic repo from github
+ 
+ */
+
 - (void)checkoutTheosIfNecessary:(void(^)(BOOL success))block {
-    BOOL theosNeeded = true;
+    BOOL theosNeeded = true; //track if theos is needed separetly from whether our SDK fork is needed
     if ([FM fileExistsAtPath:_theosPath]){
         theosNeeded = false;
         NLog(@"theos detected! checking for tvOS SDK's\n");
-        NSString *path = [_theosPath stringByAppendingPathComponent:@"sdks/AppleTVOS12.4.sdk"];
+        NSString *path = [_theosPath stringByAppendingPathComponent:@"sdks/AppleTVOS12.4.sdk"]; //check for a known path in our SDKs github fork
         if ([FM fileExistsAtPath:path]){
             NLog(@"AppleTV SDK's detected, no theos checkout is necessary\n");
-            [self upgradeTextProgress:@"" indeterminate:true percent:0];
+            [self upgradeTextProgress:@"" indeterminate:true percent:0]; //clear progress
             if (block){
-                block(true);
+                block(true); //call the completion block
             }
             return;
         }
-        
     }
+    
+    /*
+     
+     checking out things via git is tricky if the target folders already exist.
+     when you checkout THEOS it has an empty 'sdks' folder (which the user may have added folders to - so we cant delete it)
+     git will not allow you to 'clone' a repository if the target folder it will be creating already exists
+     for example: if "~/Library/theos/sdks" exists running 'git clone xxx ~/Library/theos/sdks' will yield an error
+     
+     to handle this all of the clones below go to a temporary folder first and THEN move their contents to the target directory.
+    
+     */
     
     NSString *sdks = @"https://github.com/lechium/sdks.git";//@"git@github.com:lechium/sdks.git";
     NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
     NSString *libraryPath = [libraryPaths firstObject];
     NSString *fullCmd = nil;
     if (theosNeeded){
+        //if its not called twice sometimes the UI doesnt update properly - likely a race condition on changing the progress details
         [self upgradeTextProgress:@"checking out theos master..." indeterminate:true percent:0];
         [self upgradeTextProgress:@"checking out theos master..." indeterminate:true percent:0];
         NSString *theosCheckout = @"https://github.com/theos/theos.git";//@"git@github.com:theos/theos.git";
@@ -187,11 +197,192 @@
     }
 }
 
-//post brew install: ldid, dpkg, other issues SDKs v make files. also some linking issues with my sdks
+//post processing for downloaded files, manages Xcode.xip and Command Line Utils.dmg
+- (NSString *)processDownload:(NSString *)download {
+    
+    NSString *fileExt = [[download pathExtension] lowercaseString];
+    if ([fileExt isEqualToString:@"dmg"]){
+        return [HelperClass mountImage:download];
+    } else if ([fileExt isEqualToString:@"xip"]){
+        [self upgradeTextProgress:[NSString stringWithFormat:@"Extacting file %@", download.lastPathComponent] indeterminate:true percent:0];
+        NSInteger bro = [HelperClass runTask:[NSString stringWithFormat:@"/usr/bin/xip -x %@", download] inFolder:NSHomeDirectory()];
+        if (bro == 0){
+            [FM removeItemAtPath:download error:nil];
+            NSString *outputPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Xcode.app"];
+            [self upgradeTextProgress:[NSString stringWithFormat:@"Extacting finished to %@", outputPath] indeterminate:true percent:0];
+            return outputPath;
+            
+        } else {
+            return [NSString stringWithFormat:@"returned with status %lu", bro];
+        }
+    }
+    return nil;
+}
+
+#pragma mark installation checks
 
 + (BOOL)brewInstalled {
     return ([FM fileExistsAtPath:@"/usr/local/bin/brew"]);
 }
+
++ (BOOL)commandLineToolsInstalled {
+    return ([[NSFileManager defaultManager] fileExistsAtPath:@"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/SDKSettings.plist"]);
+}
+
++ (BOOL)xcodeInstalled {
+    NSString *path = [[NSWorkspace sharedWorkspace] fullPathForApplication:@"Xcode.app"];
+    if (path.length > 0 && [FM fileExistsAtPath:path]){
+        return true;
+    }
+    return false;
+}
+
+#pragma mark website URL's
+
++ (NSURL *)appleIDPage {
+    return [NSURL URLWithString:@"https://appleid.apple.com/account#!&page=create"];
+}
++ (NSURL*)developerAccountSite {
+    return [NSURL URLWithString:@"https://developer.apple.com/account"];
+}
+
++ (NSURL *)moreDownloadsURL {
+    return [NSURL URLWithString:@"https://developer.apple.com/download/more/"];
+}
+
+#pragma mark CLI only
+
++ (void)openIDSignupPage {
+    [[NSWorkspace sharedWorkspace] openURL:self.appleIDPage];
+}
+
++ (void)openDeveloperAccountSite {
+    [[NSWorkspace sharedWorkspace] openURL:self.developerAccountSite];
+}
+
+//this is different because it will run through our current command line session rather than spawning a new terminal window.
+- (void)installHomebrewIfNecessary {
+    if (![HelperClass brewInstalled]){
+        NSString *temp = NSTemporaryDirectory();
+        NSString *runCmd = [NSString stringWithFormat:@"curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh -o %@install.sh ; chmod +x %@install.sh", temp, temp];
+        //DLog(@"runCmd: %@", runCmd);
+        [HelperClass singleLineReturnForProcess:runCmd];
+        NSString *runScript = [NSString stringWithFormat:@"/bin/bash %@", [temp stringByAppendingString:@"install.sh"]];
+        //DLog(@"%@", runScript);
+        [HelperClass runInteractiveProcess:runScript];
+    }
+}
+
+#pragma mark task execution
+
++ (BOOL)queryUserWithString:(NSString *)query {
+    
+    NSString *errorString = [NSString stringWithFormat:@"\n%@ [y/n]? ", query];
+    char c;
+    printf("%s", [errorString UTF8String] );
+    c=getchar();
+    while(c!='y' && c!='n') {
+        if (c!='\n'){
+            printf("[y/n]");
+        }
+        c=getchar();
+    }
+    if (c == 'n') {
+        return FALSE;
+    } else if (c == 'y') {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+//run a task where we dont care about the console output but we do care about the target folder & return status.
++ (NSInteger)runTask:(NSString *)fullCommand inFolder:(NSString *)targetFolder {
+    
+    if (![FM fileExistsAtPath:targetFolder]){
+        NLog(@"folder missing: %@", targetFolder);
+        [FM createDirectoryAtPath:targetFolder withIntermediateDirectories:true attributes:nil error:nil];
+        //return -1;
+    }
+    NSArray *args = [fullCommand componentsSeparatedByString:@" "];
+    NSString *taskBinary = args[0];
+    NSArray *taskArguments = [args subarrayWithRange:NSMakeRange(1, args.count-1)];
+    NLog(@"%@ %@", taskBinary, [taskArguments componentsJoinedByString:@" "]);
+    NSTask *task = [[NSTask alloc] init];
+    [task setLaunchPath:taskBinary];
+    [task setArguments:taskArguments];
+    [task setCurrentDirectoryPath:targetFolder];
+    [task launch];
+    [task waitUntilExit];
+    NSInteger retStatus = [task terminationStatus];
+    return retStatus;
+}
+
+//used when we care about the actual console output of the task being run
++ (NSArray *)arrayReturnForTask:(NSString *)taskBinary withArguments:(NSArray *)taskArguments {
+    NLog(@"%@ %@", taskBinary, [taskArguments componentsJoinedByString:@" "]);
+    NSTask *task = [[NSTask alloc] init];
+    NSPipe *pipe = [[NSPipe alloc] init];
+    NSFileHandle *handle = [pipe fileHandleForReading];
+    
+    [task setLaunchPath:taskBinary];
+    [task setArguments:taskArguments];
+    [task setStandardOutput:pipe];
+    [task setStandardError:pipe];
+    
+    [task launch];
+    
+    NSData *outData = nil;
+    NSString *temp = nil;
+    while((outData = [handle readDataToEndOfFile]) && [outData length]) {
+        temp = [[NSString alloc] initWithData:outData encoding:NSASCIIStringEncoding];
+    }
+    [handle closeFile];
+    task = nil;
+    return [temp componentsSeparatedByString:@"\n"];
+}
+
+//only used in the command line tool, for running scripts that require user interaction, ie the brew installl script.
++ (void)runInteractiveProcess:(NSString *)call {
+    if (call==nil)
+        return;
+    char line[200];
+    //DLog(@"\nRunning process: %@\n", call);
+    FILE* fp = popen([call UTF8String], "r");
+    if (fp) {
+        while (fgets(line, sizeof line, fp)){
+            NSString *s = [NSString stringWithCString:line encoding:NSUTF8StringEncoding];
+            s = [s stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            DLog(@"%@", s);
+        }
+    }
+    pclose(fp);
+}
+
+//similar to arrayFromTask but uses popen instead of NSTask
++ (NSArray *)returnForProcess:(NSString *)call {
+    if (call==nil)
+        return 0;
+    char line[200];
+    //DLog(@"\nRunning process: %@\n", call);
+    FILE* fp = popen([call UTF8String], "r");
+    NSMutableArray *lines = [[NSMutableArray alloc]init];
+    if (fp) {
+        while (fgets(line, sizeof line, fp)){
+            NSString *s = [NSString stringWithCString:line encoding:NSUTF8StringEncoding];
+            s = [s stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            [lines addObject:s];
+        }
+    }
+    pclose(fp);
+    return lines;
+}
+
+//same as above but it returns everything as one single line
++ (NSString *)singleLineReturnForProcess:(NSString *)call {
+    return [[self returnForProcess:call] componentsJoinedByString:@"\n"];
+}
+
+#pragma mark diskimage / mount manipulation
 
 + (NSString *)mountImage:(NSString *)irString {
     NSTask *irTask = [[NSTask alloc] init];
@@ -200,17 +391,11 @@
     NSMutableArray *irArgs = [[NSMutableArray alloc] init];
     [irArgs addObject:@"attach"];
     [irArgs addObject:@"-plist"];
-    
     [irArgs addObject:irString];
-    
     [irArgs addObject:@"-owners"];
     [irArgs addObject:@"off"];
-    
     [irTask setLaunchPath:@"/usr/bin/hdiutil"];
-    
     [irTask setArguments:irArgs];
-    
-    
     [irTask setStandardError:hdip];
     [irTask setStandardOutput:hdip];
     //NLog(@"hdiutil %@", [[irTask arguments] componentsJoinedByString:@" "]);
@@ -245,326 +430,7 @@
     return nil;
 }
 
-- (NSString *)processDownload:(NSString *)download {
-    
-    NSString *fileExt = [[download pathExtension] lowercaseString];
-    if ([fileExt isEqualToString:@"dmg"]){
-        return [HelperClass mountImage:download];
-    } else if ([fileExt isEqualToString:@"xip"]){
-        [self upgradeTextProgress:[NSString stringWithFormat:@"Extacting file %@", download.lastPathComponent] indeterminate:true percent:0];
-        NSInteger bro = [HelperClass runTask:[NSString stringWithFormat:@"/usr/bin/xip -x %@", download] inFolder:NSHomeDirectory()];
-        if (bro == 0){
-            [FM removeItemAtPath:download error:nil];
-            NSString *outputPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Xcode.app"];
-            [self upgradeTextProgress:[NSString stringWithFormat:@"Extacting finished to %@", outputPath] indeterminate:true percent:0];
-            return outputPath;
-            
-        } else {
-            return [NSString stringWithFormat:@"returned with status %lu", bro];
-        }
-    }
-    return nil;
-}
-
-+ (NCSystemVersionType)currentVersion {
-    SInt32 major = 0;
-    SInt32 minor = 0;
-    Gestalt(gestaltSystemVersionMajor, &major);
-    Gestalt(gestaltSystemVersionMinor, &minor);
-    if ((major == 10 && minor >= 15) || major >= 11) {
-        return NCSystemVersionTypeCatalina;
-    } else if (major == 10 && minor >= 14) {
-        return NCSystemVersionTypeMojave;
-    } else if(major == 10 && minor >= 13) {
-        return NCSystemVersionTypeHighSierra;
-    }
-    return NCSystemVersionTypeUnsupported;
-}
-+ (BOOL)commandLineToolsInstalled {
-    return ([[NSFileManager defaultManager] fileExistsAtPath:@"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/SDKSettings.plist"]);
-}
-
-+ (void)openIDSignupPage {
-    [[NSWorkspace sharedWorkspace] openURL:self.appleIDPage];
-}
-
-+ (NSURL *)appleIDPage {
-    return [NSURL URLWithString:@"https://appleid.apple.com/account#!&page=create"];
-}
-+ (NSURL*)developerAccountSite {
-    return [NSURL URLWithString:@"https://developer.apple.com/account"];
-    //https://developer.apple.com/account
-}
-
-+ (NSURL *)moreDownloadsURL {
-    return [NSURL URLWithString:@"https://developer.apple.com/download/more/"];
-}
-
-
-+ (void)openDeveloperAccountSite {
-    [[NSWorkspace sharedWorkspace] openURL:self.developerAccountSite];
-}
-/*
- -f = fail silently
- -s = silent / quiet mode
- -S = error when failing
- -L = location, handles redirects
- 
- curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh
- 
- */
-
-- (void)installHomebrewIfNecessary {
-    if (![HelperClass brewInstalled]){
-        NSString *temp = [HelperClass tempFolder];
-        NSString *runCmd = [NSString stringWithFormat:@"curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh -o %@install.sh ; chmod +x %@install.sh", temp, temp];
-        //DLog(@"runCmd: %@", runCmd);
-        [HelperClass singleLineReturnForProcess:runCmd];
-        NSString *runScript = [NSString stringWithFormat:@"/bin/bash %@", [NSTemporaryDirectory() stringByAppendingString:@"install.sh"]];
-        //DLog(@"%@", runScript);
-        [HelperClass runInteractiveProcess:runScript];
-    }
-}
-
-+ (NSString *)tempFolder {
-    NSString *ourTempFolder = NSTemporaryDirectory();
-    //mkdir([ourTempFolder UTF8String], 755);
-    if ([FM fileExistsAtPath:ourTempFolder]){
-        return ourTempFolder;
-    }
-    return NSTemporaryDirectory();
-}
-
-
-+ (BOOL)xcodeInstalled {
-    NSString *path = [[NSWorkspace sharedWorkspace] fullPathForApplication:@"Xcode.app"];
-    NLog(@"xcode path: %@", path);
-    if (path.length > 0 && [FM fileExistsAtPath:path]){
-        return true;
-    }
-    return false;
-}
-
-- (void)waitForReturnWithMessage:(NSString *)message { //doesnt work properly... might prune.
-    
-    char c;
-    printf("%s", [message UTF8String]);
-    c=getchar();
-    while(c!='\n'){
-        c=getchar();
-    }
-    NLog(@"return presssed, continuing...");
-}
-
-+ (BOOL)queryUserWithString:(NSString *)query {
-    
-    NSString *errorString = [NSString stringWithFormat:@"\n%@ [y/n]? ", query];
-    char c;
-    printf("%s", [errorString UTF8String] );
-    c=getchar();
-    while(c!='y' && c!='n') {
-        if (c!='\n'){
-            printf("[y/n]");
-        }
-        c=getchar();
-    }
-    if (c == 'n') {
-        return FALSE;
-    } else if (c == 'y') {
-        return TRUE;
-    }
-    return FALSE;
-}
-
-
-+ (NSInteger)runTask:(NSString *)fullCommand inFolder:(NSString *)targetFolder {
-    
-    if (![FM fileExistsAtPath:targetFolder]){
-        NLog(@"folder missing: %@", targetFolder);
-        [FM createDirectoryAtPath:targetFolder withIntermediateDirectories:true attributes:nil error:nil];
-        //return -1;
-    }
-    NSArray *args = [fullCommand componentsSeparatedByString:@" "];
-    NSString *taskBinary = args[0];
-    NSArray *taskArguments = [args subarrayWithRange:NSMakeRange(1, args.count-1)];
-    NLog(@"%@ %@", taskBinary, [taskArguments componentsJoinedByString:@" "]);
-    NSTask *task = [[NSTask alloc] init];
-    [task setLaunchPath:taskBinary];
-    [task setArguments:taskArguments];
-    [task setCurrentDirectoryPath:targetFolder];
-    [task launch];
-    [task waitUntilExit];
-    NSInteger retStatus = [task terminationStatus];
-    return retStatus;
-}
-
-+ (NSArray *)arrayReturnForTask:(NSString *)taskBinary withArguments:(NSArray *)taskArguments {
-    NLog(@"%@ %@", taskBinary, [taskArguments componentsJoinedByString:@" "]);
-    NSTask *task = [[NSTask alloc] init];
-    NSPipe *pipe = [[NSPipe alloc] init];
-    NSFileHandle *handle = [pipe fileHandleForReading];
-    
-    [task setLaunchPath:taskBinary];
-    [task setArguments:taskArguments];
-    [task setStandardOutput:pipe];
-    [task setStandardError:pipe];
-    
-    [task launch];
-    
-    NSData *outData = nil;
-    NSString *temp = nil;
-    while((outData = [handle readDataToEndOfFile]) && [outData length]) {
-        temp = [[NSString alloc] initWithData:outData encoding:NSASCIIStringEncoding];
-    }
-    [handle closeFile];
-    task = nil;
-    return [temp componentsSeparatedByString:@"\n"];
-}
-
-+ (NSString *)singleLineReturnForProcess:(NSString *)call {
-    return [[self returnForProcess:call] componentsJoinedByString:@"\n"];
-}
-
-+ (void)runInteractiveProcess:(NSString *)call {
-    if (call==nil)
-        return;
-    char line[200];
-    //DLog(@"\nRunning process: %@\n", call);
-    FILE* fp = popen([call UTF8String], "r");
-    if (fp) {
-        while (fgets(line, sizeof line, fp)){
-            NSString *s = [NSString stringWithCString:line encoding:NSUTF8StringEncoding];
-            s = [s stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-            DLog(@"%@", s);
-        }
-    }
-    pclose(fp);
-}
-
-+ (NSArray *)returnForProcess:(NSString *)call {
-    if (call==nil)
-        return 0;
-    char line[200];
-    //DLog(@"\nRunning process: %@\n", call);
-    FILE* fp = popen([call UTF8String], "r");
-    NSMutableArray *lines = [[NSMutableArray alloc]init];
-    if (fp) {
-        while (fgets(line, sizeof line, fp)){
-            NSString *s = [NSString stringWithCString:line encoding:NSUTF8StringEncoding];
-            s = [s stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-            [lines addObject:s];
-        }
-    }
-    pclose(fp);
-    return lines;
-}
-
-+ (NSString *)octalFromGroupSymbols:(NSString *)theSymbols {
-    NSArray *groupArray = [theSymbols componentsSeparatedByString:@"/"];
-    NSString *user = [groupArray objectAtIndex:0];
-    NSString *group = [groupArray objectAtIndex:1];
-    
-    NSString *octalUser = nil;
-    NSString *octalGroup = nil;
-    //uid=0(root) gid=0(wheel) groups=0(wheel),1(daemon),2(kmem),3(sys),4(tty),5(operator),8(procview),9(procmod),20(staff),29(certusers),80(admin)
-    if ([user isEqualToString:@"root"]) {
-        octalUser = @"0";
-    } else if ([user isEqualToString:@"mobile"]) {
-        octalUser = @"501";
-    }
-    //obviously more cases!! FIXME:
-    
-    if ([group isEqualToString:@"staff"]) {
-        octalGroup = @"20";
-    } else if ([group isEqualToString:@"admin"]) {
-        octalGroup = @"80";
-    } else if ([group isEqualToString:@"wheel"]) {
-        octalGroup = @"0";
-    } else if ([group isEqualToString:@"daemon"]) {
-        octalGroup = @"1";
-    } else if ([group isEqualToString:@"kmem"]) {
-        octalGroup = @"2";
-    } else if ([group isEqualToString:@"sys"]) {
-        octalGroup = @"3";
-    } else if ([group isEqualToString:@"tty"]) {
-        octalGroup = @"4";
-    } else if ([group isEqualToString:@"operator"]) {
-        octalGroup = @"5";
-    } else if ([group isEqualToString:@"procview"]) {
-        octalGroup = @"8";
-    } else if ([group isEqualToString:@"procmod"]) {
-        octalGroup = @"9";
-    } else if ([group isEqualToString:@"certusers"]) {
-        octalGroup = @"29";
-    } else {
-        octalGroup = @"501"; //default to mobile
-    }
-    //uid=0(root) gid=0(wheel) groups=0(wheel),1(daemon),2(kmem),3(sys),4(tty),5(operator),8(procview),9(procmod),20(staff),29(certusers),80(admin)
-    return [NSString stringWithFormat:@"%@:%@", octalUser, octalGroup];
-}
-
-+ (NSString *)octalFromSymbols:(NSString *)theSymbols {
-    NSString *U = [theSymbols substringWithRange:NSMakeRange(1, 3)];
-    NSString *G = [theSymbols substringWithRange:NSMakeRange(4, 3)];
-    NSString *O = [theSymbols substringWithRange:NSMakeRange(7, 3)];
-    
-    //USER
-    int sIdBit = 0;
-    int uOctal = 0;
-    const char *uArray = [U cStringUsingEncoding:NSASCIIStringEncoding];
-    NSUInteger stringLength = [U length];
-    
-    int x;
-    for( x=0; x<stringLength; x++ ) {
-        unsigned int aCharacter = uArray[x];
-        if (aCharacter == 'r') {
-            uOctal += 4;
-        } else if (aCharacter == 'w') {
-            uOctal += 2;
-        } else if (aCharacter == 'x') {
-            uOctal += 1;
-        } else if (aCharacter == 's') {
-            sIdBit += 4;
-        }
-    }
-    
-    //GROUP
-    int gOctal = 0;
-    const char *gArray = [G cStringUsingEncoding:NSASCIIStringEncoding];
-    stringLength = [G length];
-    int y;
-    for( y=0; y<stringLength; y++ ) {
-        unsigned int aCharacter = gArray[y];
-        if (aCharacter == 'r') {
-            gOctal += 4;
-        } else if (aCharacter == 'w') {
-            gOctal += 2;
-        } else if (aCharacter == 'x') {
-            gOctal += 1;
-        } else if (aCharacter == 's') {
-            gOctal += 2;
-        }
-    }
-    
-    //OTHERS
-    int z;
-    int oOctal = 0;
-    const char *oArray = [O cStringUsingEncoding:NSASCIIStringEncoding];
-    stringLength = [O length];
-    for( z=0; z<stringLength; z++ ) {
-        unsigned int aCharacter = oArray[z];
-        if (aCharacter == 'r') {
-            oOctal += 4;
-        } else if (aCharacter == 'w') {
-            oOctal += 2;
-        } else if (aCharacter == 'x') {
-            oOctal += 1;
-        }
-    }
-    return [NSString stringWithFormat:@"%i%i%i%i", sIdBit, uOctal, gOctal, oOctal];
-}
-
-//this is specifically if we need to find an external drive to extract / download some of the files to.
+//this is specifically if we need to find an external drive to extract / download some of the files to, currently unused
 
 + (NSArray *)scanForDrives {
     //NLog(@"%@ %s", self, _cmd);
@@ -624,5 +490,60 @@
     pipe = nil;
     return deviceList;
 }
+
+#pragma mark Unused cache code
+
+///Users/js/Library/Caches/com.apple.nsurlsessiond/Downloads
++ (NSString *)cacheFolder {
+    NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    return [libraryPaths firstObject];
+}
+
++ (long long)sessionCacheSize {
+    return [self folderSizeAtPath:[[self sessionCache] UTF8String]];
+}
+
++ (NSString *)sessionCache {
+    return [[self cacheFolder] stringByAppendingPathComponent:@"com.apple.nsurlsessiond/Downloads"];
+}
+
++ (long long) folderSizeAtPath: (const char*)folderPath {
+    long long folderSize = 0;
+    DIR* dir = opendir(folderPath);
+    if (dir == NULL) return 0;
+    struct dirent* child;
+    while ((child = readdir(dir))!=NULL) {
+        if (child->d_type == DT_DIR
+            && child->d_name[0] == '.'
+            && (child->d_name[1] == 0 // ignore .
+                ||
+                (child->d_name[1] == '.' && child->d_name[2] == 0) // ignore dir ..
+                ))
+            continue;
+        
+        size_t folderPathLength = strlen(folderPath);
+        char childPath[1024]; // child
+        stpcpy(childPath, folderPath);
+        if (folderPath[folderPathLength-1] != '/'){
+            childPath[folderPathLength] = '/';
+            folderPathLength++;
+        }
+        stpcpy(childPath+folderPathLength, child->d_name);
+        childPath[folderPathLength + child->d_namlen] = 0;
+        if (child->d_type == DT_DIR){ // directory
+            folderSize += [self folderSizeAtPath:childPath]; //
+            // add folder size
+            struct stat st;
+            if (lstat(childPath, &st) == 0)
+                folderSize += st.st_size;
+        } else if (child->d_type == DT_REG || child->d_type == DT_LNK){ // file or link
+            struct stat st;
+            if (lstat(childPath, &st) == 0)
+                folderSize += st.st_size;
+        }
+    }
+    return folderSize;
+}
+
 
 @end
