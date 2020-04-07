@@ -17,6 +17,7 @@
 - (IBAction)openAppleIDPage:(id)sender;
 - (IBAction)openDownloadsPage:(id)sender;
 - (IBAction)installBrew:(id)sender;
+- (IBAction)openTutorialVideo:(id)sender;
 - (void)startListening;
 - (void)stopListening;
 @end

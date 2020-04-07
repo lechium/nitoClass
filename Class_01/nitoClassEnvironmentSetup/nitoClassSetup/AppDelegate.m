@@ -344,6 +344,10 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     DDLogInfo(@"size: %llu", [HelperClass sessionCacheSize]);
 }
 
+- (IBAction)openTutorialVideo:(id)sender {
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://lbry.tv/@nitoTV:4/class_s01:5"]];
+}
+
 - (IBAction)openConsoleLog:(id)sender {
     
     ///usr/bin/tail -f  "`/bin/ls -1td ~/Library/Logs/nitoClassSetup/*| /usr/bin/head -n1`"

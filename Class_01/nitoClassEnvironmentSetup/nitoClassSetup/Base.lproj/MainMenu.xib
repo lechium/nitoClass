@@ -704,10 +704,10 @@
                                     <action selector="openDownloadsPage:" target="Voe-Tx-rLC" id="xB4-Xu-RZD"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Show progress window" id="YEc-vo-djs">
+                            <menuItem title="Open tutorial video" id="YEc-vo-djs">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="makeKeyAndOrderFront:" target="5pL-uq-IbM" id="b9H-HY-cRy"/>
+                                    <action selector="openTutorialVideo:" target="Voe-Tx-rLC" id="g8x-6g-Qwg"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Show progress log" id="rzB-p8-J7c">

@@ -71,6 +71,7 @@
 		32DEAFFD242F554D005508BA /* XcodeDownloads.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DEAFFC242F554D005508BA /* XcodeDownloads.m */; };
 		32E79744243C04F8007097E3 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32E79741243C047C007097E3 /* Sparkle.framework */; };
 		32E79745243C07AE007097E3 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 32E79741243C047C007097E3 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		32E79747243C0EDD007097E3 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 32E79746243C0EDD007097E3 /* Credits.rtf */; };
 		32F6680C2435A64F00D57D35 /* tester.sh in Resources */ = {isa = PBXBuildFile; fileRef = 32F6680B2435A64F00D57D35 /* tester.sh */; };
 /* End PBXBuildFile section */
 
@@ -187,6 +188,7 @@
 		32DEAFFB242F554D005508BA /* XcodeDownloads.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XcodeDownloads.h; sourceTree = "<group>"; };
 		32DEAFFC242F554D005508BA /* XcodeDownloads.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XcodeDownloads.m; sourceTree = "<group>"; };
 		32E79741243C047C007097E3 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
+		32E79746243C0EDD007097E3 /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		32F6680B2435A64F00D57D35 /* tester.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = tester.sh; path = ../../../../../tester.sh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -223,6 +225,7 @@
 				3211F2742430730000B54920 /* Info.plist */,
 				3211F2752430730000B54920 /* main.m */,
 				32F6680B2435A64F00D57D35 /* tester.sh */,
+				32E79746243C0EDD007097E3 /* Credits.rtf */,
 				3211F2772430730000B54920 /* nitoClassSetup.entitlements */,
 			);
 			path = nitoClassSetup;
@@ -490,6 +493,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				32E79747243C0EDD007097E3 /* Credits.rtf in Resources */,
 				3211F2702430730000B54920 /* Assets.xcassets in Resources */,
 				32F6680C2435A64F00D57D35 /* tester.sh in Resources */,
 				3211F2732430730000B54920 /* MainMenu.xib in Resources */,
