@@ -8,8 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <WebKit/WebKit.h>
-#import "FileMonitor.h"
-@interface AppDelegate : NSObject <NSApplicationDelegate, WebResourceLoadDelegate, WebFrameLoadDelegate, WebPolicyDelegate, FileMonitorDelegate>
+@interface AppDelegate : NSObject <NSApplicationDelegate, WebResourceLoadDelegate, WebFrameLoadDelegate, WebPolicyDelegate >
 @property IBOutlet NSProgressIndicator *progressBar;
 @property IBOutlet NSTextField *progressLabel;
 @property IBOutlet NSTextField *commandField;

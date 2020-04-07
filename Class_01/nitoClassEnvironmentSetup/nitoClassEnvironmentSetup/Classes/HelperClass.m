@@ -5,7 +5,6 @@
 #include <sys/stat.h>
 #import "NSObject+Additions.h"
 #include <sys/stat.h>
-#import "FindProcess.h"
 @import Darwin.POSIX.dirent;
 
 @implementation HelperClass

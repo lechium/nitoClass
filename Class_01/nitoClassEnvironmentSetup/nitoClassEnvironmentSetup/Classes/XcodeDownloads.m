@@ -68,8 +68,6 @@
             }
           
             self.downloads = _backingArray;
-            _xcodeDownloadURL = @"https://download.developer.apple.com/Developer_Tools/Xcode_11.4/Xcode_11.4.xip"; //8.11 GB compressed + 9.43 extracted
-            _commandLineURL = @"https://download.developer.apple.com/Developer_Tools/Command_Line_Tools_for_Xcode_11.4/Command_Line_Tools_for_Xcode_11.4.dmg"; //248 MB
         }
             break;
             
@@ -95,8 +93,6 @@
             }
         
             self.downloads = _backingArray;
-            _xcodeDownloadURL = @"https://download.developer.apple.com/Developer_Tools/Xcode_11.3.1/Xcode_11.3.1.xip"; //7.3 GB compressed
-            _commandLineURL = @"https://download.developer.apple.com/Developer_Tools/Command_Line_Tools_for_Xcode_11.3.1/Command_Line_Tools_for_Xcode_11.3.1.dmg"; //219.7 MB
         }
             break;
             
@@ -123,8 +119,6 @@
             }
        
             self.downloads = _backingArray;
-            _xcodeDownloadURL  = @"https://download.developer.apple.com/Developer_Tools/Xcode_10.1/Xcode_10.1.xip"; //5.6 GB compressed
-            _commandLineURL = @"https://download.developer.apple.com/Developer_Tools/Command_Line_Tools_macOS_10.13_for_Xcode_10/Command_Line_Tools_macOS_10.13_for_Xcode_10.dmg"; //186.7 MB
         }
         default:
             break;

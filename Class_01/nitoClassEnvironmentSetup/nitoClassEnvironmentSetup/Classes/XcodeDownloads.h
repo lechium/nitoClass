@@ -40,8 +40,6 @@ FileDownloadType;
 @property BOOL cliInstalled;
 @property NCSystemVersionType sytemVersion;
 @property NSString *systemVersionCodename;
-@property NSString *xcodeDownloadURL;
-@property NSString *commandLineURL;
 - (void)downloadFileURL:(NSURL *)url;
 - (BOOL)hasDownloads;
 - (XcodeDownload *)downloadFromURL:(NSURL *)url;

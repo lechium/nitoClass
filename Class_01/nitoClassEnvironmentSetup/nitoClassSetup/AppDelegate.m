@@ -7,8 +7,6 @@
 //
 
 #import "AppDelegate.h"
-#import "WebCategories.h"
-#import "WebFrame+Nito.h"
 #include <sys/stat.h>
 #import "NSData+CommonCrypto.h"
 #import "NSData+Flip.h"
@@ -25,7 +23,6 @@
 @property (weak) IBOutlet NSWindow *window;
 @property (assign) IBOutlet NSWindow *progressWindow;
 @property NSDate *startDate;
-@property (strong) FileMonitor *monitor;
 @property (nonatomic, strong) NSString *ourDirectory;
 @property (nonatomic, strong) HelperClass *helperInstance;
 @property (nonatomic, strong) NSTimer *gitTimer;
@@ -36,7 +33,6 @@
 - (void)stopListening {
     [self.gitTimer invalidate];
     self.gitTimer = nil;
-    //[self.monitor stopMonitor];
 }
 
 - (void)startListening {
@@ -53,12 +49,6 @@
         }
     }];
     
-    return;
-    self.monitor = [FileMonitor new];
-    self.ourDirectory = @"/usr/bin/";
-    NSLog(@"our dir: %@", self.ourDirectory);
-    [self.monitor monitorDir:self.ourDirectory delegate:self];
-    [self dirChanged:self.ourDirectory];
 }
 
 
@@ -372,7 +362,7 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.window close];
     });
-    [self updateProgressLabel:@"Post Xcode Processing, checkinging out theos & sdks..."];
+    [self updateProgressLabel:@"Post Xcode Processing, checking out theos & sdks..."];
     [self checkoutTheos];
     
 }

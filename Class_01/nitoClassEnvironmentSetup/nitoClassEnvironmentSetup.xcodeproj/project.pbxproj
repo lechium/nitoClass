@@ -27,8 +27,6 @@
 		322AC8EB2434A9EA009DA791 /* libSystem.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 322AC8EA2434A9EA009DA791 /* libSystem.tbd */; };
 		322AC8EE2434ACB5009DA791 /* NSData+Flip.mm in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8EC2434ACB5009DA791 /* NSData+Flip.mm */; };
 		322AC8EF2434ACB5009DA791 /* NSData+Flip.mm in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8EC2434ACB5009DA791 /* NSData+Flip.mm */; };
-		322AC8F22434B334009DA791 /* FileMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8F02434B334009DA791 /* FileMonitor.m */; };
-		322AC8F32434B334009DA791 /* FileMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 322AC8F02434B334009DA791 /* FileMonitor.m */; };
 		3237A2BC2437FACA003AE777 /* DDAbstractDatabaseLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 3237A2A42437FACA003AE777 /* DDAbstractDatabaseLogger.m */; };
 		3237A2BD2437FACA003AE777 /* DDAbstractDatabaseLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 3237A2A42437FACA003AE777 /* DDAbstractDatabaseLogger.m */; };
 		3237A2BE2437FACA003AE777 /* DDASLLogCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 3237A2A62437FACA003AE777 /* DDASLLogCapture.m */; };
@@ -53,12 +51,6 @@
 		32D2FC462436FCA600F81C4C /* EXTRuntimeExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 32D2FC412436FCA600F81C4C /* EXTRuntimeExtensions.m */; };
 		32D2FC472436FCA600F81C4C /* EXTScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 32D2FC432436FCA600F81C4C /* EXTScope.m */; };
 		32D2FC482436FCA600F81C4C /* EXTScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 32D2FC432436FCA600F81C4C /* EXTScope.m */; };
-		32D2FC4C24370BA100F81C4C /* FindProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 32D2FC4B24370BA100F81C4C /* FindProcess.m */; };
-		32D2FC4D24370BA100F81C4C /* FindProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 32D2FC4B24370BA100F81C4C /* FindProcess.m */; };
-		32DD61C02432C2D2001A76E3 /* WebFrame+Nito.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61BB2432C2D2001A76E3 /* WebFrame+Nito.m */; };
-		32DD61C12432C2D2001A76E3 /* WebFrame+Nito.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61BB2432C2D2001A76E3 /* WebFrame+Nito.m */; };
-		32DD61C22432C2D2001A76E3 /* WebCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61BD2432C2D2001A76E3 /* WebCategories.m */; };
-		32DD61C32432C2D2001A76E3 /* WebCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61BD2432C2D2001A76E3 /* WebCategories.m */; };
 		32DD61C72432F71A001A76E3 /* nitoClassEnvironmentSetup in Resources */ = {isa = PBXBuildFile; fileRef = 32DEAFC3242F4881005508BA /* nitoClassEnvironmentSetup */; };
 		32DD61D12433EBC2001A76E3 /* DownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61D02433EBC2001A76E3 /* DownloadOperation.m */; };
 		32DD61D22433EBC2001A76E3 /* DownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DD61D02433EBC2001A76E3 /* DownloadOperation.m */; };
@@ -132,8 +124,6 @@
 		322AC8EA2434A9EA009DA791 /* libSystem.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libSystem.tbd; path = usr/lib/libSystem.tbd; sourceTree = SDKROOT; };
 		322AC8EC2434ACB5009DA791 /* NSData+Flip.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSData+Flip.mm"; sourceTree = "<group>"; };
 		322AC8ED2434ACB5009DA791 /* NSData+Flip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Flip.h"; sourceTree = "<group>"; };
-		322AC8F02434B334009DA791 /* FileMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileMonitor.m; sourceTree = "<group>"; };
-		322AC8F12434B334009DA791 /* FileMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileMonitor.h; sourceTree = "<group>"; };
 		3237A2A22437FACA003AE777 /* CocoaLumberjack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CocoaLumberjack.h; sourceTree = "<group>"; };
 		3237A2A32437FACA003AE777 /* DDAbstractDatabaseLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDAbstractDatabaseLogger.h; sourceTree = "<group>"; };
 		3237A2A42437FACA003AE777 /* DDAbstractDatabaseLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDAbstractDatabaseLogger.m; sourceTree = "<group>"; };
@@ -165,13 +155,6 @@
 		32D2FC422436FCA600F81C4C /* EXTScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTScope.h; sourceTree = "<group>"; };
 		32D2FC432436FCA600F81C4C /* EXTScope.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTScope.m; sourceTree = "<group>"; };
 		32D2FC442436FCA600F81C4C /* metamacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = metamacros.h; sourceTree = "<group>"; };
-		32D2FC4A24370BA100F81C4C /* FindProcess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FindProcess.h; sourceTree = "<group>"; };
-		32D2FC4B24370BA100F81C4C /* FindProcess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FindProcess.m; sourceTree = "<group>"; };
-		32DD61B82432C2D2001A76E3 /* WebFrame+Nito.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WebFrame+Nito.h"; sourceTree = "<group>"; };
-		32DD61BA2432C2D2001A76E3 /* WebCategories.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebCategories.h; sourceTree = "<group>"; };
-		32DD61BB2432C2D2001A76E3 /* WebFrame+Nito.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "WebFrame+Nito.m"; sourceTree = "<group>"; };
-		32DD61BD2432C2D2001A76E3 /* WebCategories.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebCategories.m; sourceTree = "<group>"; };
-		32DD61C42432C3DB001A76E3 /* WebPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebPrivate.h; sourceTree = "<group>"; };
 		32DD61CF2433EBC2001A76E3 /* DownloadOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadOperation.h; sourceTree = "<group>"; };
 		32DD61D02433EBC2001A76E3 /* DownloadOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadOperation.m; sourceTree = "<group>"; };
 		32DD61D324343EC0001A76E3 /* NRFileManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NRFileManager.h; sourceTree = "<group>"; };
@@ -321,15 +304,6 @@
 			path = extobjc;
 			sourceTree = "<group>";
 		};
-		32D2FC4924370BA100F81C4C /* Process */ = {
-			isa = PBXGroup;
-			children = (
-				32D2FC4A24370BA100F81C4C /* FindProcess.h */,
-				32D2FC4B24370BA100F81C4C /* FindProcess.m */,
-			);
-			path = Process;
-			sourceTree = "<group>";
-		};
 		32DD61CE2433EBC2001A76E3 /* DL */ = {
 			isa = PBXGroup;
 			children = (
@@ -371,10 +345,7 @@
 			isa = PBXGroup;
 			children = (
 				3237A2A12437FACA003AE777 /* CocoaLumberjack */,
-				32D2FC4924370BA100F81C4C /* Process */,
 				32D2FC3E2436FCA600F81C4C /* extobjc */,
-				322AC8F12434B334009DA791 /* FileMonitor.h */,
-				322AC8F02434B334009DA791 /* FileMonitor.m */,
 				322AC8CF2434A962009DA791 /* CommonCrypto */,
 				32DD61CE2433EBC2001A76E3 /* DL */,
 				32DEAFF7242F5498005508BA /* Categories */,
@@ -392,11 +363,6 @@
 			children = (
 				322AC8ED2434ACB5009DA791 /* NSData+Flip.h */,
 				322AC8EC2434ACB5009DA791 /* NSData+Flip.mm */,
-				32DD61C42432C3DB001A76E3 /* WebPrivate.h */,
-				32DD61BA2432C2D2001A76E3 /* WebCategories.h */,
-				32DD61BD2432C2D2001A76E3 /* WebCategories.m */,
-				32DD61B82432C2D2001A76E3 /* WebFrame+Nito.h */,
-				32DD61BB2432C2D2001A76E3 /* WebFrame+Nito.m */,
 				32DEAFEA242F4C9D005508BA /* NSObject+Additions.h */,
 				32DEAFEB242F4C9D005508BA /* NSObject+Additions.m */,
 				32DEAFEC242F4C9D005508BA /* NSString+Additions.h */,
@@ -536,17 +502,14 @@
 				322AC8E52434A962009DA791 /* NSData+CommonCrypto.m in Sources */,
 				322AC8E32434A962009DA791 /* NSData+Base64.m in Sources */,
 				3237A2C12437FACA003AE777 /* DDASLLogger.m in Sources */,
-				32DD61C32432C2D2001A76E3 /* WebCategories.m in Sources */,
 				32D2FC462436FCA600F81C4C /* EXTRuntimeExtensions.m in Sources */,
 				32D2FC482436FCA600F81C4C /* EXTScope.m in Sources */,
 				3237A2C92437FACA003AE777 /* DDTTYLogger.m in Sources */,
 				3237A2BD2437FACA003AE777 /* DDAbstractDatabaseLogger.m in Sources */,
 				322AC8EF2434ACB5009DA791 /* NSData+Flip.mm in Sources */,
 				3211F27D2430731200B54920 /* XcodeDownloads.m in Sources */,
-				322AC8F32434B334009DA791 /* FileMonitor.m in Sources */,
 				32DD61D624343EC0001A76E3 /* NRFileManager.m in Sources */,
 				3237A2C52437FACA003AE777 /* DDLog.m in Sources */,
-				32DD61C12432C2D2001A76E3 /* WebFrame+Nito.m in Sources */,
 				3237A2CB2437FACA003AE777 /* DDContextFilterLogFormatter.m in Sources */,
 				3237A2CD2437FACA003AE777 /* DDDispatchQueueLogFormatter.m in Sources */,
 				3237A2BF2437FACA003AE777 /* DDASLLogCapture.m in Sources */,
@@ -554,7 +517,6 @@
 				3211F27E2430731500B54920 /* HelperClass.m in Sources */,
 				3237A2CF2437FACA003AE777 /* DDMultiFormatter.m in Sources */,
 				32DD61D22433EBC2001A76E3 /* DownloadOperation.m in Sources */,
-				32D2FC4D24370BA100F81C4C /* FindProcess.m in Sources */,
 				3211F26E243072F900B54920 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -567,11 +529,8 @@
 				3237A2CC2437FACA003AE777 /* DDDispatchQueueLogFormatter.m in Sources */,
 				3237A2BE2437FACA003AE777 /* DDASLLogCapture.m in Sources */,
 				32D2FC472436FCA600F81C4C /* EXTScope.m in Sources */,
-				32D2FC4C24370BA100F81C4C /* FindProcess.m in Sources */,
-				322AC8F22434B334009DA791 /* FileMonitor.m in Sources */,
 				3237A2C02437FACA003AE777 /* DDASLLogger.m in Sources */,
 				32D2FC452436FCA600F81C4C /* EXTRuntimeExtensions.m in Sources */,
-				32DD61C22432C2D2001A76E3 /* WebCategories.m in Sources */,
 				32DD61D12433EBC2001A76E3 /* DownloadOperation.m in Sources */,
 				32DEAFF5242F4C9D005508BA /* NSString+Additions.m in Sources */,
 				3237A2C82437FACA003AE777 /* DDTTYLogger.m in Sources */,
@@ -586,7 +545,6 @@
 				3237A2C42437FACA003AE777 /* DDLog.m in Sources */,
 				32DEAFF1242F4C9D005508BA /* HelperClass.m in Sources */,
 				3237A2BC2437FACA003AE777 /* DDAbstractDatabaseLogger.m in Sources */,
-				32DD61C02432C2D2001A76E3 /* WebFrame+Nito.m in Sources */,
 				322AC8E22434A962009DA791 /* NSData+Base64.m in Sources */,
 				32DEAFC7242F4881005508BA /* main.m in Sources */,
 				3237A2C62437FACA003AE777 /* DDOSLogger.m in Sources */,
