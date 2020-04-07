@@ -30,269 +30,8 @@
 
 @implementation AppDelegate
 
-- (void)stopListening {
-    [self.gitTimer invalidate];
-    self.gitTimer = nil;
-}
+#pragma mark Application lifecycle
 
-- (void)startListening {
-    
-    self.gitTimer = [NSTimer scheduledTimerWithTimeInterval:10 repeats:true block:^(NSTimer * _Nonnull timer) {
-        
-        if ([FM fileExistsAtPath:@"/usr/bin/git"]){
-            NLog(@"we done got git!, can check out theos etc now!");
-            [self stopListening];
-            [self checkoutTheos];
-        } else {
-            [self updateProgressLabel:@"command line tools are missing... waiting for install to finish"];
-            [self updateProgressValue:0 indeterminate:true];
-        }
-    }];
-    
-}
-
-
-- (IBAction)installBrew:(id)sender {
-    NSString *fileContents = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://raw.githubusercontent.com/Homebrew/install/master/install.sh"] encoding:NSUTF8StringEncoding error:nil];
-    fileContents = [fileContents stringByAppendingString:@"\necho 'installing nitoClass extras'\n\nbrew install ldid xz dpkg\n"];
-    NSString *outFile = [NSTemporaryDirectory() stringByAppendingPathComponent:@"brew.sh"];
-    [fileContents writeToFile:outFile atomically:true encoding:NSUTF8StringEncoding error:nil];
-    chmod([outFile UTF8String], 0755);
-    [[NSWorkspace sharedWorkspace] openFile:outFile withApplication:@"Terminal" andDeactivate:false];
-    [self updateProgressLabel:@""];
-    [self updateProgressValue:1 indeterminate:true];
-}
-
-- (void)checkoutTheos {
-    
-    NSString *git = @"/usr/bin/git";
-    if (![FM fileExistsAtPath:git]){
-        DDLogInfo(@"git is missing!! command line tools install is needed to continue!");
-        [self startListening];
-        [self updateProgressLabel:@"command line tools are missing... waiting for install to finish"];
-        [self updateProgressValue:0 indeterminate:true];
-        [[self progressWindow] makeKeyAndOrderFront:nil];
-        return;
-    }
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        [[self helperSharedInstance] checkoutTheosIfNecessary:^(BOOL success) {
-            NLog(@"theos is done with status %d", success);
-            if (![HelperClass brewInstalled]){
-                [self updateProgressLabel:@"Attempting to run brew install script..."];
-                [self updateProgressValue:0 indeterminate:true];
-                [self installBrew:nil];
-                
-            } else {
-                [self hideProgress];
-            }
-        }];
-    });
-}
-
-
-- (void)updateProgressLabel:(NSString *)text {
-    if (text.length == 0){
-        [self.progressWindow close];
-        [self.window makeKeyWindow];
-    } else {
-        [self.progressWindow makeKeyAndOrderFront:nil];
-    }
-    if (![NSThread isMainThread]){
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.progressLabel.stringValue = text;
-        });
-    } else {
-        self.progressLabel.stringValue = text;
-    }
-}
-
-- (void)webView:(WebView *)webView decidePolicyForNewWindowAction:(NSDictionary *)actionInformation
-        request:(NSURLRequest *)request
-   newFrameName:(NSString *)frameName
-decisionListener:(id<WebPolicyDecisionListener>)listener {
-    NLog(@"decidePolicyForNewWindowAction: %@ request: %@", actionInformation, request);
-    [listener use];
-    [[webView mainFrame] loadRequest:request];
-}
-
-- (void)shutItDown {
-    LOG_SELF;
-    [[[self helperInstance] xcDownloadInfo] cancelAllDownloads];
-    
-}
-
-- (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
-    //NLog(@"request: %@ headers: %@ body: %@", request, request.allHTTPHeaderFields, request.HTTPBody);
-    NSString *url = request.URL.absoluteString;
-    NSString *ext = url.pathExtension;
-    DDLogInfo(@"decidePolicyForNavigationAction URL: %@", url);
-    if (ext.length > 0){
-        _startDate = [NSDate date];
-        HelperClass *hc = [self helperSharedInstance];
-        XcodeDownloads *downloads = [hc xcDownloadInfo];
-        __block XcodeDownload *dl = [downloads downloadFromURL:request.URL];
-        double fullSize = (([dl expectedSize]/1024) + ([dl extractedSize])/1024);
-        double availSize = [HelperClass freeSpaceAvailable];
-        
-        NLog(@"avail: %f vs full: %f", availSize, fullSize);
-        if (availSize < fullSize){
-            NLog(@"not enough space, this is probably bad!");
-            //TODO: inform user how much free space there is vs how much is needed
-            [self showInsufficientSpaceAlertWithExpectedSize:fullSize];
-            return;
-        }
-        [hc.xcDownloadInfo downloadFile:dl];
-        //[hc.downloads downloadFileURL:request.URL];
-        downloads.FancyProgressBlock = ^(NSString *name, double percentComplete, double writtenBytes, double expectedBytes) {
-            // NSLog(@"pc: %f", percentComplete);
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self download:name durationDidIncreaseTo:writtenBytes totalDuration:expectedBytes];
-                self.progressBar.doubleValue = percentComplete;
-            });
-        };
-        downloads.CompletedBlock = ^(NSString *downloadedFile, XcodeDownload *object) {
-            
-            __block BOOL errorOccured = false;
-            NLog(@"downloaded file: %@ xc: %@", downloadedFile, object);
-            NSNumber *size = [FM attributesOfItemAtPath:downloadedFile error:nil][NSFileSize];
-            NLog(@"downladed size: %@", size);
-            NLog(@"expected size: %.2ld", (long)[object expectedSize]);
-            /*
-             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-             BOOL validated = [downloadedFile validateFileSHA:dl.SHA];
-             if (validated){
-             NLog(@"VALID!");
-             } else {
-             NSLog(@"INVALID!!!");
-             }
-             });*/
-            
-            
-            if (size.integerValue != [object expectedSize]){
-                errorOccured = true;
-                NLog(@"%ld != %ld", (long)size.integerValue, (long)[object expectedSize]);
-            }
-            
-            if (!errorOccured){
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    
-                    self.progressLabel.stringValue = @"";
-                    self.progressBar.doubleValue = 1;
-                    [self.progressBar stopAnimation:nil];
-                    
-                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-                        
-                        NSString *heyo = [[self helperInstance] processDownload:downloadedFile];
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            self.progressBar.indeterminate = false;
-                            [self.progressBar stopAnimation:nil];
-                        });
-                        DDLogInfo(@"processed location: %@", heyo);
-                        //[self startListening];
-                        NSArray *files = [FM contentsOfDirectoryAtPath:heyo error:nil];
-                        NSString *chosen = [[files filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-                            if ([[evaluatedObject pathExtension] isEqualToString:@"pkg"]){
-                                return true;
-                            }
-                            return false;
-                        }]] lastObject] ;
-                        DDLogInfo(@"chosen: %@", chosen);
-                        NSString *final = heyo;
-                        if (chosen.length > 0){
-                            final = [heyo stringByAppendingPathComponent:chosen];
-                        }
-                        
-                        [self updateProgressLabel:[NSString stringWithFormat:@"opening %@", final]];
-                        [[NSWorkspace sharedWorkspace] openFile:final];
-                        if (downloads.operationQueue.operationCount == 0){
-                            DDLogInfo(@"no operations left, continue forward!");
-                            [self runPostXcodeProcess];
-                        }
-                    });
-                    
-
-                });
-            }
-            
-        };
-        
-    } else {
-        [listener use];
-    }
-}
-
-- (void)authSuccessful {
-    NLog(@"we are signed in!");
-    [self loadURLInBackground:[HelperClass moreDownloadsURL]]; //this hopefully fixes some session issues where downloads wouldnt normally start
-    [self.window close];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self runStandardProcess];
-        
-    });
-}
-
-
-- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame; {
-    
-    NSString *mfu = [sender mainFrameURL];
-    DDLogInfo(@"mfu: %@", mfu);
-    if ([mfu containsString:@"/#/welcome"] || [mfu containsString:@"#/overview"]){
-        
-        if (!_authed){
-            _authed = true;
-            [self authSuccessful];
-        } else {
-            DDLogInfo(@"ALREADY AUTHED!!!");
-        }
-    }
-    NLog(@"title: %@", [[frame DOMDocument] title]);
-}
-
-- (void)showInsufficientSpaceAlertWithExpectedSize:(double)size {
-    
-    NSString *neededSize = [[NSString stringWithFormat:@"%.2f", size] suffixNumber];
-    NSAlert *developerAccountAlert = [NSAlert alertWithMessageText:NSLocalizedString(@"Insufficient Free Space",@"") defaultButton:NSLocalizedString(@"OK",@"") alternateButton:nil otherButton:nil informativeTextWithFormat:NSLocalizedString(@"There is insufficient free space to install the development environment.\n\nSpace Needed: %@\nSpace Available %@\n\n",@""), neededSize, [HelperClass freeSpaceString]];
-    [developerAccountAlert runModal];
-}
-
-- (NSInteger)_showDeveloperAccountAlert
-{
-    NSAlert *developerAccountAlert = [NSAlert alertWithMessageText:NSLocalizedString(@"Developer Account Required",@"") defaultButton:NSLocalizedString(@"Yes",@"") alternateButton:NSLocalizedString(@"No", @"") otherButton:nil informativeTextWithFormat:NSLocalizedString(@"Development for deployment to any mobile apple device requires an Apple Developer account. Do you have one? (Free ones are sufficient). \n\nIf you have an Apple ID, signing in to the developer portal with this apple ID will enable you to sign up for the free account.",@"")];
-    return [developerAccountAlert runModal];
-    
-}
-
-- (void)download:(NSString *)fileName durationDidIncreaseTo:(long long)writtenDuration totalDuration:(long long)sourceDuration;
-{
-    float currentLevel = (float)((double)writtenDuration/(double)sourceDuration);
-    float percent = currentLevel*100.0;
-    NSTimeInterval interval = [[NSDate date] timeIntervalSinceDate:_startDate];
-    float speed = (float)writtenDuration/(float)interval;
-    float left = ((float)sourceDuration - (float)writtenDuration)/speed;
-    NSString *leftString = nil;
-    if(interval < 15){
-        leftString = NSLocalizedString(@"ETR", @"ETR");
-    } else {
-        leftString = [[NSString stringWithFormat:@"%f",left] TIMEFormat];
-    }
-    if(percent > 100.0) {
-        
-    } else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if(![self->_progressWindow isVisible]){
-                [self->_progressWindow makeKeyAndOrderFront:nil];
-            }
-            [self->_progressLabel setStringValue:[NSString stringWithFormat:NSLocalizedString(@"Downloading %@...\nAbout %.1f%% Complete <%@>", nil), fileName, percent, leftString]];
-            
-        });
-    }
-    
-}
-
-- (void)applicationWillTerminate:(NSNotification *)notification {
-    
-    [[self.helperInstance xcDownloadInfo] cancelAllDownloads];
-}
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
@@ -300,6 +39,10 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     [self _createViews];
     [self openDeveloperPage:nil];
     [self scanEnvironment];
+    [self setupLogging];
+}
+
+- (void)setupLogging {
     [DDLog addLogger:[DDASLLogger sharedInstance]];
     [DDLog addLogger:[DDTTYLogger sharedInstance]];
     DDLogFileManagerDefault *manager = [[DDLogFileManagerDefault alloc] initWithLogsDirectory:nil];
@@ -307,150 +50,10 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     fileLogger.rollingFrequency = 60 * 60 * 24; // 24 hour rolling
     fileLogger.logFileManager.maximumNumberOfLogFiles = 7;
     [DDLog addLogger:fileLogger];
-    DDLogInfo(@"file: %@", [manager logsDirectory]);
-    DDLogInfo(@"DDLOGTEST: %@", [HelperClass cacheFolder]);
-    DDLogInfo(@"size: %llu", [HelperClass sessionCacheSize]);
-}
-
-- (IBAction)openTutorialVideo:(id)sender {
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://lbry.tv/@nitoTV:4/class_s01:5"]];
-}
-
-- (IBAction)openConsoleLog:(id)sender {
-    
-    ///usr/bin/tail -f  "`/bin/ls -1td ~/Library/Logs/nitoClassSetup/*| /usr/bin/head -n1`"
-    NSString *fileContents = @"/usr/bin/tail -f  \"`/bin/ls -1td ~/Library/Logs/nitoClassSetup/*| /usr/bin/head -n1`\"";
-    NSString *outFile = [NSTemporaryDirectory() stringByAppendingPathComponent:@"tailLog.sh"];
-    [fileContents writeToFile:outFile atomically:true encoding:NSUTF8StringEncoding error:nil];
-    chmod([outFile UTF8String], 0755);
-    [[NSWorkspace sharedWorkspace] openFile:outFile withApplication:@"Terminal" andDeactivate:false];
-}
-
-- (void)hideProgress {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.progressWindow close];
-        [self updateProgressLabel:@""];
-        [self updateProgressValue:1 indeterminate:true];
-        
-    });
-    
-}
-
-- (void)runPostXcodeProcess {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.window close];
-    });
-    [self updateProgressLabel:@"Post Xcode Processing, checking out theos & sdks..."];
-    [self checkoutTheos];
-    
-}
-
-- (void)runAuthBasedProcess {
-    [self.window makeKeyAndOrderFront:nil];
-}
-
-- (void)scanEnvironment {
-    
-    NSInteger freeSpace = [HelperClass freeSpaceAvailable];
-    NLog(@"free space: %lu", freeSpace);
-    if (![HelperClass xcodeInstalled] || ![HelperClass commandLineToolsInstalled]){
-        NLog(@"either Xcode or the command line tools are missing, need to authenticate!");
-        [self runAuthBasedProcess];
-    } else {
-        [self runPostXcodeProcess];
-    }
-    
-}
-
-
-- (void)updateProgressValue:(double)value indeterminate:(BOOL)indy {
-    if (![NSThread isMainThread]){
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.progressBar.indeterminate = indy;
-            if (value == 0 && indy == true){
-                [self.progressBar startAnimation:nil];
-                
-            } else if (indy == true && value == 1){
-                [self.progressBar stopAnimation:nil];
-            } else {
-                [self.progressBar startAnimation:nil];
-                self.progressBar.doubleValue = value;
-            }
-            
-        });
-    } else {
-        self.progressBar.indeterminate = indy;
-        if (value == 0 && indy == true){
-            [self.progressBar startAnimation:nil];
-            
-            
-        } else if (indy == true && value == 1){
-            [self.progressBar stopAnimation:nil];
-        } else {
-            [self.progressBar startAnimation:nil];
-            self.progressBar.doubleValue = value;
-        }
-    }
-}
-
-- (HelperClass *)helperSharedInstance {
-    if (!self.helperInstance){
-        self.helperInstance = [HelperClass new];
-        @weakify(self);
-        self.helperInstance.BasicProgressBlock = ^(NSString *progressDetails, BOOL indeterminate, double percentComplete) {
-            [self_weak_ updateProgressLabel:progressDetails];
-            [self_weak_ updateProgressValue:percentComplete indeterminate:indeterminate];
-            NLog(@"%@", progressDetails);
-        };
-    }
-    return self.helperInstance;
-}
-
-- (void)runStandardProcess {
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.progressWindow makeKeyAndOrderFront:nil];
-    });
-    HelperClass *hc = [self helperSharedInstance];
-    XcodeDownloads *xcdl = [hc xcDownloadInfo];
-    NSArray <XcodeDownload *> *dl = [xcdl downloads];
-    
-    [dl enumerateObjectsUsingBlock:^(XcodeDownload * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        
-        NSURLRequest *req = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:obj.downloadURL]];
-        [[self->webView mainFrame] loadRequest:req];
-    }];
-}
-
-- (void)loadURLInBackground:(NSURL *)url {
-    NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
-    [[webView mainFrame] loadRequest:req];
-}
-
-- (IBAction)openDownloadsPage:(id)sender {
-    [self.window makeKeyAndOrderFront:nil];
-    NSURL *url = [HelperClass moreDownloadsURL];
-    NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
-    [[webView mainFrame] loadRequest:req];
-}
-
-- (IBAction)openDeveloperPage:(id)sender {
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.window makeKeyAndOrderFront:nil];
-        NSURL *url = [HelperClass developerAccountSite];
-        NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
-        [[self->webView mainFrame] loadRequest:req];
-    });
-    
-}
-
-- (IBAction)openAppleIDPage:(id)sender {
-    [self.window makeKeyAndOrderFront:nil];
-    NSURL *url = [HelperClass appleIDPage];
-    NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
-    [[webView mainFrame] loadRequest:req];
-    
+    DDLogInfo(@"\n\n");
+    DDLogInfo(@"**********************");
+    DDLogInfo(@"New Session Started!");
+    DDLogInfo(@"**********************\n");
 }
 
 - (void)_createViews {
@@ -460,20 +63,19 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     webView = [[WebView alloc] initWithFrame:contentView.frame];
     webView.policyDelegate = self;
     webView.frameLoadDelegate = self;
-    [webView setAutoresizingMask:(NSViewHeightSizable | NSViewWidthSizable)];
+    //[webView setAutoresizingMask:(NSViewHeightSizable | NSViewWidthSizable)];
     [contentView addSubview:webView];
-    /*
-     webView.translatesAutoresizingMaskIntoConstraints = false;
-     [webView.widthAnchor constraintEqualToAnchor:contentView.widthAnchor multiplier:1.0].active = true;
-     [webView.heightAnchor constraintEqualToAnchor:contentView.heightAnchor multiplier:1.0].active = true;
-     [webView.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = true;
-     [webView.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = true;
-     [webView.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = true;
-     [webView.bottomAnchor constraintEqualToAnchor:contentView.bottomAnchor].active = true;
-     */
+    
+    webView.translatesAutoresizingMaskIntoConstraints = false;
+    [webView.widthAnchor constraintEqualToAnchor:contentView.widthAnchor multiplier:1.0].active = true;
+    [webView.heightAnchor constraintEqualToAnchor:contentView.heightAnchor multiplier:1.0].active = true;
+    [webView.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = true;
+    [webView.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = true;
+    [webView.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = true;
+    [webView.bottomAnchor constraintEqualToAnchor:contentView.bottomAnchor].active = true;
+    
     self.progressLabel.alignment = NSTextAlignmentCenter;
     self.progressLabel.textColor = [NSColor whiteColor];
-    //return;
     webView.alphaValue = 0;
     infoText = [[NSTextView alloc] init];
     infoText.editable = false;
@@ -509,15 +111,439 @@ decisionListener:(id<WebPolicyDecisionListener>)listener {
     
 }
 
+- (void)applicationWillTerminate:(NSNotification *)notification {
+    
+    [[self.helperInstance xcDownloadInfo] cancelAllDownloads];
+}
+
+#pragma mark Application flow
+
 - (void)continueProcess:(id)sender {
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->infoView removeFromSuperview];
         //infoView.alphaValue = 0.0;
-        [self openDeveloperPage:nil];
+        //[self openDeveloperPage:nil];
         [self->webView setAlphaValue:1.0];
         
     });
+    
+}
+
+- (void)runPostXcodeProcess {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.window close];
+    });
+    [self updateProgressLabel:@"Post Xcode Processing, checking out theos & sdks..."];
+    [self checkoutTheos];
+    
+}
+
+- (void)runAuthBasedProcess {
+    [self.window makeKeyAndOrderFront:nil];
+}
+
+- (void)scanEnvironment {
+    
+    NSInteger freeSpace = [HelperClass freeSpaceAvailable];
+    NLog(@"free space: %lu", freeSpace);
+    if (![HelperClass xcodeInstalled] || ![HelperClass commandLineToolsInstalled]){
+        NLog(@"either Xcode or the command line tools are missing, need to authenticate!");
+        [self runAuthBasedProcess];
+    } else {
+        [self runPostXcodeProcess];
+    }
+    
+}
+
+- (void)checkoutTheos {
+    
+    NSString *git = @"/usr/bin/git";
+    if (![FM fileExistsAtPath:git]){
+        DDLogInfo(@"git is missing!! command line tools install is needed to continue!");
+        [self startListening];
+        [self updateProgressLabel:@"command line tools are missing... waiting for install to finish"];
+        [self updateProgressValue:0 indeterminate:true];
+        [[self progressWindow] makeKeyAndOrderFront:nil];
+        return;
+    }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        [[self helperSharedInstance] checkoutTheosIfNecessary:^(BOOL success) {
+            NLog(@"theos is done with status %d", success);
+            if (![HelperClass brewInstalled]){
+                [self updateProgressLabel:@"Attempting to run brew install script..."];
+                [self updateProgressValue:0 indeterminate:true];
+                [self installBrew:nil];
+                
+            } else {
+                [self hideProgress];
+                NLog(@"Installations are complete or unnecessesary!\n");
+            }
+        }];
+    });
+}
+
+#pragma mark Actions
+
+- (IBAction)openTutorialVideo:(id)sender {
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://lbry.tv/@nitoTV:4/class_s01:5"]];
+}
+
+- (IBAction)openConsoleLog:(id)sender {
+    
+    ///usr/bin/tail -f  "`/bin/ls -1td ~/Library/Logs/nitoClassSetup/*| /usr/bin/head -n1`"
+    NSString *fileContents = @"/usr/bin/tail -f  \"`/bin/ls -1td ~/Library/Logs/nitoClassSetup/*| /usr/bin/head -n1`\"";
+    NSString *outFile = [NSTemporaryDirectory() stringByAppendingPathComponent:@"tailLog.sh"];
+    [fileContents writeToFile:outFile atomically:true encoding:NSUTF8StringEncoding error:nil];
+    chmod([outFile UTF8String], 0755);
+    [[NSWorkspace sharedWorkspace] openFile:outFile withApplication:@"Terminal" andDeactivate:false];
+}
+
+- (IBAction)installBrew:(id)sender {
+    NSString *fileContents = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://raw.githubusercontent.com/Homebrew/install/master/install.sh"] encoding:NSUTF8StringEncoding error:nil];
+    fileContents = [fileContents stringByAppendingString:@"\necho 'installing nitoClass extras'\n\nbrew install ldid xz dpkg\n"];
+    NSString *outFile = [NSTemporaryDirectory() stringByAppendingPathComponent:@"brew.sh"];
+    [fileContents writeToFile:outFile atomically:true encoding:NSUTF8StringEncoding error:nil];
+    chmod([outFile UTF8String], 0755);
+    [[NSWorkspace sharedWorkspace] openFile:outFile withApplication:@"Terminal" andDeactivate:false];
+    [self updateProgressLabel:@""];
+    [self updateProgressValue:1 indeterminate:true];
+}
+
+#pragma mark Web View methods
+
+- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame; {
+    
+    NSString *mfu = [sender mainFrameURL];
+    //DDLogInfo(@"mfu: %@", mfu);
+    if ([mfu containsString:@"/#/welcome"] || [mfu containsString:@"#/overview"]){
+        
+        if (!_authed){
+            _authed = true;
+            [self authSuccessful];
+        } else {
+            DDLogInfo(@"ALREADY AUTHED!!!");
+        }
+    }
+    //NLog(@"title: %@", [[frame DOMDocument] title]);
+}
+
+- (void)authSuccessful {
+    NLog(@"we are signed in!");
+    [self loadURLInBackground:[HelperClass moreDownloadsURL]]; //this hopefully fixes some session issues where downloads wouldnt normally start
+    [self.window close];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self runStandardProcess];
+        
+    });
+}
+
+- (void)loadURLInBackground:(NSURL *)url {
+    NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
+    [[webView mainFrame] loadRequest:req];
+}
+
+- (void)webView:(WebView *)webView decidePolicyForNewWindowAction:(NSDictionary *)actionInformation
+        request:(NSURLRequest *)request
+   newFrameName:(NSString *)frameName
+decisionListener:(id<WebPolicyDecisionListener>)listener {
+    NLog(@"decidePolicyForNewWindowAction: %@ request: %@", actionInformation, request);
+    [listener use];
+    [[webView mainFrame] loadRequest:request];
+}
+
+
+
+- (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
+    //NLog(@"request: %@ headers: %@ body: %@", request, request.allHTTPHeaderFields, request.HTTPBody);
+    NSString *url = request.URL.absoluteString;
+    NSString *ext = url.pathExtension;
+    //DDLogInfo(@"decidePolicyForNavigationAction URL: %@", url);
+    if (ext.length > 0){
+        
+        [self handleFileDownloadRequest:request];
+        
+    } else {
+        [listener use];
+    }
+}
+
+
+- (void)handleFileDownloadRequest:(NSURLRequest *)request {
+    _startDate = [NSDate date];
+    HelperClass *hc = [self helperSharedInstance];
+    XcodeDownloads *downloads = [hc xcDownloadInfo];
+    __block XcodeDownload *dl = [downloads downloadFromURL:request.URL];
+    double fullSize = (([dl expectedSize]/1024) + ([dl extractedSize])/1024);
+    double availSize = [HelperClass freeSpaceAvailable];
+    
+    NLog(@"avail: %f vs full: %f", availSize, fullSize);
+    if (availSize < fullSize){
+        NLog(@"not enough space, this is probably bad!");
+        //TODO: inform user how much free space there is vs how much is needed
+        [self showInsufficientSpaceAlertWithExpectedSize:fullSize];
+        return;
+    }
+    [hc.xcDownloadInfo downloadFile:dl];
+    //[hc.downloads downloadFileURL:request.URL];
+    downloads.FancyProgressBlock = ^(NSString *name, double percentComplete, double writtenBytes, double expectedBytes) {
+        // NSLog(@"pc: %f", percentComplete);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self download:name durationDidIncreaseTo:writtenBytes totalDuration:expectedBytes];
+            self.progressBar.doubleValue = percentComplete;
+        });
+    };
+    downloads.CompletedBlock = ^(NSString *downloadedFile, XcodeDownload *object) {
+        
+        __block BOOL errorOccured = false;
+        NLog(@"downloaded file: %@ xc: %@", downloadedFile, object);
+        NSNumber *size = [FM attributesOfItemAtPath:downloadedFile error:nil][NSFileSize];
+        NLog(@"downladed size: %@", size);
+        NLog(@"expected size: %.2ld", (long)[object expectedSize]);
+        /*
+         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+         BOOL validated = [downloadedFile validateFileSHA:dl.SHA];
+         if (validated){
+         NLog(@"VALID!");
+         } else {
+         NSLog(@"INVALID!!!");
+         }
+         });*/
+        
+        
+        if (size.integerValue != [object expectedSize]){
+            errorOccured = true;
+            NLog(@"%ld != %ld", (long)size.integerValue, (long)[object expectedSize]);
+        }
+        
+        if (!errorOccured){
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                self.progressLabel.stringValue = @"";
+                self.progressBar.doubleValue = 1;
+                [self.progressBar stopAnimation:nil];
+                
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+                    
+                    NSString *heyo = [[self helperInstance] processDownload:downloadedFile];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        self.progressBar.indeterminate = false;
+                        [self.progressBar stopAnimation:nil];
+                    });
+                    DDLogInfo(@"processed location: %@", heyo);
+                    //[self startListening];
+                    NSArray *files = [FM contentsOfDirectoryAtPath:heyo error:nil];
+                    NSString *chosen = [[files filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+                        if ([[evaluatedObject pathExtension] isEqualToString:@"pkg"]){
+                            return true;
+                        }
+                        return false;
+                    }]] lastObject] ;
+                    DDLogInfo(@"chosen: %@", chosen);
+                    NSString *final = heyo;
+                    if (chosen.length > 0){
+                        final = [heyo stringByAppendingPathComponent:chosen];
+                    }
+                    
+                    [self updateProgressLabel:[NSString stringWithFormat:@"opening %@", final]];
+                    [[NSWorkspace sharedWorkspace] openFile:final];
+                    if (downloads.operationQueue.operationCount == 0){
+                        DDLogInfo(@"no operations left, continue forward!");
+                        [self runPostXcodeProcess];
+                    }
+                });
+                
+                
+            });
+        }
+        
+    };
+    
+}
+
+- (void)shutItDown {
+    LOG_SELF;
+    [[[self helperInstance] xcDownloadInfo] cancelAllDownloads];
+    
+}
+
+#pragma Alerts
+
+- (void)showInsufficientSpaceAlertWithExpectedSize:(double)size {
+    
+    NSString *neededSize = [[NSString stringWithFormat:@"%.2f", size] suffixNumber];
+    NSAlert *developerAccountAlert = [NSAlert alertWithMessageText:NSLocalizedString(@"Insufficient Free Space",@"") defaultButton:NSLocalizedString(@"OK",@"") alternateButton:nil otherButton:nil informativeTextWithFormat:NSLocalizedString(@"There is insufficient free space to install the development environment.\n\nSpace Needed: %@\nSpace Available %@\n\n",@""), neededSize, [HelperClass freeSpaceString]];
+    [developerAccountAlert runModal];
+}
+
+- (NSInteger)_showDeveloperAccountAlert
+{
+    NSAlert *developerAccountAlert = [NSAlert alertWithMessageText:NSLocalizedString(@"Developer Account Required",@"") defaultButton:NSLocalizedString(@"Yes",@"") alternateButton:NSLocalizedString(@"No", @"") otherButton:nil informativeTextWithFormat:NSLocalizedString(@"Development for deployment to any mobile apple device requires an Apple Developer account. Do you have one? (Free ones are sufficient). \n\nIf you have an Apple ID, signing in to the developer portal with this apple ID will enable you to sign up for the free account.",@"")];
+    return [developerAccountAlert runModal];
+    
+}
+
+#pragma mark Progress Management
+
+- (void)updateProgressLabel:(NSString *)text {
+    if (text.length == 0){
+        [self.progressWindow close];
+        [self.window makeKeyWindow];
+    } else {
+        [self.progressWindow makeKeyAndOrderFront:nil];
+    }
+    if (![NSThread isMainThread]){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.progressLabel.stringValue = text;
+        });
+    } else {
+        self.progressLabel.stringValue = text;
+    }
+}
+
+- (void)updateProgressValue:(double)value indeterminate:(BOOL)indy {
+    if (![NSThread isMainThread]){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.progressBar.indeterminate = indy;
+            if (value == 0 && indy == true){
+                [self.progressBar startAnimation:nil];
+                
+            } else if (indy == true && value == 1){
+                [self.progressBar stopAnimation:nil];
+            } else {
+                [self.progressBar startAnimation:nil];
+                self.progressBar.doubleValue = value;
+            }
+            
+        });
+    } else {
+        self.progressBar.indeterminate = indy;
+        if (value == 0 && indy == true){
+            [self.progressBar startAnimation:nil];
+            
+            
+        } else if (indy == true && value == 1){
+            [self.progressBar stopAnimation:nil];
+        } else {
+            [self.progressBar startAnimation:nil];
+            self.progressBar.doubleValue = value;
+        }
+    }
+}
+
+- (void)download:(NSString *)fileName durationDidIncreaseTo:(long long)writtenDuration totalDuration:(long long)sourceDuration {
+    float currentLevel = (float)((double)writtenDuration/(double)sourceDuration);
+    float percent = currentLevel*100.0;
+    NSTimeInterval interval = [[NSDate date] timeIntervalSinceDate:_startDate];
+    float speed = (float)writtenDuration/(float)interval;
+    float left = ((float)sourceDuration - (float)writtenDuration)/speed;
+    NSString *leftString = nil;
+    if(interval < 15){
+        leftString = NSLocalizedString(@"ETR", @"ETR");
+    } else {
+        leftString = [[NSString stringWithFormat:@"%f",left] TIMEFormat];
+    }
+    if(percent > 100.0) {
+        
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if(![self->_progressWindow isVisible]){
+                [self->_progressWindow makeKeyAndOrderFront:nil];
+            }
+            [self->_progressLabel setStringValue:[NSString stringWithFormat:NSLocalizedString(@"Downloading %@...\nAbout %.1f%% Complete <%@>", nil), fileName, percent, leftString]];
+            
+        });
+    }
+    
+}
+
+- (void)hideProgress {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.progressWindow close];
+        [self updateProgressLabel:@""];
+        [self updateProgressValue:1 indeterminate:true];
+        
+    });
+    
+}
+
+- (HelperClass *)helperSharedInstance {
+    if (!self.helperInstance){
+        self.helperInstance = [HelperClass new];
+        @weakify(self);
+        self.helperInstance.BasicProgressBlock = ^(NSString *progressDetails, BOOL indeterminate, double percentComplete) {
+            [self_weak_ updateProgressLabel:progressDetails];
+            [self_weak_ updateProgressValue:percentComplete indeterminate:indeterminate];
+            NLog(@"%@", progressDetails);
+        };
+    }
+    return self.helperInstance;
+}
+
+- (void)runStandardProcess {
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.progressWindow makeKeyAndOrderFront:nil];
+    });
+    HelperClass *hc = [self helperSharedInstance];
+    XcodeDownloads *xcdl = [hc xcDownloadInfo];
+    NSArray <XcodeDownload *> *dl = [xcdl downloads];
+    
+    [dl enumerateObjectsUsingBlock:^(XcodeDownload * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        
+        NSURLRequest *req = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:obj.downloadURL]];
+        [[self->webView mainFrame] loadRequest:req];
+    }];
+}
+
+
+- (IBAction)openDownloadsPage:(id)sender {
+    [self.window makeKeyAndOrderFront:nil];
+    NSURL *url = [HelperClass moreDownloadsURL];
+    NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
+    [[webView mainFrame] loadRequest:req];
+}
+
+- (IBAction)openDeveloperPage:(id)sender {
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.window makeKeyAndOrderFront:nil];
+        NSURL *url = [HelperClass developerAccountSite];
+        NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
+        [[self->webView mainFrame] loadRequest:req];
+    });
+    
+}
+
+- (IBAction)openAppleIDPage:(id)sender {
+    [self.window makeKeyAndOrderFront:nil];
+    NSURL *url = [HelperClass appleIDPage];
+    NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
+    [[webView mainFrame] loadRequest:req];
+    
+}
+
+
+#pragma mark potentially disposable code
+
+- (void)stopListening {
+    [self.gitTimer invalidate];
+    self.gitTimer = nil;
+}
+
+- (void)startListening {
+    
+    self.gitTimer = [NSTimer scheduledTimerWithTimeInterval:10 repeats:true block:^(NSTimer * _Nonnull timer) {
+        
+        if ([FM fileExistsAtPath:@"/usr/bin/git"]){
+            NLog(@"we done got git!, can check out theos etc now!");
+            [self stopListening];
+            [self checkoutTheos];
+        } else {
+            [self updateProgressLabel:@"command line tools are missing... waiting for install to finish"];
+            [self updateProgressValue:0 indeterminate:true];
+        }
+    }];
     
 }
 
