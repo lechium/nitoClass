@@ -41,3 +41,7 @@ These need to be placed in $THEOS/templates/
 
 10. ldid (requires brew)<br/>
 ```brew install ldid```
+
+## Next Session notes:
+
+use BlueCocoa's [class-dump](https://github.com:BlueCocoa/class-dump)
