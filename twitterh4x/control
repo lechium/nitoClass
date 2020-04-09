@@ -1,0 +1,9 @@
+Package: com.nito.twitterh4x
+Name: TwitterH4x
+Depends: mobilesubstrate
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: Adds a 'h4x' button to Twitter app, said h4x button will automatically compose a tweet and send it.
+Maintainer: Kevin Bradley
+Author: Kevin Bradley
+Section: Tweaks
