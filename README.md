@@ -44,4 +44,4 @@ These need to be placed in $THEOS/templates/
 
 ## Next Session notes:
 
-use BlueCocoa's [class-dump](https://github.com:BlueCocoa/class-dump)
+use BlueCocoa's [class-dump](https://github.com/BlueCocoa/class-dump)
