@@ -28,7 +28,7 @@
 
 /*
  
- using logos for hooking & swizzling, (preprocessing language that is part of theos build environment)
+ using logos for hooking & swizzling, (set of preprocessing directives:https://iphonedevwiki.net/index.php/Logos that is part of theos development suite)
  FYI: AppDelegate class for the Twitter Apps lives inside the embedded framework T1Twitter.framework
  
  ** NOTE: This .m file does not build and is merely presented in the following fashion to get syntax highlighting working properly **
@@ -44,6 +44,7 @@
 
 //%new keyword adds a new function to T1AppDelegate, this is a conveience method to get at the rootViewController
 
+//%new - (UIViewController *)rootViewController {
 - (UIViewController *)rootViewController {
     UIWindow *key = [[UIApplication sharedApplication] keyWindow];
     return [key rootViewController];
@@ -59,7 +60,7 @@
     //create the button we are adding to the UI
     UIButton *button = [[UIButton alloc] init];
     button.translatesAutoresizingMaskIntoConstraints = false; //always necessary when doing autolayout
-    [button setTitle:@"h4x" forState:0];
+    [button setTitle:@"h4x" forState:UIControlStateNormal];
     //sizing constraints
     [button.widthAnchor constraintEqualToConstant: 60].active = true;
     [button.heightAnchor constraintEqualToConstant: 40].active = true;
