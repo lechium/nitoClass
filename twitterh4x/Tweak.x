@@ -26,7 +26,7 @@
 
 //%new keyword adds a new function to T1AppDelegate, this is a conveience method to get at the rootViewController
 
-%new - (UIViewController *)rootViewController {
+%new - (UIViewController *)rootViewController { 
     UIWindow *key = [[UIApplication sharedApplication] keyWindow];
     return [key rootViewController];
 }
@@ -35,7 +35,7 @@
 
 %new - (void)addH4xButton {
     
-    UIViewController *rvc = [self rootViewController]; //TFNPortraitScreenBoundsLockedContainerViewController
+    UIViewController *rvc = [self rootViewController]; 
     UIView *rootView = [rvc view];
     //create the button we are adding to the UI
     UIButton *button = [[UIButton alloc] init];
@@ -61,17 +61,18 @@
     //if this isnt in the main thread it acts weird, UI events should always be in the main thread anyways!
     dispatch_async(dispatch_get_main_queue(), ^{
         UIViewController *rvc = [self rootViewController];
-        UIView *view = [rvc.view findFirstSubviewWithClass:NSClassFromString(@"TFNFloatingActionButton")];
+        UIView *view = [rvc.view findFirstSubviewWithClass:NSClassFromString(@"TFNFloatingActionButton")]; //this is the the compose tweet button 
         [view tap];
     });
     //wait for a few seconds for the presented view to appear before we continue.
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        UIViewController *presented = [[[[UIApplication sharedApplication] keyWindow] rootViewController] presentedViewController]; //TFNModalSheetViewController
+        UIViewController *presented = [[[[UIApplication sharedApplication] keyWindow] rootViewController] presentedViewController]; //Class: TFNModalSheetViewController
         if (presented) {
-            //theres probably a cleaner way in their classes to grab their nav controller class, but this works for now!
-            UINavigationController *navController = [[[[presented childViewControllers] lastObject] childViewControllers] lastObject]; //TFNNavigationController
+            
+            //get their navigation controller equivalent
+            UINavigationController *navController = [[[[presented childViewControllers] lastObject] childViewControllers] lastObject]; //Class: TFNNavigationController
             //handy visibleViewController method since TFNNavigationController inherits from UINavigationController
-            T1TweetComposeViewController *visible = (T1TweetComposeViewController *)[navController visibleViewController]; //T1TweetComposeViewController
+            T1TweetComposeViewController *visible = (T1TweetComposeViewController *)[navController visibleViewController]; //Class: T1TweetComposeViewController
             UITextView *compose  = (UITextView*)[visible.view findFirstSubviewWithClass: NSClassFromString(@"T1ComposeTextView")]; //is actually part of a child view controller a few layers deeper, this finds it easier!
             //grab the text editing delegate for purposes of calling textViewDidChange: manually after we set our desired tweet text
             id <UITextViewDelegate> delegate = [compose delegate]; //T1TweetComposeSingleTweetViewController
