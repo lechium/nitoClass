@@ -77,7 +77,7 @@
     });
     //wait for a few seconds for the presented view to appear before we continue.
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        TFNModalSheetViewController *presented = (TFNModalSheetViewController*)[[[[UIApplication sharedApplication] keyWindow] rootViewController] presentedViewController]; //Class: TFNModalSheetViewController
+        TFNModalSheetViewController *presented = (TFNModalSheetViewController*)[[self rootViewController] presentedViewController];
         if (presented) {
             
             T1TweetComposeContainerViewController *containerViewController = [presented modalContentViewController];
