@@ -1,7 +1,7 @@
 #import "UIView-KIFAdditions.h" //use some classes from the KIF framework to simulate touching/tapping the screen
 #import "UIView+RecursiveFind.h" //use a handy recursive function i wrote to find subviews of a certain class type
 #import "UIColor+Additions.h" //color additions to create colors from hex values
-
+#import <UIKit/UIKit.h>
 //silence warnings from the compiler
 @interface T1TweetComposeViewController: UIViewController
 - (void)_t1_didTapSendButton:(id)sender;
@@ -26,7 +26,7 @@
 
 //%new keyword adds a new function to T1AppDelegate, this is a conveience method to get at the rootViewController
 
-%new - (UIViewController *)rootViewController { 
+%new - (UIViewController *)rootViewController {
     UIWindow *key = [[UIApplication sharedApplication] keyWindow];
     return [key rootViewController];
 }
@@ -55,7 +55,6 @@
     //add our target
     [button addTarget:self action:@selector(doH4x) forControlEvents:UIControlEventTouchUpInside];
 }
-
 
 %new - (void)doH4x {
     //if this isnt in the main thread it acts weird, UI events should always be in the main thread anyways!
@@ -87,8 +86,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
-    %log;
-    BOOL _orig = %orig; //run the original method / get the original return value.
+    BOOL _orig = %orig;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ //wait 5 seconds for the UI to show up before we add our button. kindy hacky, but gets the job done.
         [self addH4xButton];
     });

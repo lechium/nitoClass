@@ -1,0 +1,29 @@
+T1TabBarHostView
+
+UIApp.keyWindow .rootViewController .presentedViewController .childViewControllers.lastObject().childViewControllers.lastObject() .visibleViewController 
+
+contentViewController of root (TFNPortraitScreenBoundsLockedContainerViewController) = T1HostViewController
+
+ bro = [contentViewController childViewControllers].lastObject(); // T1TabbedAppNavigationViewController
+#"<T1TabbedAppNavigationViewController: 0x1428ed400>"
+
+[bro tabbedViewController] = TFNTabbedViewController
+
+rootViewController = TFNPortraitScreenBoundsLockedContainerViewController
+presentedViewController = TFNModalSheetViewController
+childViewControllers.lastObject() = T1TweetComposeContainerViewController
+childViewControllers.lastObject() = TFNNavigationController
+visibleViewController = T1TweetComposeViewController
+
+send button = sendButton = TFNButton
+send action = @selector(_t1_didTapSendButton:)
+
+ (T1TweetComposeViewController*)compose.childViewControllers
+@[#"<T1TweetComposeTableViewController: 0x141e4b050>",#"<T1PhotoMediaRailViewController: 0x144357560>"]
+
+composeTableViewController = [compose.childViewControllers firstObject]; //T1TweetComposeTableViewController
+st = [composeTableViewController childViewControllers].firstObject(); //T1TweetComposeSingleTweetViewController
+tweetTextView = [st tweetTextView]; //T1ComposeTextView
+
+
+
