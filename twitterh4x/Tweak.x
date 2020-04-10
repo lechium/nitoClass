@@ -5,6 +5,18 @@
 //silence warnings from the compiler
 @interface T1TweetComposeViewController: UIViewController
 - (void)_t1_didTapSendButton:(id)sender;
+- (void)_t1_appendDroppedText:(id)arg1;
+@end
+
+@interface TFNModalSheetViewController: UIViewController
+- (id)modalContentViewController;
+@end
+
+@interface TFNViewController : UIViewController
+@end
+
+@interface T1TweetComposeContainerViewController : TFNViewController
+@property(retain, nonatomic) T1TweetComposeViewController *tweetComposeViewController;
 @end
 
 //ditto
@@ -65,20 +77,13 @@
     });
     //wait for a few seconds for the presented view to appear before we continue.
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        UIViewController *presented = [[[[UIApplication sharedApplication] keyWindow] rootViewController] presentedViewController]; //Class: TFNModalSheetViewController
+        TFNModalSheetViewController *presented = (TFNModalSheetViewController*)[[[[UIApplication sharedApplication] keyWindow] rootViewController] presentedViewController]; //Class: TFNModalSheetViewController
         if (presented) {
             
-            //get their navigation controller equivalent
-            UINavigationController *navController = [[[[presented childViewControllers] lastObject] childViewControllers] lastObject]; //Class: TFNNavigationController
-            //handy visibleViewController method since TFNNavigationController inherits from UINavigationController
-            T1TweetComposeViewController *visible = (T1TweetComposeViewController *)[navController visibleViewController]; //Class: T1TweetComposeViewController
-            UITextView *compose  = (UITextView*)[visible.view findFirstSubviewWithClass: NSClassFromString(@"T1ComposeTextView")]; //is actually part of a child view controller a few layers deeper, this finds it easier!
-            //grab the text editing delegate for purposes of calling textViewDidChange: manually after we set our desired tweet text
-            id <UITextViewDelegate> delegate = [compose delegate]; //T1TweetComposeSingleTweetViewController
-            [compose setText:@"#nitoClass automated tweet testing, testing 123"]; //the content of our automated tweet
-            [delegate textViewDidChange:compose]; //enables the send button and kicks off whatever other processes are done in between so we know this tweet can be sent
-            id sendButton = [visible valueForKey:@"sendButton"]; //might be frivolous, but used below anyway
-            [visible _t1_didTapSendButton:sendButton];//_t1_didTapSendButton is the action that is triggered when the send button is presssed, triggering it via code instead
+            T1TweetComposeContainerViewController *containerViewController = [presented modalContentViewController];
+            T1TweetComposeViewController *composeViewController = [containerViewController tweetComposeViewController];
+            [composeViewController _t1_appendDroppedText:@"#nitoClass automated tweet testing, testing 123"];
+            [composeViewController _t1_didTapSendButton:nil];
             
         }
     });
