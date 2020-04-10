@@ -81,24 +81,10 @@
 		32C97B02244085B4006B77FB /* UIWindow-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 32C97ACE244085B3006B77FB /* UIWindow-KIFAdditions.h */; };
 		32C97B03244085B4006B77FB /* UIWindow-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 32C97ACF244085B3006B77FB /* UIWindow-KIFAdditions.m */; };
 		32C97B04244085B4006B77FB /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 32C97AD0244085B3006B77FB /* Makefile */; };
-		32C97B06244085B4006B77FB /* com.nito.twitterh4x_0.0.1-10+debug_iphoneos-arm.deb in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C97AD3244085B3006B77FB /* com.nito.twitterh4x_0.0.1-10+debug_iphoneos-arm.deb */; };
-		32C97B07244085B4006B77FB /* com.nito.twitterh4x_0.0.1-11+debug_iphoneos-arm.deb in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C97AD4244085B3006B77FB /* com.nito.twitterh4x_0.0.1-11+debug_iphoneos-arm.deb */; };
-		32C97B08244085B4006B77FB /* com.nito.twitterh4x_0.0.1-12+debug_iphoneos-arm.deb in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C97AD5244085B3006B77FB /* com.nito.twitterh4x_0.0.1-12+debug_iphoneos-arm.deb */; };
-		32C97B09244085B4006B77FB /* com.nito.twitterh4x_0.0.1-13+debug_iphoneos-arm.deb in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C97AD6244085B3006B77FB /* com.nito.twitterh4x_0.0.1-13+debug_iphoneos-arm.deb */; };
-		32C97B0A244085B4006B77FB /* com.nito.twitterh4x_0.0.1-14+debug_iphoneos-arm.deb in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C97AD7244085B3006B77FB /* com.nito.twitterh4x_0.0.1-14+debug_iphoneos-arm.deb */; };
-		32C97B0B244085B4006B77FB /* com.nito.twitterh4x_0.0.1-15+debug_iphoneos-arm.deb in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C97AD8244085B3006B77FB /* com.nito.twitterh4x_0.0.1-15+debug_iphoneos-arm.deb */; };
-		32C97B0C244085B4006B77FB /* com.nito.twitterh4x_0.0.1-16+debug_iphoneos-arm.deb in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C97AD9244085B3006B77FB /* com.nito.twitterh4x_0.0.1-16+debug_iphoneos-arm.deb */; };
-		32C97B0D244085B4006B77FB /* com.nito.twitterh4x_0.0.1-2+debug_iphoneos-arm.deb in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C97ADA244085B3006B77FB /* com.nito.twitterh4x_0.0.1-2+debug_iphoneos-arm.deb */; };
-		32C97B0E244085B4006B77FB /* com.nito.twitterh4x_0.0.1-3+debug_iphoneos-arm.deb in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C97ADB244085B3006B77FB /* com.nito.twitterh4x_0.0.1-3+debug_iphoneos-arm.deb */; };
-		32C97B0F244085B4006B77FB /* com.nito.twitterh4x_0.0.1-4+debug_iphoneos-arm.deb in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C97ADC244085B3006B77FB /* com.nito.twitterh4x_0.0.1-4+debug_iphoneos-arm.deb */; };
-		32C97B10244085B4006B77FB /* com.nito.twitterh4x_0.0.1-5+debug_iphoneos-arm.deb in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C97ADD244085B3006B77FB /* com.nito.twitterh4x_0.0.1-5+debug_iphoneos-arm.deb */; };
-		32C97B11244085B4006B77FB /* com.nito.twitterh4x_0.0.1-6+debug_iphoneos-arm.deb in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C97ADE244085B3006B77FB /* com.nito.twitterh4x_0.0.1-6+debug_iphoneos-arm.deb */; };
-		32C97B12244085B4006B77FB /* com.nito.twitterh4x_0.0.1-7+debug_iphoneos-arm.deb in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C97ADF244085B3006B77FB /* com.nito.twitterh4x_0.0.1-7+debug_iphoneos-arm.deb */; };
-		32C97B13244085B4006B77FB /* com.nito.twitterh4x_0.0.1-8+debug_iphoneos-arm.deb in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C97AE0244085B3006B77FB /* com.nito.twitterh4x_0.0.1-8+debug_iphoneos-arm.deb */; };
-		32C97B14244085B4006B77FB /* com.nito.twitterh4x_0.0.1-9+debug_iphoneos-arm.deb in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C97AE1244085B3006B77FB /* com.nito.twitterh4x_0.0.1-9+debug_iphoneos-arm.deb */; };
 		32C97B15244085B4006B77FB /* Tweak.x in Resources */ = {isa = PBXBuildFile; fileRef = 32C97AE2244085B3006B77FB /* Tweak.x */; };
 		32C97B16244085B4006B77FB /* TwitterH4x.plist in Resources */ = {isa = PBXBuildFile; fileRef = 32C97AE3244085B3006B77FB /* TwitterH4x.plist */; };
 		32C97B18244085BB006B77FB /* Tweak.m in Sources */ = {isa = PBXBuildFile; fileRef = 32C97B17244085BB006B77FB /* Tweak.m */; };
+		32C97B1A24411691006B77FB /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C97B1924411691006B77FB /* IOKit.framework */; };
 		32D2FC452436FCA600F81C4C /* EXTRuntimeExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 32D2FC412436FCA600F81C4C /* EXTRuntimeExtensions.m */; };
 		32D2FC462436FCA600F81C4C /* EXTRuntimeExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 32D2FC412436FCA600F81C4C /* EXTRuntimeExtensions.m */; };
 		32D2FC472436FCA600F81C4C /* EXTScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 32D2FC432436FCA600F81C4C /* EXTScope.m */; };
@@ -255,6 +241,7 @@
 		32C97AE2244085B3006B77FB /* Tweak.x */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.objc.preprocessed; fileEncoding = 4; path = Tweak.x; sourceTree = "<group>"; };
 		32C97AE3244085B3006B77FB /* TwitterH4x.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = TwitterH4x.plist; sourceTree = "<group>"; };
 		32C97B17244085BB006B77FB /* Tweak.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Tweak.m; path = ../../../Tweak.m; sourceTree = "<group>"; };
+		32C97B1924411691006B77FB /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = ../../IOKit.framework; sourceTree = "<group>"; };
 		32D2FC3F2436FCA600F81C4C /* EXTKeyPathCoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTKeyPathCoding.h; sourceTree = "<group>"; };
 		32D2FC402436FCA600F81C4C /* EXTRuntimeExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTRuntimeExtensions.h; sourceTree = "<group>"; };
 		32D2FC412436FCA600F81C4C /* EXTRuntimeExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTRuntimeExtensions.m; sourceTree = "<group>"; };
@@ -298,21 +285,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				32C97B09244085B4006B77FB /* com.nito.twitterh4x_0.0.1-13+debug_iphoneos-arm.deb in Frameworks */,
-				32C97B13244085B4006B77FB /* com.nito.twitterh4x_0.0.1-8+debug_iphoneos-arm.deb in Frameworks */,
-				32C97B11244085B4006B77FB /* com.nito.twitterh4x_0.0.1-6+debug_iphoneos-arm.deb in Frameworks */,
-				32C97B12244085B4006B77FB /* com.nito.twitterh4x_0.0.1-7+debug_iphoneos-arm.deb in Frameworks */,
-				32C97B0E244085B4006B77FB /* com.nito.twitterh4x_0.0.1-3+debug_iphoneos-arm.deb in Frameworks */,
-				32C97B07244085B4006B77FB /* com.nito.twitterh4x_0.0.1-11+debug_iphoneos-arm.deb in Frameworks */,
-				32C97B10244085B4006B77FB /* com.nito.twitterh4x_0.0.1-5+debug_iphoneos-arm.deb in Frameworks */,
-				32C97B0F244085B4006B77FB /* com.nito.twitterh4x_0.0.1-4+debug_iphoneos-arm.deb in Frameworks */,
-				32C97B0B244085B4006B77FB /* com.nito.twitterh4x_0.0.1-15+debug_iphoneos-arm.deb in Frameworks */,
-				32C97B06244085B4006B77FB /* com.nito.twitterh4x_0.0.1-10+debug_iphoneos-arm.deb in Frameworks */,
-				32C97B0A244085B4006B77FB /* com.nito.twitterh4x_0.0.1-14+debug_iphoneos-arm.deb in Frameworks */,
-				32C97B0D244085B4006B77FB /* com.nito.twitterh4x_0.0.1-2+debug_iphoneos-arm.deb in Frameworks */,
-				32C97B0C244085B4006B77FB /* com.nito.twitterh4x_0.0.1-16+debug_iphoneos-arm.deb in Frameworks */,
-				32C97B14244085B4006B77FB /* com.nito.twitterh4x_0.0.1-9+debug_iphoneos-arm.deb in Frameworks */,
-				32C97B08244085B4006B77FB /* com.nito.twitterh4x_0.0.1-12+debug_iphoneos-arm.deb in Frameworks */,
+				32C97B1A24411691006B77FB /* IOKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -345,6 +318,7 @@
 		3211F27F2430735E00B54920 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				32C97B1924411691006B77FB /* IOKit.framework */,
 				32E79741243C047C007097E3 /* Sparkle.framework */,
 				322AC8EA2434A9EA009DA791 /* libSystem.tbd */,
 				322AC8E82434A983009DA791 /* libcommonCrypto.tbd */,

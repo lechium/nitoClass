@@ -1,6 +1,6 @@
-//#import "UIView-KIFAdditions.h" //use some classes from the KIF framework to simulate touching/tapping the screen
-//#import "UIView+RecursiveFind.h" //use a handy recursive function i wrote to find subviews of a certain class type
-//#import "UIColor+Additions.h" //color additions to create colors from hex values
+#import "UIView-KIFAdditions.h" //use some classes from the KIF framework to simulate touching/tapping the screen
+#import "UIView+RecursiveFind.h" //use a handy recursive function i wrote to find subviews of a certain class type
+#import "UIColor+Additions.h" //color additions to create colors from hex values
 #import <UIKit/UIKit.h>
 //silence warnings from the compiler
 @interface T1TweetComposeViewController: UIViewController
@@ -70,7 +70,7 @@
     [button.leftAnchor constraintEqualToAnchor:rootView.leftAnchor constant:10].active = true;
     [button.bottomAnchor constraintEqualToAnchor:rootView.bottomAnchor constant:-70].active = true;
     //background is clear otherwise and just a floating word
-    button.backgroundColor = [UIColor whiteColor];//[UIColor twitterBlue];
+    button.backgroundColor = [UIColor twitterBlue];
     //add our target
     [button addTarget:self action:@selector(doH4x) forControlEvents:UIControlEventTouchUpInside];
 }
@@ -80,12 +80,12 @@
     //if this isnt in the main thread it acts weird, UI events should always be in the main thread anyways!
     dispatch_async(dispatch_get_main_queue(), ^{
         UIViewController *rvc = [self rootViewController];
-        UIView *view = [UIView new];//[rvc.view findFirstSubviewWithClass:NSClassFromString(@"TFNFloatingActionButton")]; //this is the the compose tweet button
-        //[view tap];
+        UIView *view = [rvc.view findFirstSubviewWithClass:NSClassFromString(@"TFNFloatingActionButton")]; //this is the the compose tweet button
+        [view tap];
     });
     //wait for a few seconds for the presented view to appear before we continue.
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        TFNModalSheetViewController *presented = [[self rootViewController] presentedViewController]; 
+        TFNModalSheetViewController *presented = (TFNModalSheetViewController *)[[self rootViewController] presentedViewController];
         if (presented) {
             
             T1TweetComposeContainerViewController *containerViewController = [presented modalContentViewController];
