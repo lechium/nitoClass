@@ -7,6 +7,8 @@ Open source free class for tvOS (in progress)
 
 [developer environment setup video](https://lbry.tv/@nitoTV:4/class_s01:5)
 
+[tweaking iOS](https://lbry.tv/@nitoTV:4/installing_2:3)
+
 **NOTE**: the command line tool and shell script are unfinished, I will revist them later when I have more time. A full writeup of this environment install will also be available at a later date.
 
 ## Manual setup:
