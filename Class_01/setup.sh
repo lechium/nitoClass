@@ -39,8 +39,8 @@ if [[ "$(uname)" = "Linux" ]]; then
 	echo "Installing toolchain..."
 	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/toolchain-linux.tar.gz
 	tar fxz toolchain-linux.tar.gz -C $THEOS/toolchain
-	ln -s $THEOS/toolchain/appletv ~/cctools
-	chmod -R +x $THEOS/toolchain/appletv/bin 
+	ln -s $THEOS/toolchain/linux/appletv ~/cctools
+	chmod -R +x $THEOS/toolchain/linux/appletv/bin 
 	rm -rf $THEOS/sdks
 	pushd $THEOS
 	echo "Cloning SDKs..."
