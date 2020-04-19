@@ -27,14 +27,26 @@ if [[ "$(uname)" = "Linux" ]]; then
 	ON_LINUX=1
 	echo "on linux!"
 	sudo "echo 'deb http://apt.llvm.org/eoan/ llvm-toolchain-eoan-10 main' >> /etc/apt/sources.list"
+	sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 15CF4D18AF4F7421
 	sudo apt-get update
-	sudo apt-get install fakeroot git perl clang-10.0 build-essential curl dpkg nvim
+	sudo apt-get install fakeroot git perl clang-10 build-essential curl dpkg neovim
 	echo "export THEOS=~/theos" >> ~/.profile
 	source ~/.profile
-	git clone --recursive https://github.com/lechium/theos.git codegen $THEOS
+	git clone --recursive https://github.com/lechium/theos.git -b codegen $THEOS
 	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/toolchain-linux.tar.gz
 	tar fxpz toolchain-linux.tar.gz -C $THEOS/toolchain
+	ln -s $THEOS/toolchain/appletv ~/cctools
+	rm -rf $THEOS/sdks
+	pushd $THEOS
+	git clone https://github.com/lechium/sdks.git
+	popd
 	sudo gem install xcpretty
+	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+	mkdir -p ~/.config/nvim
+	pushd ~/.config/nvrim
+	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/nvim/init.vim
+	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/nvim/ycm_extra_conf.py
+	popd
 	exit 0
 fi
 
