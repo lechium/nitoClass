@@ -31,6 +31,7 @@ if [[ "$(uname)" = "Linux" ]]; then
 	sudo apt-get update
 	sudo apt-get install fakeroot git perl clang-10 build-essential curl dpkg neovim python3.7-dev exuberant-ctags cmake libpng-dev libpng16-16 libxml2-dev pkg-config ninja-build
 	echo "export THEOS=~/theos" >> ~/.profile
+	echo 'export PATH=$PATH:$THEOS/bin:~/xcbuild/build/' >> ~/.profile
 	source ~/.profile
 	git clone --recursive https://github.com/lechium/theos.git -b codegen $THEOS
 	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/toolchain-linux.tar.gz
@@ -52,6 +53,7 @@ if [[ "$(uname)" = "Linux" ]]; then
 	cd xcbuild
 	git submodule update --init
 	sed -i 's|-Werror||g' CMakeLists.txt
+	make
 	#pushd ~/.config/nvim/plugged/YouCompleteMe
 	#./install.py
 	exit 0
