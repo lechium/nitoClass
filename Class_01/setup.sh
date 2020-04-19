@@ -29,7 +29,7 @@ if [[ "$(uname)" = "Linux" ]]; then
 	sudo "echo 'deb http://apt.llvm.org/eoan/ llvm-toolchain-eoan-10 main' >> /etc/apt/sources.list"
 	sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 15CF4D18AF4F7421
 	sudo apt-get update
-	sudo apt-get install fakeroot git perl clang-10 build-essential curl dpkg neovim
+	sudo apt-get install fakeroot git perl clang-10 build-essential curl dpkg neovim python3.8
 	echo "export THEOS=~/theos" >> ~/.profile
 	source ~/.profile
 	git clone --recursive https://github.com/lechium/theos.git -b codegen $THEOS
