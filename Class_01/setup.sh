@@ -10,6 +10,32 @@
 ## will make exhaustive comments as necessary in case you want to learn a little bit about shell scripting as well!
 ## bash scripting isnt my speciality, i can do it, but im not an expert. forgive the mess!
 
+# linux notes
+# https://raw.githubusercontent.com/lechium/nitoClass/master/toolchain-linux.tar.gz 
+# https://iweb.dl.sourceforge.net/project/osboxes/v/vm/55-U--u/19.10/U-1910-VM-64bit.7z
+# deb http://apt.llvm.org/eoan/ llvm-toolchain-eoan-10 main
+# https://github.com/theos/theos/wiki/Installation-Linux
+
+# sudo apt-get install fakeroot git perl clang-10.0 build-essential curl dpkg nvim
+# echo "export THEOS=~/theos" >> ~/.profile
+# git clone --recursive https://github.com/lechium/theos.git codegen $THEOS
+# curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/toolchain-linux.tar.gz
+# tar fxpz toolchain-linux.tar.gz -C $THEOS/toolchain
+# rm toolchain-linux.tar.gz
+
+if [[ "$(uname)" = "Linux" ]]; then
+	ON_LINUX=1
+	sudo echo "deb http://apt.llvm.org/eoan/ llvm-toolchain-eoan-10 main" >> /etc/apt/sources.list
+	sudo apt-get update
+	sudo apt-get install fakeroot git perl clang-10.0 build-essential curl dpkg nvim
+	echo "export THEOS=~/theos" >> ~/.profile
+	source ~/.profile
+	git clone --recursive https://github.com/lechium/theos.git codegen $THEOS
+	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/toolchain-linux.tar.gz
+	tar fxpz toolchain-linux.tar.gz -C $THEOS/toolchain
+	sudo gem install xcpretty
+fi
+
 
 ## Essentials 
 
