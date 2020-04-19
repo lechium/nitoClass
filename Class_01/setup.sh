@@ -43,7 +43,7 @@ if [[ "$(uname)" = "Linux" ]]; then
 	sudo gem install xcpretty
 	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 	mkdir -p ~/.config/nvim
-	pushd ~/.config/nvrim
+	pushd ~/.config/nvim
 	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/nvim/init.vim
 	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/nvim/ycm_extra_conf.py
 	popd
