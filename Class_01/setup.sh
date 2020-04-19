@@ -29,7 +29,7 @@ if [[ "$(uname)" = "Linux" ]]; then
 	sudo apt-add-repository 'deb http://apt.llvm.org/eoan/ llvm-toolchain-eoan-10 main'
 	sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 15CF4D18AF4F7421
 	sudo apt-get update
-	sudo apt-get install fakeroot git perl clang-10 build-essential curl dpkg neovim python3.8 exuberant-ctags
+	sudo apt-get install fakeroot git perl clang-10 build-essential curl dpkg neovim python3.7-dev exuberant-ctags cmake
 	echo "export THEOS=~/theos" >> ~/.profile
 	source ~/.profile
 	git clone --recursive https://github.com/lechium/theos.git -b codegen $THEOS
