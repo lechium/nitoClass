@@ -2,7 +2,7 @@ let mapleader = ","
 let g:ycm_use_clangd = 0
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_global_ycm_extra_conf = expand('~/.config/nvim/ycm_extra_conf.py')
-let g:ycm_server_python_interpreter = "/usr/local/bin/python3"
+let g:ycm_server_python_interpreter = "/usr/bin/python3"
 let g:ycm_extra_conf_vim_data = ['&filetype']
 if ! filereadable(expand('~/.config/nvim/autoload/plug.vim'))
 	echo "Downloading junegunn/vim-plug to manage plugins..."

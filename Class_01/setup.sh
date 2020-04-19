@@ -62,6 +62,7 @@ if [[ "$(uname)" = "Linux" ]]; then
 	sed -i 's|-Werror||g' CMakeLists.txt
 	echo "Making xcbuild..."
 	make
+	echo "to finish installing neovim and YouCompleteMe you must first run nvim :PlugInstall and then '~/.config/nvim/plugged/YouCompleteMe/install.py --clang-completer'"
 	#pushd ~/.config/nvim/plugged/YouCompleteMe
 	#./install.py
 	exit 0
