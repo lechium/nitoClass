@@ -47,6 +47,8 @@ if [[ "$(uname)" = "Linux" ]]; then
 	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/nvim/init.vim
 	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/nvim/ycm_extra_conf.py
 	popd
+	#pushd ~/.config/nvim/plugged/YouCompleteMe
+	#./install.py
 	exit 0
 fi
 
