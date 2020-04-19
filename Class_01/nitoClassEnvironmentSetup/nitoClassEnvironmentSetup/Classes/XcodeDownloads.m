@@ -38,7 +38,10 @@
     }
     return self;
 }
-
+//https://download.developer.apple.com/Developer_Tools/Xcode_11.4.1/Xcode_11.4.1.xip
+//https://download.developer.apple.com/Developer_Tools/Command_Line_Tools_for_Xcode_11.4.1/Command_Line_Tools_for_Xcode_11.4.1.dmg
+//shasum for cli tools = 4d833db60acb13fc7a4dc237ed9fe487c98cf3c9 size = 260365974
+//shasum for xcode.xip = 32a106e48c9907cd230d6a27e923e9aaf6685358 size = 8108773540
 - (void)_populateInfo {
     
     switch (_sytemVersion) {
