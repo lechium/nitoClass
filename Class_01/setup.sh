@@ -25,7 +25,8 @@
 
 if [[ "$(uname)" = "Linux" ]]; then
 	ON_LINUX=1
-	sudo echo "deb http://apt.llvm.org/eoan/ llvm-toolchain-eoan-10 main" >> /etc/apt/sources.list
+	echo "on linux!"
+	sudo "echo 'deb http://apt.llvm.org/eoan/ llvm-toolchain-eoan-10 main' >> /etc/apt/sources.list"
 	sudo apt-get update
 	sudo apt-get install fakeroot git perl clang-10.0 build-essential curl dpkg nvim
 	echo "export THEOS=~/theos" >> ~/.profile
@@ -34,6 +35,7 @@ if [[ "$(uname)" = "Linux" ]]; then
 	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/toolchain-linux.tar.gz
 	tar fxpz toolchain-linux.tar.gz -C $THEOS/toolchain
 	sudo gem install xcpretty
+	exit 0
 fi
 
 
