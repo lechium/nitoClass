@@ -30,7 +30,7 @@ if [[ "$(uname)" = "Linux" ]]; then
 	sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 15CF4D18AF4F7421
 	sudo apt-get update
 	echo "Installing packages through apt..."
-	sudo apt-get install fakeroot git perl clang-10 build-essential curl dpkg neovim python3.7-dev exuberant-ctags cmake libpng-dev libpng16-16 libxml2-dev pkg-config ninja-build
+	sudo apt-get install fakeroot git perl clang-10 build-essential curl dpkg neovim python3.7-dev exuberant-ctags cmake libpng-dev libpng16-16 libxml2-dev pkg-config ninja-build ruby
 	echo "export THEOS=~/theos" >> ~/.profile
 	echo 'export PATH=$PATH:$THEOS/bin:~/xcbuild/build/' >> ~/.profile
 	source ~/.profile
