@@ -49,6 +49,10 @@ if [[ "$(uname)" = "Linux" ]]; then
 		echo "CentOS $VID..."
 		sudo yum install git perl curl ctags cmake python3 ruby libpng wget libxml2 clang pkg-config vim lsb python3-devel
 		sudo yum groupinstall 'Development Tools'
+	elif [[ $ID == "fedora" ]]; then
+		echo "Fedora $VID..."
+		sudo yum install git perl curl ctags cmake python3 ruby libpng wget libxml2 clang pkg-config vim lsb python3-devel
+		sudo yum groupinstall 'Development Tools'
 	else
 		echo "UnKnown flavor of Linux $ALL ..."
 		exit 1
