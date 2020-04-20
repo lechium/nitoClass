@@ -38,9 +38,11 @@ if [[ "$(uname)" = "Linux" ]]; then
 	git clone --recursive https://github.com/lechium/theos.git -b codegen $THEOS
 	echo "Installing toolchain..."
 	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/toolchain-linux.tar.gz
-	tar fxz toolchain-linux.tar.gz -C $THEOS/toolchain
-	ln -s $THEOS/toolchain/linux/appletv ~/cctools
-	chmod -R +x $THEOS/toolchain/linux/appletv/bin 
+	mkdir $THEOS/toolchain/linux 
+	sudo mkdir -p /opt/local
+	sudo tar fxz toolchain-linux.tar.gz -C /opt/local/
+	ln -s /opt/local/toolchain $THEOS/toolchain/linux/appletv
+	#chmod -R +x $THEOS/toolchain/linux/appletv/bin 
 	rm -rf $THEOS/sdks
 	pushd $THEOS
 	echo "Cloning SDKs..."
