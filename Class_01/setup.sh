@@ -29,6 +29,7 @@ if [[ "$(uname)" = "Linux" ]]; then
 	ALL=`uname -a`
 	ID=`cat /etc/os-release | grep -m 1 ID | cut -d = -f 2 | tr -d \"`
 	VID=`cat /etc/os-release | grep -m 1 VERSION_ID | cut -d = -f 2 | tr -d \"`
+	VC=`cat /etc/os-release | grep -m 1 VERSION_CODENAME | cut -d = -f 2 | tr -d \"`
 	echo "ID: $ID"
 	echo "VID: $VID"
 	if [[ $ALL == *"ARCH"* ]]; then
@@ -36,8 +37,8 @@ if [[ "$(uname)" = "Linux" ]]; then
 		sudo pacman -S git perl curl dpkg neovim "python>=3.7" ctags cmake ruby libpng ninja python-pynvim python2 libxml2
 		exit 1 # for now
 	elif [[ $ALL == *"Ubuntu"* ]]; then
-		echo "Ubuntu! hoping its eoan..."
-		sudo apt-add-repository 'deb http://apt.llvm.org/eoan/ llvm-toolchain-eoan-10 main'
+		echo "Ubuntu! its $VC..."
+		sudo apt-add-repository "deb http://apt.llvm.org/$VC/ llvm-toolchain-$VC-10 main"
 		sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 15CF4D18AF4F7421
 		sudo apt-get update
 		echo "Installing packages through apt..."
