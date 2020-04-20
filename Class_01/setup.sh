@@ -33,7 +33,10 @@ if [[ "$(uname)" = "Linux" ]]; then
 	echo "ID: $ID"
 	if [[ $ID == "arch" ]]; then
 		echo "ArchLinux"
-		sudo pacman -S git perl curl dpkg neovim "python>=3.7" ctags cmake ruby libpng ninja python-pynvim python2 wget libxml2
+		sudo pacman-key --refresh-keys
+		sudo pacman -Sy archlinux-keyring
+		sudo pacman -Su
+		sudo pacman -S git perl curl dpkg neovim "python>=3.7" ctags cmake ruby libpng ninja python-pynvim python2 wget libxml2 clang
 		exit 1 # for now
 	elif [[ $ID == "ubuntu" ]]; then
 		echo "Ubuntu $VID ($VC)..."
@@ -42,6 +45,10 @@ if [[ "$(uname)" = "Linux" ]]; then
 		sudo apt-get update
 		echo "Installing packages through apt..."
 		sudo apt-get install fakeroot git perl clang-10 build-essential curl dpkg neovim python3.7-dev exuberant-ctags cmake libpng-dev libpng16-16 libxml2-dev pkg-config ninja-build ruby
+	elif [[ $ID == "centos" ]]; then
+		echo "CentOS $VID..."
+		sudo yum install git perl curl ctags cmake python3 ruby libpng wget libxml2 clang pkg-config vim lsb
+		sudo yum groupinstall 'Development Tools'
 	else
 		echo "UnKnown flavor of Linux $ALL ..."
 		exit 1
