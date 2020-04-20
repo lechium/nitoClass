@@ -47,11 +47,11 @@ if [[ "$(uname)" = "Linux" ]]; then
 		sudo apt-get install fakeroot git perl clang-10 build-essential curl dpkg neovim python3.7-dev exuberant-ctags cmake libpng-dev libpng16-16 libxml2-dev pkg-config ninja-build ruby
 	elif [[ $ID == "centos" ]]; then
 		echo "CentOS $VID..."
-		sudo yum install git perl curl ctags cmake python3 ruby libpng wget libxml2 clang pkg-config vim lsb python3-devel
+		sudo yum install git perl curl ctags cmake python3 ruby libpng wget libxml2 clang pkg-config vim lsb python3-devel python2 python2-devel neovim
 		sudo yum groupinstall 'Development Tools'
 	elif [[ $ID == "fedora" ]]; then
 		echo "Fedora $VID..."
-		sudo yum install git perl curl ctags cmake python3 ruby libpng wget libxml2 clang pkg-config vim lsb python3-devel
+		sudo yum install git perl curl ctags cmake python3 ruby libpng wget libxml2 clang pkg-config vim lsb python3-devel python2 python2-devel neovim
 		sudo yum groupinstall 'Development Tools'
 	else
 		echo "UnKnown flavor of Linux $ALL ..."
@@ -63,7 +63,7 @@ if [[ "$(uname)" = "Linux" ]]; then
 	echo "Cloning theos..."
 	git clone --recursive https://github.com/lechium/theos.git -b codegen $THEOS
 	echo "Installing toolchain..."
-	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/toolchain-linux.tar.gz
+	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/toolchain-8.tar.gz
 	mkdir $THEOS/toolchain/linux 
 	sudo mkdir -p /opt/local
 	sudo tar fxz toolchain-linux.tar.gz -C /opt/local/
@@ -81,6 +81,8 @@ if [[ "$(uname)" = "Linux" ]]; then
 	echo "Installing xcpretty..."
 	sudo gem install xcpretty
 	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+	echo 'eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)' >> /home/osboxes/.bash_profile
+	eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
 	echo "Configuring nvim..."
 	mkdir -p ~/.config/nvim
 	pushd ~/.config/nvim
@@ -91,7 +93,7 @@ if [[ "$(uname)" = "Linux" ]]; then
 	ninja=`which ninja`
 	if [[ -z "$ninja" ]]; then
 		echo "Installing ninja, dpkg and neovim!"
-		brew install ninja dpkg neovim	
+		brew install ninja dpkg	
 	fi
 	echo "Cloning xcbuild..."
 	git clone --depth=1 https://github.com/facebook/xcbuild
