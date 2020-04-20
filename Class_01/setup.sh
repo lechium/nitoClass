@@ -64,7 +64,11 @@ if [[ "$(uname)" = "Linux" ]]; then
 	sudo mkdir -p /opt/local
 	sudo tar fxz toolchain-linux.tar.gz -C /opt/local/
 	ln -s /opt/local/toolchain $THEOS/toolchain/linux/appletv
-	#chmod -R +x $THEOS/toolchain/linux/appletv/bin 
+
+	## kabirs toolchain just in case
+	curl https://kabiroberai.com/toolchain/download.php?toolchain=ios-linux -Lo toolchain.tar.gz
+ 	tar xzf toolchain.tar.gz -C $THEOS/toolchain
+ 	rm toolchain.tar.gz
 	rm -rf $THEOS/sdks
 	pushd $THEOS
 	echo "Cloning SDKs..."
@@ -79,6 +83,12 @@ if [[ "$(uname)" = "Linux" ]]; then
 	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/nvim/init.vim
 	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/nvim/ycm_extra_conf.py
 	popd
+	echo "Checking for ninja..."
+	ninja=`which ninja`
+	if [[ -z "$ninja" ]]; then
+		echo "Installing ninja, dpkg and neovim!"
+		brew install ninja dpkg neovim	
+	fi
 	echo "Cloning xcbuild..."
 	git clone --depth=1 https://github.com/facebook/xcbuild
 	cd xcbuild
