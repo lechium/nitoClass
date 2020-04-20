@@ -47,7 +47,7 @@ if [[ "$(uname)" = "Linux" ]]; then
 		sudo apt-get install fakeroot git perl clang-10 build-essential curl dpkg neovim python3.7-dev exuberant-ctags cmake libpng-dev libpng16-16 libxml2-dev pkg-config ninja-build ruby
 	elif [[ $ID == "centos" ]]; then
 		echo "CentOS $VID..."
-		sudo yum install git perl curl ctags cmake python3 ruby libpng wget libxml2 clang pkg-config vim lsb
+		sudo yum install git perl curl ctags cmake python3 ruby libpng wget libxml2 clang pkg-config vim lsb python3-devel
 		sudo yum groupinstall 'Development Tools'
 	else
 		echo "UnKnown flavor of Linux $ALL ..."
@@ -72,7 +72,7 @@ if [[ "$(uname)" = "Linux" ]]; then
 	popd
 	echo "Installing xcpretty..."
 	sudo gem install xcpretty
-	#/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 	echo "Configuring nvim..."
 	mkdir -p ~/.config/nvim
 	pushd ~/.config/nvim
