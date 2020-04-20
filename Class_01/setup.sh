@@ -26,11 +26,22 @@
 if [[ "$(uname)" = "Linux" ]]; then
 	ON_LINUX=1
 	echo "on linux!"
-	sudo apt-add-repository 'deb http://apt.llvm.org/eoan/ llvm-toolchain-eoan-10 main'
-	sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 15CF4D18AF4F7421
-	sudo apt-get update
-	echo "Installing packages through apt..."
-	sudo apt-get install fakeroot git perl clang-10 build-essential curl dpkg neovim python3.7-dev exuberant-ctags cmake libpng-dev libpng16-16 libxml2-dev pkg-config ninja-build ruby
+	ALL=`uname -a`
+	if [[ $ALL == *"ARCH"* ]]; then
+		echo "ArchLinux"
+		sudo pacman -S git perl curl dpkg neovim "python>=3.7" ctags cmake ruby libpng ninja python-pynvim python2 libxml2
+		exit 1 # for now
+	elif [[ $ALL == *"Ubuntu"* ]]; then
+		echo "Ubuntu! hoping its eoan..."
+		sudo apt-add-repository 'deb http://apt.llvm.org/eoan/ llvm-toolchain-eoan-10 main'
+		sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 15CF4D18AF4F7421
+		sudo apt-get update
+		echo "Installing packages through apt..."
+		sudo apt-get install fakeroot git perl clang-10 build-essential curl dpkg neovim python3.7-dev exuberant-ctags cmake libpng-dev libpng16-16 libxml2-dev pkg-config ninja-build ruby
+	else
+		echo "UnKnown flavor of Linux $ALL ..."
+		exit 1
+	fi
 	echo "export THEOS=~/theos" >> ~/.profile
 	echo 'export PATH=$PATH:$THEOS/bin:~/xcbuild/build/' >> ~/.profile
 	source ~/.profile
