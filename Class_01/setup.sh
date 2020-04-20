@@ -31,7 +31,6 @@ if [[ "$(uname)" = "Linux" ]]; then
 	VID=`cat /etc/os-release | grep -m 1 VERSION_ID | cut -d = -f 2 | tr -d \"`
 	VC=`cat /etc/os-release | grep -m 1 VERSION_CODENAME | cut -d = -f 2 | tr -d \"`
 	echo "ID: $ID"
-	echo "VID: $VID"
 	if [[ $ID == "arch" ]]; then
 		echo "ArchLinux"
 		sudo pacman -S git perl curl dpkg neovim "python>=3.7" ctags cmake ruby libpng ninja python-pynvim python2 wget libxml2
