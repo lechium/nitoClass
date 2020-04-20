@@ -27,6 +27,10 @@ if [[ "$(uname)" = "Linux" ]]; then
 	ON_LINUX=1
 	echo "on linux!"
 	ALL=`uname -a`
+	ID=`cat /etc/os-release | grep -m 1 ID | cut -d = -f 2 | tr -d \"`
+	VID=`cat /etc/os-release | grep -m 1 VERSION_ID | cut -d = -f 2 | tr -d \"`
+	echo "ID: $ID"
+	echo "VID: $VID"
 	if [[ $ALL == *"ARCH"* ]]; then
 		echo "ArchLinux"
 		sudo pacman -S git perl curl dpkg neovim "python>=3.7" ctags cmake ruby libpng ninja python-pynvim python2 libxml2
