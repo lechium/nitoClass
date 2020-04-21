@@ -66,7 +66,7 @@ if [[ "$(uname)" = "Linux" ]]; then
 	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/toolchain-8.tar.gz
 	mkdir $THEOS/toolchain/linux 
 	sudo mkdir -p /opt/local
-	sudo tar fxz toolchain-linux.tar.gz -C /opt/local/
+	sudo tar fxz toolchain-8.tar.gz -C /opt/local/
 	ln -s /opt/local/toolchain $THEOS/toolchain/linux/appletv
 
 	## kabirs toolchain just in case
