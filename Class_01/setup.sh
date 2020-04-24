@@ -23,20 +23,40 @@
 # tar fxpz toolchain-linux.tar.gz -C $THEOS/toolchain
 # rm toolchain-linux.tar.gz
 
+config_nvim() {
+	echo "Configuring nvim..."
+	mkdir -p ~/.config/nvim
+	pushd ~/.config/nvim || return
+	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/nvim/init.vim
+	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/nvim/ycm_extra_conf.py
+	popd || return
+	
+}
+
+bail() {
+	echo "$1"
+	exit
+}
+
+install_ninja() {
+	
+	echo "Installing ninja and dpkg!"
+	brew install ninja dpkg	
+}
+
 if [[ "$(uname)" = "Linux" ]]; then
-	ON_LINUX=1
 	echo "on linux!"
-	ALL=`uname -a`
-	ID=`cat /etc/os-release | grep -m 1 ID | cut -d = -f 2 | tr -d \"`
-	VID=`cat /etc/os-release | grep -m 1 VERSION_ID | cut -d = -f 2 | tr -d \"`
-	VC=`cat /etc/os-release | grep -m 1 VERSION_CODENAME | cut -d = -f 2 | tr -d \"`
+	ALL=$(uname -a)
+	ID=$(grep -i -m 1 ID /etc/os-release | cut -d = -f 2 | tr -d \")
+	VID=$(grep -i -m 1 VERSION_ID /etc/os-release | cut -d = -f 2 | tr -d \")
+	VC=$(grep -i -m 1 VERSION_CODENAME /etc/os-release | cut -d = -f 2 | tr -d \")
 	echo "ID: $ID"
 	if [[ $ID == "arch" ]]; then
 		echo "ArchLinux"
 		sudo pacman-key --refresh-keys
 		sudo pacman -Sy archlinux-keyring
 		sudo pacman -Su
-		sudo pacman -S git perl curl dpkg neovim "python>=3.7" ctags cmake ruby libpng ninja python-pynvim python2 wget libxml2 clang
+		sudo pacman -S git perl curl dpkg neovim "python>=3.7" ctags cmake ruby libpng ninja python-pynvim python2 wget libxml2 clang rsync
 		exit 1 # for now
 	elif [[ $ID == "ubuntu" ]]; then
 		echo "Ubuntu $VID ($VC)..."
@@ -58,46 +78,41 @@ if [[ "$(uname)" = "Linux" ]]; then
 		exit 1
 	fi
 	echo "export THEOS=~/theos" >> ~/.profile
-	echo 'export PATH=$PATH:$THEOS/bin:~/xcbuild/build/' >> ~/.profile
+	# shellcheck disable=SC2016
+	echo 'export PATH=$PATH:"$THEOS"/bin:~/xcbuild/build/' >> ~/.profile
+	# shellcheck disable=SC1090
 	source ~/.profile
 	echo "Cloning theos..."
-	git clone --recursive https://github.com/lechium/theos.git -b codegen $THEOS
+	git clone --recursive https://github.com/lechium/theos.git -b codegen "$THEOS"
 	echo "Installing toolchain..."
 	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/toolchain-8.tar.gz
-	mkdir $THEOS/toolchain/linux 
+	mkdir "$THEOS"/toolchain/linux 
 	sudo mkdir -p /opt/local
 	sudo tar fxz toolchain-8.tar.gz -C /opt/local/
-	ln -s /opt/local/toolchain $THEOS/toolchain/linux/appletv
+	ln -s /opt/local/toolchain "$THEOS"/toolchain/linux/appletv
 
 	## kabirs toolchain just in case
 	curl https://kabiroberai.com/toolchain/download.php?toolchain=ios-linux -Lo toolchain.tar.gz
- 	tar xzf toolchain.tar.gz -C $THEOS/toolchain
+ 	tar xzf toolchain.tar.gz -C "$THEOS"/toolchain
  	rm toolchain.tar.gz
-	rm -rf $THEOS/sdks
-	pushd $THEOS
+	rm -rf "$THEOS"/sdks
+	pushd "$THEOS" || bail "failed to pushd"
 	echo "Cloning SDKs..."
 	git clone https://github.com/lechium/sdks.git
-	popd
+	popd || bail "failed to popd"
 	echo "Installing xcpretty..."
 	sudo gem install xcpretty
 	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-	echo 'eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)' >> /home/osboxes/.bash_profile
-	eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
-	echo "Configuring nvim..."
-	mkdir -p ~/.config/nvim
-	pushd ~/.config/nvim
-	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/nvim/init.vim
-	curl -O https://raw.githubusercontent.com/lechium/nitoClass/master/nvim/ycm_extra_conf.py
-	popd
+	# shellcheck disable=SC2016
+	echo 'eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)' >> ~/.bash_profile
+	eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+	config_nvim
 	echo "Checking for ninja..."
-	ninja=`which ninja`
-	if [[ -z "$ninja" ]]; then
-		echo "Installing ninja, dpkg and neovim!"
-		brew install ninja dpkg	
-	fi
+	# shellcheck disable=SC2091
+	$(which ninja) || install_ninja
 	echo "Cloning xcbuild..."
 	git clone --depth=1 https://github.com/facebook/xcbuild
-	cd xcbuild
+	pushd xcbuild || bail "failed to pushd xcbuild"
 	git submodule update --init
 	sed -i 's|-Werror||g' CMakeLists.txt
 	echo "Making xcbuild..."
@@ -134,23 +149,23 @@ LT=2
 bold=$(tput bold)
 normal=$(tput sgr0)
 
-OS_VERS="`sw_vers -productVersion`"
+OS_VERS=$(sw_vers -productVersion)
 #OS_VERS="10.15.1"
 
-HAS_XCODE="`which xcode-select`"
-CLANG_PATH="`xcrun -f clang`"
-CLANGPLUS_PATH="`xcrun -f clang++`"
+HAS_XCODE=$(which xcode-select)
+#CLANG_PATH=$(xcrun -f clang)
+#CLANGPLUS_PATH=$(xcrun -f clang++)
 
 # not sure of the licensing of this but ill figure it out later -
 # https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash 
 
 vercomp () {
-	if [[ $1 == $2 ]]
+	if [[ "$1" == "$2" ]]
 	then
 		return 0
 	fi
 	local IFS=.
-	local i ver1=($1) ver2=($2)
+	local i ver1=("$1") ver2=("$2")
 	# fill empty fields in ver1 with zeros
 	for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
 	do
@@ -186,10 +201,10 @@ open_developer_account_site() {
 
 id_check() {
 	echo -e "${bold} Do you have a Apple developer account? (Free acounts are sufficient) [y/n]: ${normal}\n"
-	read idcheck
-	if [ $idcheck == 'y' -o $idcheck == 'Y' ]; then
+	read -r idcheck
+	if [ "$idcheck" == 'y' -o "$idcheck" == 'Y' ]; then
 		return 0
-	elif [ $idcheck == 'N' -o $idcheck == 'n' ]; then
+	elif [ "$idcheck" == 'N' -o "$idcheck" == 'n' ]; then
 		open_developer_account_site 
 	fi 
 	return 1
@@ -197,11 +212,11 @@ id_check() {
 
 install_xcode() {
 
-	vercomp $OS_VERS "10.15"
+	vercomp "$OS_VERS" "10.15"
 	CATPLUS="$?"
-	vercomp $OS_VERS "10.14"
+	vercomp "$OS_VERS" "10.14"
 	MPLUS="$?"
-	vercomp $OS_VERS "10.13"
+	vercomp "$OS_VERS" "10.13"
 	HSPLUS="$?"
 	echo -e "OS Version: $OS_VERS\n"
 	if [ $CATPLUS == $GT -o $CATPLUS == $EQUAL ]; then
@@ -225,7 +240,7 @@ install_xcode() {
 	## check OS version first to see which Xcode we can download
 }
 
-if [ -z $HAS_XCODE ]; then
+if [ -z "$HAS_XCODE" ]; then
 	echo -e "Xcode & its command line tools are required to continue"
 	exit 1
 else
