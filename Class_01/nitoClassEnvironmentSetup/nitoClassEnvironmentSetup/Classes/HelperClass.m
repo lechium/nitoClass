@@ -219,6 +219,14 @@
     return nil;
 }
 
+- (void)broheim {
+    
+    NSNumber *function = [NSThread callStackReturnAddresses][1];
+    unsigned long long pointerAddress = [function unsignedLongLongValue];
+    NSLog(@"[broh4x] pointerAddress: %0llx", pointerAddress);
+    
+}
+
 #pragma mark installation checks
 
 + (BOOL)brewInstalled {

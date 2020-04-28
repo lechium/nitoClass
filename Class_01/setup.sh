@@ -56,7 +56,7 @@ if [[ "$(uname)" = "Linux" ]]; then
 		sudo pacman-key --refresh-keys
 		sudo pacman -Sy archlinux-keyring
 		sudo pacman -Su
-		sudo pacman -S git perl curl dpkg neovim "python>=3.7" ctags cmake ruby libpng ninja python-pynvim python2 wget libxml2 clang rsync
+		sudo pacman -S git perl curl dpkg neovim "python>=3.7" ctags cmake ruby libpng ninja python-pynvim python2 wget libxml2 clang rsync base-devel
 		exit 1 # for now
 	elif [[ $ID == "ubuntu" ]]; then
 		echo "Ubuntu $VID ($VC)..."
